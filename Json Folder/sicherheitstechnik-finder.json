@@ -1,0 +1,3428 @@
+{
+  "category": {
+    "id": 1126,
+    "name": "Sicherheitstechnik",
+    "slug": "sicherheitstechnik",
+    "url": "https://edelstahl-tuerklingel.de/sicherheitstechnik"
+  },
+  "note": "Products (variation parents + standalone) across the category and its whole subcategory branch, deduped by product. Each model's characteristics are aggregated across its variants (full option space). Prices are indicative gross (net x 1.19). Use filter_dimensions as the value universe for a guided finder. Merkmale are ordered by how many models use them (most useful filters first). Enriched (tuersprechanlagen-finder approach): cross_sell ({sku,name}), finder_facets (key Merkmale + Preisklasse per model), decision_tree, and finder_guide.",
+  "count": 51,
+  "models_per_category": {
+    "Sicherheitstechnik": 37,
+    "IP Kameras": 18,
+    "Anschlussdosen & Zubehör": 10,
+    "Alarmanlagen": 8,
+    "IP Kamera Sets": 6,
+    "Dual-Objektiv Kameras": 6,
+    "Videorekorder": 4,
+    "WLAN Kameras": 3,
+    "EasyLink WLAN Sets": 2
+  },
+  "filter_dimensions": {
+    "Auflösung": [
+      "4 MP",
+      "2 MP",
+      "8 MP [4K]",
+      "6 MP"
+    ],
+    "Nachtsicht": [
+      "Farbe",
+      "SW"
+    ],
+    "PTZ-Funktion": [
+      "Ja",
+      "Nein"
+    ],
+    "POE": [
+      "Ja"
+    ],
+    "Marke": [
+      "Hilook",
+      "Hikvision"
+    ],
+    "Speicherart": [
+      "Intern",
+      "Cloud",
+      "Extern"
+    ],
+    "Farbe": [
+      "Weiß"
+    ]
+  },
+  "products": [
+    {
+      "id": 40410,
+      "sku": "13588",
+      "name": "HiLook Anschlussdose DS-1280ZJ-DM8",
+      "categories": [
+        "Anschlussdosen & Zubehör"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 10.99,
+        "to": 10.99
+      },
+      "url": "https://edelstahl-tuerklingel.de/hilook-anschlussdose-ds-1280zj-dm8",
+      "short_description": "",
+      "cross_sell_count": 0,
+      "characteristics": {},
+      "cross_sell": [],
+      "finder_facets": {
+        "Preisklasse": "Einstieg (< 79 €)"
+      }
+    },
+    {
+      "id": 40409,
+      "sku": "42491",
+      "name": "HiLook Anschlussdose DS-1280ZJ-XS",
+      "categories": [
+        "Anschlussdosen & Zubehör"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 14.99,
+        "to": 14.99
+      },
+      "url": "https://edelstahl-tuerklingel.de/hilook-anschlussdose-ds-1280zj-xs",
+      "short_description": "",
+      "cross_sell_count": 0,
+      "characteristics": {},
+      "cross_sell": [],
+      "finder_facets": {
+        "Preisklasse": "Einstieg (< 79 €)"
+      }
+    },
+    {
+      "id": 37147,
+      "sku": "DS-1273ZJ-130-TRL",
+      "name": "HiLook DS-1273ZJ-130-TRL Wandhalterung mit Anschlussdose",
+      "categories": [
+        "Anschlussdosen & Zubehör"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 41.99,
+        "to": 41.99
+      },
+      "url": "https://edelstahl-tuerklingel.de/hilook-ds-1273zj-130-trl-wandhalterung-mit-anschlussdose",
+      "short_description": "Wandmontagehalterung für Dome-Kamera (mit Adapterplatte) Geeignet für die Wandmontage von Dome-Kameras Hikvision Weiß Werkstoff Aluminium-Legierung 900 g",
+      "cross_sell_count": 19,
+      "characteristics": {},
+      "cross_sell": [
+        {
+          "sku": "HN-AN-ES-200",
+          "name": "Metzler Hausnummer | Edelstahl | Modern | Anthrazitgrau | Höhe 20 cm"
+        },
+        {
+          "sku": "HS-Elbars-Str-AN",
+          "name": "Metzler Individuelle Hausnummer aus Edelstahl"
+        },
+        {
+          "sku": "anCE_HN_sa",
+          "name": "Metzler Hausnummernschild aus Edelstahl Anthrazitgrau RAL 7016"
+        },
+        {
+          "sku": "WEB-L-SO",
+          "name": "Namensschild in Anthrazit mit Lasergravur"
+        },
+        {
+          "sku": "HS-Elbars-AN",
+          "name": "Metzler modernes Hausnummernschild Edelstahl Anthrazit"
+        },
+        {
+          "sku": "Siebert",
+          "name": "Metzler Briefkasten aus hochwertigem Stahl | Siebert"
+        },
+        {
+          "sku": "Hermann",
+          "name": "Metzler Briefkasten mit Lasergravur | Hermann"
+        },
+        {
+          "sku": "Ebenhard",
+          "name": "Metzler Briefkasten austauschbares Namensschild | Ebenhard"
+        },
+        {
+          "sku": "ebenhard-BS",
+          "name": "Metzler Standbriefkasten aus hochwertigem Stahl | Siebert"
+        },
+        {
+          "sku": "Stencil27",
+          "name": "Metzler Briefkasten mit Lasergravur | Stencil"
+        },
+        {
+          "sku": "Modell-G",
+          "name": "Metzler Briefkasten Design | Modell-G"
+        },
+        {
+          "sku": "Stelio",
+          "name": "Metzler Briefkasten pulverbeschichtet | Lasergravur | Stelio"
+        },
+        {
+          "sku": "PBOX-BISPO2-1x",
+          "name": "Metzler Paketbox mit Briefkasten | personalisiert mit Gravur | Edelstahl-Namensschild | mit Briefeinwurf | Bispo 2"
+        },
+        {
+          "sku": "Avalon2",
+          "name": "Metzler Paketbox | personalisiert mit Gravur | Edelstahl-Namensschild | rostfrei & massiv | Avalon 2"
+        },
+        {
+          "sku": "MMB-1-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-3-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | in Holzoptik | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-4-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | Anthrazit RAL 7016 | aus Stahl | mit Sichtstreifen | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-2-2X",
+          "name": "Metzler Mülltonnenbox mit Pflanzdach | 2er | 240l | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-2-1X",
+          "name": "Metzler Mülltonnenbox mit Pflanzdach | 1er | 240l | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        }
+      ],
+      "finder_facets": {
+        "Preisklasse": "Einstieg (< 79 €)"
+      }
+    },
+    {
+      "id": 42084,
+      "sku": "13887",
+      "name": "HiLook EasyLink WLAN Kit | 2x 4 MP Bullet Überwachungskameras | WiFi NVS | Komplettset | Menschen- & Fahrzeugerkennung | Farbnachtsicht | 2-Wege-Audio | 24/7 Aufzeichnung | IKS-2044BH-PH/W",
+      "categories": [
+        "Sicherheitstechnik",
+        "EasyLink WLAN Sets"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 139.0,
+        "to": 139.0
+      },
+      "url": "https://edelstahl-tuerklingel.de/hilook-easylink-wlan-kit-2x-4-mp-bullet-ueberwachungskameras-wifi-nvs-komplettset-menschen-fahrzeugerkennung-farbnachtsicht-2-wege-audio-24-7-aufzeichnung-iks-2044bh-ph-w",
+      "short_description": "KI Personen- & Fahrzeugerkennung – benachrichtigt Sie sofort, wenn wirklich etwas Relevantes passiert Plug-&-Play-WLAN-Komplettset - komplette Einrichtung in unter 5 Minuten Kostenlose Smartphone App - kein Abo, keine Folgekosten, volle Kontrolle von überall aus 4MP Bullet Kameras mit Hybrid Light - 4 MP „ColorVu“-Farbnachtsicht – liefert auch bei Dunkelheit farbige, detailreiche Bilder statt klas",
+      "cross_sell_count": 0,
+      "characteristics": {
+        "Auflösung": [
+          "4 MP"
+        ]
+      },
+      "cross_sell": [],
+      "finder_facets": {
+        "Auflösung": [
+          "4 MP"
+        ],
+        "Preisklasse": "Mittelklasse (79–199 €)"
+      }
+    },
+    {
+      "id": 42083,
+      "sku": "13886",
+      "name": "HiLook EasyLink WLAN Kit | 4 MP Bullet + PT Turret Überwachungskameras | WiFi NVS | Komplettset | Menschen- & Fahrzeugerkennung | Farbnachtsicht | 2-Wege-Audio | 24/7 Aufzeichnung | IKS-2044BTH-PH/W",
+      "categories": [
+        "Sicherheitstechnik",
+        "EasyLink WLAN Sets"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 139.0,
+        "to": 139.0
+      },
+      "url": "https://edelstahl-tuerklingel.de/hilook-easylink-wlan-kit-4-mp-bullet-pt-turret-ueberwachungskameras-wifi-nvs-komplettset-menschen-fahrzeugerkennung-farbnachtsicht-2-wege-audio-24-7-aufzeichnung-iks-2044bth-ph-w",
+      "short_description": "KI Personen- & Fahrzeugerkennung – benachrichtigt Sie sofort, wenn wirklich etwas Relevantes passiert Plug-&-Play-WLAN-Komplettset - komplette Einrichtung in unter 5 Minuten Kostenlose Smartphone App - kein Abo, keine Folgekosten, volle Kontrolle von überall aus 4MP Bullet + PT Turret Kameras mit Hybrid Light - 4 MP „ColorVu“-Farbnachtsicht – liefert auch bei Dunkelheit farbige, detailreiche Bilde",
+      "cross_sell_count": 0,
+      "characteristics": {},
+      "cross_sell": [],
+      "finder_facets": {
+        "Preisklasse": "Mittelklasse (79–199 €)"
+      }
+    },
+    {
+      "id": 30376,
+      "sku": "VDM10-BULLET-CAM",
+      "name": "HiLook IP Bullet Kamera | FullHD | 2 MP | IR Nachtsicht | LAN + PoE",
+      "categories": [
+        "Sicherheitstechnik",
+        "IP Kameras"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 59.99,
+        "to": 59.99
+      },
+      "url": "https://edelstahl-tuerklingel.de/hilook-ip-bullet-kamera-fullhd-2-mp-ir-nachtsicht-lan-poe",
+      "short_description": "Die kompakte Kamera für den Außenbereich, kompatibel mit Metzler Intercom.",
+      "cross_sell_count": 19,
+      "characteristics": {
+        "Auflösung": [
+          "2 MP"
+        ]
+      },
+      "cross_sell": [
+        {
+          "sku": "HN-AN-ES-200",
+          "name": "Metzler Hausnummer | Edelstahl | Modern | Anthrazitgrau | Höhe 20 cm"
+        },
+        {
+          "sku": "HS-Elbars-Str-AN",
+          "name": "Metzler Individuelle Hausnummer aus Edelstahl"
+        },
+        {
+          "sku": "anCE_HN_sa",
+          "name": "Metzler Hausnummernschild aus Edelstahl Anthrazitgrau RAL 7016"
+        },
+        {
+          "sku": "WEB-L-SO",
+          "name": "Namensschild in Anthrazit mit Lasergravur"
+        },
+        {
+          "sku": "HS-Elbars-AN",
+          "name": "Metzler modernes Hausnummernschild Edelstahl Anthrazit"
+        },
+        {
+          "sku": "Siebert",
+          "name": "Metzler Briefkasten aus hochwertigem Stahl | Siebert"
+        },
+        {
+          "sku": "Hermann",
+          "name": "Metzler Briefkasten mit Lasergravur | Hermann"
+        },
+        {
+          "sku": "Ebenhard",
+          "name": "Metzler Briefkasten austauschbares Namensschild | Ebenhard"
+        },
+        {
+          "sku": "ebenhard-BS",
+          "name": "Metzler Standbriefkasten aus hochwertigem Stahl | Siebert"
+        },
+        {
+          "sku": "Stencil27",
+          "name": "Metzler Briefkasten mit Lasergravur | Stencil"
+        },
+        {
+          "sku": "Modell-G",
+          "name": "Metzler Briefkasten Design | Modell-G"
+        },
+        {
+          "sku": "Stelio",
+          "name": "Metzler Briefkasten pulverbeschichtet | Lasergravur | Stelio"
+        },
+        {
+          "sku": "PBOX-BISPO2-1x",
+          "name": "Metzler Paketbox mit Briefkasten | personalisiert mit Gravur | Edelstahl-Namensschild | mit Briefeinwurf | Bispo 2"
+        },
+        {
+          "sku": "Avalon2",
+          "name": "Metzler Paketbox | personalisiert mit Gravur | Edelstahl-Namensschild | rostfrei & massiv | Avalon 2"
+        },
+        {
+          "sku": "MMB-1-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-3-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | in Holzoptik | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-4-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | Anthrazit RAL 7016 | aus Stahl | mit Sichtstreifen | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-2-2X",
+          "name": "Metzler Mülltonnenbox mit Pflanzdach | 2er | 240l | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-2-1X",
+          "name": "Metzler Mülltonnenbox mit Pflanzdach | 1er | 240l | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        }
+      ],
+      "finder_facets": {
+        "Auflösung": [
+          "2 MP"
+        ],
+        "Preisklasse": "Einstieg (< 79 €)"
+      }
+    },
+    {
+      "id": 43294,
+      "sku": "DS-1281ZJ-M",
+      "name": "HiLook Schräge Deckenhalterung DS-1281ZJ-M",
+      "categories": [
+        "Anschlussdosen & Zubehör"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 38.99,
+        "to": 38.99
+      },
+      "url": "https://edelstahl-tuerklingel.de/hilook-schraege-deckenhalterung-ds-1281zj-m",
+      "short_description": "Schräge Deckenhalterung für Dome-Kamera Geeignet für die Wandmontage von Dome-Kameras Hikvision Weiß Werkstoff Aluminium-Legierung 586 g",
+      "cross_sell_count": 19,
+      "characteristics": {},
+      "cross_sell": [
+        {
+          "sku": "HN-AN-ES-200",
+          "name": "Metzler Hausnummer | Edelstahl | Modern | Anthrazitgrau | Höhe 20 cm"
+        },
+        {
+          "sku": "HS-Elbars-AN",
+          "name": "Metzler modernes Hausnummernschild Edelstahl Anthrazit"
+        },
+        {
+          "sku": "HS-Elbars-Str-AN",
+          "name": "Metzler Individuelle Hausnummer aus Edelstahl"
+        },
+        {
+          "sku": "Avalon2",
+          "name": "Metzler Paketbox | personalisiert mit Gravur | Edelstahl-Namensschild | rostfrei & massiv | Avalon 2"
+        },
+        {
+          "sku": "MMB-2-1X",
+          "name": "Metzler Mülltonnenbox mit Pflanzdach | 1er | 240l | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "WEB-L-SO",
+          "name": "Namensschild in Anthrazit mit Lasergravur"
+        },
+        {
+          "sku": "Modell-G",
+          "name": "Metzler Briefkasten Design | Modell-G"
+        },
+        {
+          "sku": "Stencil27",
+          "name": "Metzler Briefkasten mit Lasergravur | Stencil"
+        },
+        {
+          "sku": "Hermann",
+          "name": "Metzler Briefkasten mit Lasergravur | Hermann"
+        },
+        {
+          "sku": "Ebenhard",
+          "name": "Metzler Briefkasten austauschbares Namensschild | Ebenhard"
+        },
+        {
+          "sku": "Siebert",
+          "name": "Metzler Briefkasten aus hochwertigem Stahl | Siebert"
+        },
+        {
+          "sku": "ebenhard-BS",
+          "name": "Metzler Standbriefkasten aus hochwertigem Stahl | Siebert"
+        },
+        {
+          "sku": "PBOX-BISPO2-1x",
+          "name": "Metzler Paketbox mit Briefkasten | personalisiert mit Gravur | Edelstahl-Namensschild | mit Briefeinwurf | Bispo 2"
+        },
+        {
+          "sku": "Stelio",
+          "name": "Metzler Briefkasten pulverbeschichtet | Lasergravur | Stelio"
+        },
+        {
+          "sku": "MMB-2-2X",
+          "name": "Metzler Mülltonnenbox mit Pflanzdach | 2er | 240l | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-3-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | in Holzoptik | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-4-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | Anthrazit RAL 7016 | aus Stahl | mit Sichtstreifen | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-1-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "anCE_HN_sa",
+          "name": "Metzler Hausnummernschild aus Edelstahl Anthrazitgrau RAL 7016"
+        }
+      ],
+      "finder_facets": {
+        "Preisklasse": "Einstieg (< 79 €)"
+      }
+    },
+    {
+      "id": 42494,
+      "sku": "13965",
+      "name": "HiLook by HIKVISION 4 MP Smart Hybrid Light Mini PT Netzwerkkamera PTZ-N2C400M-DE(B)",
+      "categories": [
+        "Sicherheitstechnik",
+        "IP Kameras"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 79.99,
+        "to": 79.99
+      },
+      "url": "https://edelstahl-tuerklingel.de/hilook-by-hikvision-4-mp-smart-hybrid-light-mini-pt-netzwerkkamera-ptz-n2c400m-deb",
+      "short_description": "PTZ-Funktion mit Auto-Tracking – Automatisches Verfolgen von Bewegungen und präziser Zoom für gezielte Objektverfolgung 4 MP Auflösung – Klare, detailreiche Aufnahmen bei Tag und Nacht für zuverlässige Überwachung Smart Hybrid Light (IR & Weißlicht, bis 30 m) – Automatische Umschaltung für optimale Nachtsicht in jeder Umgebung Integriertes Zwei-Wege-Audio & Alarmfunktionen – Direkte Kommunikation ",
+      "cross_sell_count": 0,
+      "characteristics": {
+        "Auflösung": [
+          "4 MP"
+        ],
+        "Nachtsicht": [
+          "Farbe"
+        ],
+        "PTZ-Funktion": [
+          "Ja"
+        ],
+        "POE": [
+          "Ja"
+        ]
+      },
+      "cross_sell": [],
+      "finder_facets": {
+        "Auflösung": [
+          "4 MP"
+        ],
+        "Nachtsicht": [
+          "Farbe"
+        ],
+        "PTZ-Funktion": [
+          "Ja"
+        ],
+        "Preisklasse": "Mittelklasse (79–199 €)"
+      }
+    },
+    {
+      "id": 42491,
+      "sku": "13962",
+      "name": "HiLook by HIKVISION 4 MP Smart Hybrid Light TandemVu PT Netzwerkkamera PTZ-N2D400M-DE/14",
+      "categories": [
+        "Sicherheitstechnik",
+        "IP Kameras"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 180.0,
+        "to": 180.0
+      },
+      "url": "https://edelstahl-tuerklingel.de/hilook-by-hikvision-4-mp-smart-hybrid-light-tandemvu-pt-netzwerkkamera-ptz-n2d400m-de-14",
+      "short_description": "Dual-Kamera-Technologie – Panorama- und PTZ-Einheit in einer Kamera für gleichzeitigen Gesamtüberblick und Detailansicht 4 MP Auflösung – Klare, detailreiche Aufnahmen bei Tag und Nacht für präzise Überwachung Auto-Tracking & Human Detection – Automatisches Verfolgen von Personen oder Fahrzeugen für intelligente Bewegungserkennung Smart Hybrid Light (IR & Weißlicht, bis 30 m) – Optimale Nachtsicht",
+      "cross_sell_count": 0,
+      "characteristics": {
+        "Auflösung": [
+          "4 MP"
+        ],
+        "Nachtsicht": [
+          "Farbe"
+        ],
+        "PTZ-Funktion": [
+          "Ja"
+        ],
+        "POE": [
+          "Ja"
+        ]
+      },
+      "cross_sell": [],
+      "finder_facets": {
+        "Auflösung": [
+          "4 MP"
+        ],
+        "Nachtsicht": [
+          "Farbe"
+        ],
+        "PTZ-Funktion": [
+          "Ja"
+        ],
+        "Preisklasse": "Mittelklasse (79–199 €)"
+      }
+    },
+    {
+      "id": 41270,
+      "sku": "13719",
+      "name": "HiLook by HIKVISION 4 MP WLAN PT Video Überwachungskamera | PTZ-N2C400I-W (2.8mm)",
+      "categories": [
+        "Sicherheitstechnik",
+        "WLAN Kameras"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 79.99,
+        "to": 79.99
+      },
+      "url": "https://edelstahl-tuerklingel.de/hilook-by-hikvision-4-mp-wlan-pt-video-ueberwachungskamera-ptz-n2c400i-w-28mm",
+      "short_description": "Hochauflösende Überwachung – 4 MP Netzwerkkamera mit gestochen scharfer Bildqualität Intelligente Erkennung – Unterstützt Personenerkennung, Fahrzeugerkennung und Auto-Tracking Lite Leistungsstarke Nachtsicht – EXIR 2.0 Infrarot-Technologie mit bis zu 30 m Reichweite Fernzugriff & Steuerung – Hik-Connect Cloud-Service und App für bequeme Überwachung Eingebaute Audiofunktion – Mikrofon & Lautsprech",
+      "cross_sell_count": 0,
+      "characteristics": {},
+      "cross_sell": [],
+      "finder_facets": {
+        "Preisklasse": "Mittelklasse (79–199 €)"
+      }
+    },
+    {
+      "id": 41266,
+      "sku": "13715",
+      "name": "HiLook by HIKVISION 4 MP WLAN Video Überwachungskamera Bullet | IPC-B140HA-D (2.8mm)",
+      "categories": [
+        "Sicherheitstechnik",
+        "WLAN Kameras"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 69.99,
+        "to": 69.99
+      },
+      "url": "https://edelstahl-tuerklingel.de/hilook-by-hikvision-4-mp-wlan-video-ueberwachungskamera-bullet-ipc-b140ha-d-28mm",
+      "short_description": "4 MP-Auflösung – Scharfe und detaillierte Videoaufnahmen für präzise Überwachung EXIR 2.0 Nachtsicht & wetterfest (IP66) – Klare Bilder bei Dunkelheit bis zu 30 m Reichweite, geschützt vor Wind und Wetter WLAN & microSD-Speicher bis 512 GB – Kabellose Installation und optional Speicherplatz für lokale Aufzeichnungen Zwei-Wege-Audio – Eingebautes Mikrofon und Lautsprecher ermöglichen direkte Kommun",
+      "cross_sell_count": 1,
+      "characteristics": {
+        "Auflösung": [
+          "4 MP"
+        ]
+      },
+      "cross_sell": [
+        {
+          "sku": "42491",
+          "name": "HiLook Anschlussdose DS-1280ZJ-XS"
+        }
+      ],
+      "finder_facets": {
+        "Auflösung": [
+          "4 MP"
+        ],
+        "Preisklasse": "Einstieg (< 79 €)"
+      }
+    },
+    {
+      "id": 41268,
+      "sku": "13717",
+      "name": "HiLook by HIKVISION 4 MP WLAN Video Überwachungskamera Dome | IPC-D140HA-D (2.8mm)",
+      "categories": [
+        "Sicherheitstechnik",
+        "WLAN Kameras"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 99.99,
+        "to": 99.99
+      },
+      "url": "https://edelstahl-tuerklingel.de/hilook-by-hikvision-4-mp-wlan-video-ueberwachungskamera-dome-ipc-d140ha-d-28mm",
+      "short_description": "4 MP-Auflösung – Scharfe und detaillierte Videoaufnahmen für präzise Überwachung EXIR 2.0 Nachtsicht & wetterfest (IP66) – Klare Bilder bei Dunkelheit bis 30 m Reichweite, geschützt vor Wind und Wetter WLAN & microSD-Speicher bis 512 GB – Kabellose Installation und optional Speicherplatz für lokale Aufzeichnungen Zwei-Wege-Audio – Eingebautes Mikrofon und Lautsprecher ermöglichen direkte Kommunika",
+      "cross_sell_count": 0,
+      "characteristics": {
+        "Auflösung": [
+          "4 MP"
+        ]
+      },
+      "cross_sell": [],
+      "finder_facets": {
+        "Auflösung": [
+          "4 MP"
+        ],
+        "Preisklasse": "Mittelklasse (79–199 €)"
+      }
+    },
+    {
+      "id": 40401,
+      "sku": "13579",
+      "name": "HiLook by HIKVISION 4K Video Überwachungskamera Bullet IPC-B180HA-LUF (2.8mm)",
+      "categories": [
+        "Sicherheitstechnik",
+        "IP Kameras"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 89.99,
+        "to": 89.99
+      },
+      "url": "https://edelstahl-tuerklingel.de/hilook-by-hikvision-4k-video-ueberwachungskamera-bullet-ipc-b180ha-luf-28mm",
+      "short_description": "8 MP / 4K Auflösung – Detailreiche und gestochen scharfe Bilder für höchste Sicherheitsansprüche Smart Hybrid Light – Intelligente Beleuchtung passt sich automatisch der Umgebung an Motion Detection 2.0 – Verbesserte Bewegungserkennung minimiert Fehlalarme Standalone oder mit NVR – Flexible Nutzung als Einzelgerät oder im Überwachungssystem Smartphone App – Live-Überwachung und Steuerung bequem pe",
+      "cross_sell_count": 1,
+      "characteristics": {
+        "Auflösung": [
+          "8 MP [4K]"
+        ]
+      },
+      "cross_sell": [
+        {
+          "sku": "42491",
+          "name": "HiLook Anschlussdose DS-1280ZJ-XS"
+        }
+      ],
+      "finder_facets": {
+        "Auflösung": [
+          "8 MP [4K]"
+        ],
+        "Preisklasse": "Mittelklasse (79–199 €)"
+      }
+    },
+    {
+      "id": 41771,
+      "sku": "13826",
+      "name": "HiLook by HIKVISION 4K Video Überwachungskamera Dome IPC-D180HA-LU (2.8mm)",
+      "categories": [
+        "Sicherheitstechnik",
+        "IP Kameras"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 89.99,
+        "to": 89.99
+      },
+      "url": "https://edelstahl-tuerklingel.de/hilook-by-hikvision-4k-video-ueberwachungskamera-dome-ipc-d180ha-lu-28mm",
+      "short_description": "Hohe Auflösung - 8 MP (3840 × 2160) für klare und detaillierte Bilder Smart Hybrid Light - Kombiniert IR- und Weißlicht für optimale Nachtsicht (bis zu 30 m) KI-gestützte Erkennung - Intelligente Erkennung von Personen und Fahrzeugen Schutzklasse IP67 & IK08 - Staub- und wasserfest, vandalismussicher Einfache Installation - Unterstützt PoE (Power over Ethernet) für weniger Kabelaufwand",
+      "cross_sell_count": 0,
+      "characteristics": {},
+      "cross_sell": [],
+      "finder_facets": {
+        "Preisklasse": "Mittelklasse (79–199 €)"
+      }
+    },
+    {
+      "id": 40402,
+      "sku": "13580",
+      "name": "HiLook by HIKVISION 4K Video Überwachungskamera Turret IPC-T280HA-LUF (2.8mm)",
+      "categories": [
+        "Sicherheitstechnik",
+        "IP Kameras"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 89.99,
+        "to": 89.99
+      },
+      "url": "https://edelstahl-tuerklingel.de/hilook-by-hikvision-4k-video-ueberwachungskamera-turret-ipc-t280ha-luf-28mm",
+      "short_description": "8 MP / 4K Auflösung – Detailreiche und gestochen scharfe Bilder für höchste Sicherheitsansprüche Smart Hybrid Light – Intelligente Beleuchtung passt sich automatisch der Umgebung an Motion Detection 2.0 – Verbesserte Bewegungserkennung minimiert Fehlalarme Standalone oder mit NVR – Flexible Nutzung als Einzelgerät oder im Überwachungssystem Smartphone App – Live-Überwachung und Steuerung bequem pe",
+      "cross_sell_count": 1,
+      "characteristics": {
+        "Auflösung": [
+          "8 MP [4K]"
+        ]
+      },
+      "cross_sell": [
+        {
+          "sku": "13588",
+          "name": "HiLook Anschlussdose DS-1280ZJ-DM8"
+        }
+      ],
+      "finder_facets": {
+        "Auflösung": [
+          "8 MP [4K]"
+        ],
+        "Preisklasse": "Mittelklasse (79–199 €)"
+      }
+    },
+    {
+      "id": 40405,
+      "sku": "IK28P-480B",
+      "name": "HiLook by HIKVISION 4K Überwachungskamera-Set | 4* 4K Bullet Kamera | Smart Hybrid Light | NVR 8-CH | 2 TB HDD | Smartphone App",
+      "categories": [
+        "Sicherheitstechnik",
+        "IP Kamera Sets"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 499.0,
+        "to": 499.0
+      },
+      "url": "https://edelstahl-tuerklingel.de/hilook-by-hikvision-4k-ueberwachungskamera-set-4-4k-bullet-kamera-smart-hybrid-light-nvr-8-ch-2-tb-hdd-smartphone-app",
+      "short_description": "Ultra-High-Definition 4K Auflösung: Gestochen scharfe Bilder und Videos mit der herausragenden 8 MP (4K) Auflösung, die jedes Detail erfasst KI Erkennungstechnologie: Mit integrierter Personen- und Fahrzeugerkennung erhalten Sie Echtzeit Warnmeldungen und reduzieren Fehlalarme Wetterfest und Robust: Durch Schutzklasse IP67 wasser- und staubdicht, ideal für den Einsatz im Freien Effiziente H.265+ V",
+      "cross_sell_count": 1,
+      "characteristics": {
+        "Auflösung": [
+          "8 MP [4K]"
+        ]
+      },
+      "cross_sell": [
+        {
+          "sku": "42491",
+          "name": "HiLook Anschlussdose DS-1280ZJ-XS"
+        }
+      ],
+      "finder_facets": {
+        "Auflösung": [
+          "8 MP [4K]"
+        ],
+        "Preisklasse": "Premium (> 199 €)"
+      }
+    },
+    {
+      "id": 40406,
+      "sku": "IK28P-480T",
+      "name": "HiLook by HIKVISION 4K Überwachungskamera-Set | 4* 4K Turret Kamera | Smart Hybrid Light | NVR 8-CH | 2 TB HDD | Smartphone App",
+      "categories": [
+        "Sicherheitstechnik",
+        "IP Kamera Sets"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 499.0,
+        "to": 499.0
+      },
+      "url": "https://edelstahl-tuerklingel.de/hilook-by-hikvision-4k-ueberwachungskamera-set-4-4k-turret-kamera-smart-hybrid-light-nvr-8-ch-2-tb-hdd-smartphone-app",
+      "short_description": "Hochauflösende 8 MP Bildqualität: Erfasst jedes Detail mit kristallklarer Bildqualität. Intelligente Erkennungstechnologie: Reduziert Fehlalarme durch präzise Mensch- und Fahrzeugerkennung. Robuste Bauweise: Mit Schutzklasse IP67 sind die Kameras wetterfest und ideal für den Außenbereich. Effiziente H.265+ Kompression: Spart Speicherplatz und Bandbreite ohne Einbußen bei der Bildqualität. Einfache",
+      "cross_sell_count": 1,
+      "characteristics": {
+        "Auflösung": [
+          "8 MP [4K]"
+        ]
+      },
+      "cross_sell": [
+        {
+          "sku": "13588",
+          "name": "HiLook Anschlussdose DS-1280ZJ-DM8"
+        }
+      ],
+      "finder_facets": {
+        "Auflösung": [
+          "8 MP [4K]"
+        ],
+        "Preisklasse": "Premium (> 199 €)"
+      }
+    },
+    {
+      "id": 40407,
+      "sku": "IK28P-460B",
+      "name": "HiLook by HIKVISION 6 MP Überwachungskamera-Set | 4* 6 MP Bullet Kamera | Smart Hybrid Light | NVR 8-CH | 2 TB HDD | Smartphone App",
+      "categories": [
+        "Sicherheitstechnik",
+        "IP Kamera Sets"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 429.0,
+        "to": 429.0
+      },
+      "url": "https://edelstahl-tuerklingel.de/hilook-by-hikvision-6-mp-ueberwachungskamera-set-4-6-mp-bullet-kamera-smart-hybrid-light-nvr-8-ch-2-tb-hdd-smartphone-app",
+      "short_description": "Hochauflösende 6 MP Bildqualität: Erfasst jedes Detail mit kristallklarer Bildqualität. Intelligente Erkennungstechnologie: Reduziert Fehlalarme durch präzise Mensch- und Fahrzeugerkennung. Robuste Bauweise: Mit Schutzklasse IP67 sind die Kameras wetterfest und ideal für den Außenbereich. Effiziente H.265+ Kompression: Spart Speicherplatz und Bandbreite ohne Einbußen bei der Bildqualität. Einfache",
+      "cross_sell_count": 1,
+      "characteristics": {
+        "Auflösung": [
+          "6 MP"
+        ]
+      },
+      "cross_sell": [
+        {
+          "sku": "42491",
+          "name": "HiLook Anschlussdose DS-1280ZJ-XS"
+        }
+      ],
+      "finder_facets": {
+        "Auflösung": [
+          "6 MP"
+        ],
+        "Preisklasse": "Premium (> 199 €)"
+      }
+    },
+    {
+      "id": 40408,
+      "sku": "IK28P-460T",
+      "name": "HiLook by HIKVISION 6 MP Überwachungskamera-Set | 4* 6 MP Turret Kamera | Smart Hybrid Light | NVR 8-CH | 2 TB HDD | Smartphone App",
+      "categories": [
+        "Sicherheitstechnik",
+        "IP Kamera Sets"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 429.0,
+        "to": 429.0
+      },
+      "url": "https://edelstahl-tuerklingel.de/hilook-by-hikvision-6-mp-ueberwachungskamera-set-4-6-mp-turret-kamera-smart-hybrid-light-nvr-8-ch-2-tb-hdd-smartphone-app",
+      "short_description": "Hochauflösende 6 MP Bildqualität: Erfasst jedes Detail mit kristallklarer Bildqualität. Intelligente Erkennungstechnologie: Reduziert Fehlalarme durch präzise Mensch- und Fahrzeugerkennung. Robuste Bauweise: Mit Schutzklasse IP67 sind die Kameras wetterfest und ideal für den Außenbereich. Effiziente H.265+ Kompression: Spart Speicherplatz und Bandbreite ohne Einbußen bei der Bildqualität. Einfache",
+      "cross_sell_count": 1,
+      "characteristics": {
+        "Auflösung": [
+          "6 MP"
+        ]
+      },
+      "cross_sell": [
+        {
+          "sku": "13588",
+          "name": "HiLook Anschlussdose DS-1280ZJ-DM8"
+        }
+      ],
+      "finder_facets": {
+        "Auflösung": [
+          "6 MP"
+        ],
+        "Preisklasse": "Premium (> 199 €)"
+      }
+    },
+    {
+      "id": 43096,
+      "sku": "DUAL-LENS-SET-IPC-B480HAD-LUF/SL",
+      "name": "HiLook by HIKVISION 8 MP Überwachungskamera-Set | 180° Sichtfeld | 4* 8 MP Bullet Kamera | Smart Hybrid Light | NVR 16-CH | 4 TB HDD | Smartphone App",
+      "categories": [
+        "Sicherheitstechnik",
+        "IP Kamera Sets",
+        "Dual-Objektiv Kameras"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 870.0,
+        "to": 870.0
+      },
+      "url": "https://edelstahl-tuerklingel.de/hilook-by-hikvision-8-mp-ueberwachungskamera-set-180-sichtfeld-4-8-mp-bullet-kamera-smart-hybrid-light-nvr-16-ch-4-tb-hdd-smartphone-app",
+      "short_description": "Hochauflösende 8 MP Netzwerkkamera mit Panorama-Weitwinkelobjektiv (180° Sichtfeld) für erstklassige Überwachungsbilder. Intelligente Personen- und Fahrzeugerkennung für erhöhte Sicherheit und schnelle Alarmierung. Smart Hybrid Light Technologie mit bis zu 30m IR- und Weißlichtbeleuchtung plus akustischem Alarm zur effektiven Abschreckung. Flexible Speicherung mit 2 SATA-Schnittstellen für bis zu ",
+      "cross_sell_count": 0,
+      "characteristics": {
+        "Auflösung": [
+          "8 MP [4K]"
+        ]
+      },
+      "cross_sell": [],
+      "finder_facets": {
+        "Auflösung": [
+          "8 MP [4K]"
+        ],
+        "Preisklasse": "Premium (> 199 €)"
+      }
+    },
+    {
+      "id": 43094,
+      "sku": "DUAL-LENS-SET-IPC-T280HAD-LUF/SL",
+      "name": "HiLook by HIKVISION 8 MP Überwachungskamera-Set | 180° Sichtfeld | 4* 8 MP Turret Kamera | Smart Hybrid Light | NVR 16-CH | 4 TB HDD | Smartphone App",
+      "categories": [
+        "Sicherheitstechnik",
+        "IP Kamera Sets",
+        "Dual-Objektiv Kameras"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 870.0,
+        "to": 870.0
+      },
+      "url": "https://edelstahl-tuerklingel.de/hilook-by-hikvision-8-mp-ueberwachungskamera-set-180-sichtfeld-4-8-mp-turret-kamera-smart-hybrid-light-nvr-16-ch-4-tb-hdd-smartphone-app",
+      "short_description": "Hohe Bildqualität mit 8 MP Auflösung und nahtloser 180° Panoramaansicht durch Dual-Lens-Technologie. Smart Hybrid Light mit IR- und Weißlicht für optimale Nachtsicht bis 30 m und hohe Sicherheit. Unterstützung der Personenerkennung und Fahrzeugeerkennung für intelligente Alarmierung. Flexible Speicherung mit 2 SATA-Schnittstellen für bis zu 16 TB Festplattenkapazität pro Laufwerk und synchrone 8-K",
+      "cross_sell_count": 1,
+      "characteristics": {
+        "Auflösung": [
+          "8 MP [4K]"
+        ]
+      },
+      "cross_sell": [
+        {
+          "sku": "DS-1281ZJ-M",
+          "name": "HiLook Schräge Deckenhalterung DS-1281ZJ-M"
+        }
+      ],
+      "finder_facets": {
+        "Auflösung": [
+          "8 MP [4K]"
+        ],
+        "Preisklasse": "Premium (> 199 €)"
+      }
+    },
+    {
+      "id": 43514,
+      "sku": "14171",
+      "name": "HiLook by HIKVISION Funk-Alarmanlage | 6-teiliges Komplettset | Hub + Melder + Sirene + Fernbedienung",
+      "categories": [
+        "Alarmanlagen"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 239.0,
+        "to": 239.0
+      },
+      "url": "https://edelstahl-tuerklingel.de/hilook-by-hikvision-funk-alarmanlage-6-teiliges-komplettset-hub-melder-sirene-fernbedienung",
+      "short_description": "Kabelloses Funk-Alarmanlagen-Set zur erweiterten Absicherung von Wohnungen und Häusern Alarmzentrale mit LAN- und WLAN-Anbindung sowie App-Steuerung Umfangreicheres Set mit mehreren Funk-Meldern zur Flächenabsicherung Erweiterbar auf bis zu 16 Funk-Komponenten Installation ohne Verkabelung durch Funktechnik Der Betrieb dieses Artikels ist ausschließlich in Verbindung mit einem HiLook Alarm-Set mög",
+      "cross_sell_count": 5,
+      "characteristics": {},
+      "cross_sell": [
+        {
+          "sku": "14172",
+          "name": "HiLook by HIKVISION Funk-Alarmanlage | Basis-Set | Hub + Melder + Fernbedienung"
+        },
+        {
+          "sku": "14173",
+          "name": "HiLook by HIKVISION Tür- & Fensterkontakt | Funk-Magnetkontakt | kabellos"
+        },
+        {
+          "sku": "14174",
+          "name": "HiLook by HIKVISION Funk-Bewegungsmelder | PIR | haustierimmun bis 25 kg"
+        },
+        {
+          "sku": "14175",
+          "name": "HiLook by HIKVISION Funk-Keypad | LED-Statusanzeige | Bedienfeld für Alarmanlage"
+        },
+        {
+          "sku": "14176",
+          "name": "HiLook by HIKVISION Funk-Fernbedienung | 4 Tasten | Scharf/Unscharf per Knopfdruck"
+        }
+      ],
+      "finder_facets": {
+        "Preisklasse": "Premium (> 199 €)"
+      }
+    },
+    {
+      "id": 43515,
+      "sku": "14172",
+      "name": "HiLook by HIKVISION Funk-Alarmanlage | Basis-Set | Hub + Melder + Fernbedienung",
+      "categories": [
+        "Alarmanlagen"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 199.99,
+        "to": 199.99
+      },
+      "url": "https://edelstahl-tuerklingel.de/hilook-by-hikvision-funk-alarmanlage-basis-set-hub-melder-fernbedienung",
+      "short_description": "Kabelloses Funk-Alarmanlagen-Set zur Grundabsicherung von Wohnungen und Häusern Erweiterbar auf bis zu 16 Funk-Sensoren und Fernbedienungen Push-Benachrichtigungen bei Alarmereignissen über die HiLook / Hik-Connect App Installation ohne Verkabelung durch kabellose Funktechnik Im Bestellvorgang direkt um weitere kompatible HiLook Alarm-Komponenten erweiterbar Der Betrieb dieses Artikels ist ausschl",
+      "cross_sell_count": 5,
+      "characteristics": {},
+      "cross_sell": [
+        {
+          "sku": "14171",
+          "name": "HiLook by HIKVISION Funk-Alarmanlage | 6-teiliges Komplettset | Hub + Melder + Sirene + Fernbedienung"
+        },
+        {
+          "sku": "14173",
+          "name": "HiLook by HIKVISION Tür- & Fensterkontakt | Funk-Magnetkontakt | kabellos"
+        },
+        {
+          "sku": "14174",
+          "name": "HiLook by HIKVISION Funk-Bewegungsmelder | PIR | haustierimmun bis 25 kg"
+        },
+        {
+          "sku": "14175",
+          "name": "HiLook by HIKVISION Funk-Keypad | LED-Statusanzeige | Bedienfeld für Alarmanlage"
+        },
+        {
+          "sku": "14176",
+          "name": "HiLook by HIKVISION Funk-Fernbedienung | 4 Tasten | Scharf/Unscharf per Knopfdruck"
+        }
+      ],
+      "finder_facets": {
+        "Preisklasse": "Premium (> 199 €)"
+      }
+    },
+    {
+      "id": 44570,
+      "sku": "14583",
+      "name": "HiLook by HIKVISION Funk-Außensirene ALARM-S201-E-WE | 110 dB | LED-Blitzlicht | IP65 | Rot",
+      "categories": [
+        "Alarmanlagen"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 99.0,
+        "to": 99.0
+      },
+      "url": "https://edelstahl-tuerklingel.de/hilook-by-hikvision-funk-aussensirene-alarm-s201-e-we-110-db-led-blitzlicht-ip65-rot",
+      "short_description": "Kabellose Außensirene – Zur akustischen und optischen Alarmierung im Außenbereich Hohe Lautstärke – Akustische Alarmmeldung mit bis zu 110 dB (in 3 Stufen einstellbar) LED-Blitzlicht & Statusanzeige – Rote Blitzleuchte und Rot/Grün-LED für maximale Aufmerksamkeit Sichere Funkübertragung – 868-MHz-Band mit Zweiwege-Funk und AES-128 Verschlüsselung, bis zu 1,6 km Reichweite App-Steuerung – Komfortab",
+      "cross_sell_count": 2,
+      "characteristics": {},
+      "cross_sell": [
+        {
+          "sku": "14171",
+          "name": "HiLook by HIKVISION Funk-Alarmanlage | 6-teiliges Komplettset | Hub + Melder + Sirene + Fernbedienung"
+        },
+        {
+          "sku": "14172",
+          "name": "HiLook by HIKVISION Funk-Alarmanlage | Basis-Set | Hub + Melder + Fernbedienung"
+        }
+      ],
+      "finder_facets": {
+        "Preisklasse": "Mittelklasse (79–199 €)"
+      }
+    },
+    {
+      "id": 43517,
+      "sku": "14174",
+      "name": "HiLook by HIKVISION Funk-Bewegungsmelder | PIR | haustierimmun bis 25 kg",
+      "categories": [
+        "Alarmanlagen"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 32.99,
+        "to": 32.99
+      },
+      "url": "https://edelstahl-tuerklingel.de/hilook-by-hikvision-funk-bewegungsmelder-pir-haustierimmun-bis-25-kg",
+      "short_description": "Kabelloser Infrarot-Bewegungsmelder für HiLook Alarmsysteme Erfassungsreichweite bis 10 m mit 90° Erfassungswinkel Haustierimmunität bis 24 kg zur Reduzierung von Fehlalarmen Flexible Montage im Innenbereich, z. B. an Wand oder Decke Einrichtung und Konfiguration über HiLook Vision / Hik-Connect App Der Betrieb dieses Artikels ist ausschließlich in Verbindung mit einem HiLook Alarm-Set möglich – e",
+      "cross_sell_count": 5,
+      "characteristics": {},
+      "cross_sell": [
+        {
+          "sku": "14171",
+          "name": "HiLook by HIKVISION Funk-Alarmanlage | 6-teiliges Komplettset | Hub + Melder + Sirene + Fernbedienung"
+        },
+        {
+          "sku": "14172",
+          "name": "HiLook by HIKVISION Funk-Alarmanlage | Basis-Set | Hub + Melder + Fernbedienung"
+        },
+        {
+          "sku": "14173",
+          "name": "HiLook by HIKVISION Tür- & Fensterkontakt | Funk-Magnetkontakt | kabellos"
+        },
+        {
+          "sku": "14175",
+          "name": "HiLook by HIKVISION Funk-Keypad | LED-Statusanzeige | Bedienfeld für Alarmanlage"
+        },
+        {
+          "sku": "14176",
+          "name": "HiLook by HIKVISION Funk-Fernbedienung | 4 Tasten | Scharf/Unscharf per Knopfdruck"
+        }
+      ],
+      "finder_facets": {
+        "Preisklasse": "Einstieg (< 79 €)"
+      }
+    },
+    {
+      "id": 43519,
+      "sku": "14176",
+      "name": "HiLook by HIKVISION Funk-Fernbedienung | 4 Tasten | Scharf/Unscharf per Knopfdruck",
+      "categories": [
+        "Alarmanlagen"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 17.99,
+        "to": 17.99
+      },
+      "url": "https://edelstahl-tuerklingel.de/hilook-by-hikvision-funk-fernbedienung-4-tasten-scharf-unscharf-per-knopfdruck",
+      "short_description": "Funk-Fernbedienung zur Steuerung von HiLook Alarmsystemen Aktivieren und Deaktivieren des Alarmsystems per Tastendruck Vier Tasten, davon zwei frei konfigurierbar Funkübertragung im 868-MHz-Band (Tri-X Technologie) Kompakte Bauform für Schlüsselbund oder Tasche Der Betrieb dieses Artikels ist ausschließlich in Verbindung mit einem HiLook Alarm-Set möglich – eine Nutzung ohne entsprechendes Set ist",
+      "cross_sell_count": 5,
+      "characteristics": {},
+      "cross_sell": [
+        {
+          "sku": "14171",
+          "name": "HiLook by HIKVISION Funk-Alarmanlage | 6-teiliges Komplettset | Hub + Melder + Sirene + Fernbedienung"
+        },
+        {
+          "sku": "14172",
+          "name": "HiLook by HIKVISION Funk-Alarmanlage | Basis-Set | Hub + Melder + Fernbedienung"
+        },
+        {
+          "sku": "14173",
+          "name": "HiLook by HIKVISION Tür- & Fensterkontakt | Funk-Magnetkontakt | kabellos"
+        },
+        {
+          "sku": "14174",
+          "name": "HiLook by HIKVISION Funk-Bewegungsmelder | PIR | haustierimmun bis 25 kg"
+        },
+        {
+          "sku": "14175",
+          "name": "HiLook by HIKVISION Funk-Keypad | LED-Statusanzeige | Bedienfeld für Alarmanlage"
+        }
+      ],
+      "finder_facets": {
+        "Preisklasse": "Einstieg (< 79 €)"
+      }
+    },
+    {
+      "id": 43520,
+      "sku": "14177",
+      "name": "HiLook by HIKVISION Funk-Innensirene | 95 dB | LED-Blitzlicht | kabellos",
+      "categories": [
+        "Alarmanlagen"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 32.99,
+        "to": 32.99
+      },
+      "url": "https://edelstahl-tuerklingel.de/hilook-by-hikvision-funk-innensirene-95-db-led-blitzlicht-kabellos",
+      "short_description": "Kabellose Innensirene – zur akustischen Alarmierung im Innenraum Einstellbare Lautstärke – Akustische Alarmmeldung mit bis zu 95 dB LED-Statusanzeige – für den aktuellen Alarm- und Systemstatus Sichere Funkübertragung – 868-MHz-Band mit moderner Tri-X Technologie App-Steuerung – Komfortable Konfiguration über HiLook Vision oder die HIK-Connect App Der Betrieb dieses Artikels ist ausschließlich in ",
+      "cross_sell_count": 6,
+      "characteristics": {},
+      "cross_sell": [
+        {
+          "sku": "14171",
+          "name": "HiLook by HIKVISION Funk-Alarmanlage | 6-teiliges Komplettset | Hub + Melder + Sirene + Fernbedienung"
+        },
+        {
+          "sku": "14172",
+          "name": "HiLook by HIKVISION Funk-Alarmanlage | Basis-Set | Hub + Melder + Fernbedienung"
+        },
+        {
+          "sku": "14173",
+          "name": "HiLook by HIKVISION Tür- & Fensterkontakt | Funk-Magnetkontakt | kabellos"
+        },
+        {
+          "sku": "14174",
+          "name": "HiLook by HIKVISION Funk-Bewegungsmelder | PIR | haustierimmun bis 25 kg"
+        },
+        {
+          "sku": "14175",
+          "name": "HiLook by HIKVISION Funk-Keypad | LED-Statusanzeige | Bedienfeld für Alarmanlage"
+        },
+        {
+          "sku": "14176",
+          "name": "HiLook by HIKVISION Funk-Fernbedienung | 4 Tasten | Scharf/Unscharf per Knopfdruck"
+        }
+      ],
+      "finder_facets": {
+        "Preisklasse": "Einstieg (< 79 €)"
+      }
+    },
+    {
+      "id": 43518,
+      "sku": "14175",
+      "name": "HiLook by HIKVISION Funk-Keypad | LED-Statusanzeige | Bedienfeld für Alarmanlage",
+      "categories": [
+        "Alarmanlagen"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 53.99,
+        "to": 53.99
+      },
+      "url": "https://edelstahl-tuerklingel.de/hilook-by-hikvision-funk-keypad-led-statusanzeige-bedienfeld-fuer-alarmanlage",
+      "short_description": "Funk-Tastatur zur Steuerung von HiLook Alarmsystemen im Innenbereich LED-Statusanzeige zur Anzeige von System- und Alarmzuständen Physische Tasten für schnelle und direkte Bedienung Kabellose Funkübertragung im 868-MHz-Band (Tri-X Technologie) Unterstützung von Notfallfunktionen wie Panik-, Feuer- und medizinischem Alarm Der Betrieb dieses Artikels ist ausschließlich in Verbindung mit einem HiLook",
+      "cross_sell_count": 0,
+      "characteristics": {},
+      "cross_sell": [],
+      "finder_facets": {
+        "Preisklasse": "Einstieg (< 79 €)"
+      }
+    },
+    {
+      "id": 40403,
+      "sku": "13581",
+      "name": "HiLook by HIKVISION Netzwerk Videorekorder | NVR | 4 Kanäle",
+      "categories": [
+        "Sicherheitstechnik",
+        "Videorekorder"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 134.0,
+        "to": 134.0
+      },
+      "url": "https://edelstahl-tuerklingel.de/hilook-by-hikvision-netzwerk-videorekorder-nvr-4-kanaele",
+      "short_description": "Unterstützt bis zu 4 IP-Kameras mit 8 MP Auflösung für zuverlässige Videoüberwachung. Effiziente H.265+ Kompression reduziert den Speicherbedarf um bis zu 75%. HDMI- und VGA-Ausgänge mit 4K-Auflösung für gestochen scharfe Bildqualität. Vier PoE-Schnittstellen ermöglichen einfache und flexible Netzwerkverbindungen. Intelligente Videoanalyse und VCA-Alarmunterstützung für fortschrittliche Sicherheit",
+      "cross_sell_count": 0,
+      "characteristics": {},
+      "cross_sell": [],
+      "finder_facets": {
+        "Preisklasse": "Mittelklasse (79–199 €)"
+      }
+    },
+    {
+      "id": 40404,
+      "sku": "13582",
+      "name": "HiLook by HIKVISION Netzwerk Videorekorder | NVR | 8 Kanäle",
+      "categories": [
+        "Sicherheitstechnik",
+        "Videorekorder"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 189.0,
+        "to": 189.0
+      },
+      "url": "https://edelstahl-tuerklingel.de/hilook-by-hikvision-netzwerk-videorekorder-nvr-8-kanaele",
+      "short_description": "Unterstützt bis zu 8 IP-Kameras mit 8 MP Auflösung für erstklassige Videoüberwachung. H.265+ Kompression reduziert Speicherplatzbedarf um bis zu 75%. Unabhängige HDMI- und VGA-Ausgänge mit 4K-Auflösung für kristallklare Bildqualität. Integrierte PoE-Schnittstellen für einfache und flexible Netzwerkverbindungen. Intelligente Videoanalyse und VCA-Alarmunterstützung für fortschrittliche Sicherheitsfu",
+      "cross_sell_count": 0,
+      "characteristics": {},
+      "cross_sell": [],
+      "finder_facets": {
+        "Preisklasse": "Mittelklasse (79–199 €)"
+      }
+    },
+    {
+      "id": 44821,
+      "sku": "14640",
+      "name": "HiLook by HIKVISION Solar-Überwachungskamera | 4 MP | 24/7-Aufnahme | 4G-SIM | Smartphone App | IPC-CFS04/4G-SIM",
+      "categories": [
+        "Sicherheitstechnik",
+        "IP Kameras"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 159.99,
+        "to": 159.99
+      },
+      "url": "https://edelstahl-tuerklingel.de/hilook-by-hikvision-solar-ueberwachungskamera-4-mp-24-7-aufnahme-4g-sim-smartphone-app-ipc-cfs04-4g-sim",
+      "short_description": "Aufzeichnung rund um die Uhr – dank AOV-Modus nimmt die Kamera 24/7 auf und verbraucht dabei besonders wenig Energie – so verpasst du keine Sekunde, ganz ohne ständiges Nachladen. Unabhängig dank Solar & Akku – Solarpanel und kräftiger Akku versorgen die Kamera ganz ohne Steckdose oder Stromkabel. Klare Bilder rund um die Uhr – ob bei Tageslicht oder in völliger Dunkelheit: scharfe 4-MP-Aufnahmen ",
+      "cross_sell_count": 0,
+      "characteristics": {
+        "Auflösung": [
+          "4 MP"
+        ],
+        "Nachtsicht": [
+          "Farbe"
+        ],
+        "PTZ-Funktion": [
+          "Nein"
+        ],
+        "Marke": [
+          "Hilook"
+        ]
+      },
+      "cross_sell": [],
+      "finder_facets": {
+        "Auflösung": [
+          "4 MP"
+        ],
+        "Nachtsicht": [
+          "Farbe"
+        ],
+        "PTZ-Funktion": [
+          "Nein"
+        ],
+        "Marke": [
+          "Hilook"
+        ],
+        "Preisklasse": "Mittelklasse (79–199 €)"
+      }
+    },
+    {
+      "id": 44822,
+      "sku": "14641",
+      "name": "HiLook by HIKVISION Solar-Überwachungskamera | 4 MP | schwenkbar | 4G-SIM | Smartphone App | IPC-CFSP4/4G-SIM",
+      "categories": [
+        "Sicherheitstechnik",
+        "IP Kameras"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 209.99,
+        "to": 209.99
+      },
+      "url": "https://edelstahl-tuerklingel.de/hilook-by-hikvision-solar-ueberwachungskamera-4-mp-schwenkbar-4g-sim-smartphone-app-ipc-cfsp4-4g-sim",
+      "short_description": "Schwenken, Neigen & Smart Tracking – die Kamera schwenkt und neigt sich automatisch, behält dein ganzes Grundstück im Blick und folgt Personen, sobald sich etwas bewegt – so entgeht dir nichts. Unabhängig dank Solar & Akku – Solarpanel und kräftiger Akku versorgen die Kamera ganz ohne Steckdose oder Stromkabel. Klare Bilder rund um die Uhr – ob bei Tageslicht oder in völliger Dunkelheit: scharfe 4",
+      "cross_sell_count": 0,
+      "characteristics": {
+        "Auflösung": [
+          "4 MP"
+        ],
+        "Nachtsicht": [
+          "Farbe"
+        ],
+        "PTZ-Funktion": [
+          "Ja"
+        ],
+        "Speicherart": [
+          "Intern",
+          "Cloud"
+        ]
+      },
+      "cross_sell": [],
+      "finder_facets": {
+        "Auflösung": [
+          "4 MP"
+        ],
+        "Nachtsicht": [
+          "Farbe"
+        ],
+        "PTZ-Funktion": [
+          "Ja"
+        ],
+        "Speicherart": [
+          "Intern",
+          "Cloud"
+        ],
+        "Preisklasse": "Premium (> 199 €)"
+      }
+    },
+    {
+      "id": 43516,
+      "sku": "14173",
+      "name": "HiLook by HIKVISION Tür- & Fensterkontakt | Funk-Magnetkontakt | kabellos",
+      "categories": [
+        "Alarmanlagen"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 23.99,
+        "to": 23.99
+      },
+      "url": "https://edelstahl-tuerklingel.de/hilook-by-hikvision-tuer-fensterkontakt-funk-magnetkontakt-kabellos",
+      "short_description": "Kabelloser Öffnungsmelder zur Überwachung von Türen und Fenstern Zuverlässige Erkennung von Öffnungs- und Schließbewegungen Kompakte Bauform für unauffällige Montage im Innenbereich Einbindung und Konfiguration über HiLook Vision / Hik-Connect App Geeignet zur Erweiterung bestehender HiLook Alarmsysteme Der Betrieb dieses Artikels ist ausschließlich in Verbindung mit einem HiLook Alarm-Set möglich",
+      "cross_sell_count": 5,
+      "characteristics": {},
+      "cross_sell": [
+        {
+          "sku": "14171",
+          "name": "HiLook by HIKVISION Funk-Alarmanlage | 6-teiliges Komplettset | Hub + Melder + Sirene + Fernbedienung"
+        },
+        {
+          "sku": "14172",
+          "name": "HiLook by HIKVISION Funk-Alarmanlage | Basis-Set | Hub + Melder + Fernbedienung"
+        },
+        {
+          "sku": "14174",
+          "name": "HiLook by HIKVISION Funk-Bewegungsmelder | PIR | haustierimmun bis 25 kg"
+        },
+        {
+          "sku": "14175",
+          "name": "HiLook by HIKVISION Funk-Keypad | LED-Statusanzeige | Bedienfeld für Alarmanlage"
+        },
+        {
+          "sku": "14176",
+          "name": "HiLook by HIKVISION Funk-Fernbedienung | 4 Tasten | Scharf/Unscharf per Knopfdruck"
+        }
+      ],
+      "finder_facets": {
+        "Preisklasse": "Einstieg (< 79 €)"
+      }
+    },
+    {
+      "id": 42493,
+      "sku": "NVR-216MH-K/16P",
+      "name": "HiLook by Hikvision Network Video Recorder | 16-Kanal PoE | 4K AcuSense NVR | NVR-216MH-K/16P",
+      "categories": [
+        "Videorekorder",
+        "Dual-Objektiv Kameras"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 439.0,
+        "to": 439.0
+      },
+      "url": "https://edelstahl-tuerklingel.de/hilook-by-hikvision-network-video-recorder-16-kanal-poe-4k-acusense-nvr-nvr-216mh-k-16p",
+      "short_description": "Unterstützt bis zu 16 IP-Kanäle mit 16 integrierten PoE-Anschlüssen für einfache Plug & Play Installation. Fortschrittliche H.265+ Komprimierung reduziert den Speicherbedarf um bis zu 75% und gewährleistet effiziente Datenverarbeitung. Intelligente Videoanalyse mit 2-Kanal Personen- und Fahrzeugerkennung, 1-Kanal Gesichtserkennung und Bewegungserkennung 2.0. HDMI-Ausgang mit bis zu 4K UHD sowie VG",
+      "cross_sell_count": 0,
+      "characteristics": {},
+      "cross_sell": [],
+      "finder_facets": {
+        "Preisklasse": "Premium (> 199 €)"
+      }
+    },
+    {
+      "id": 42492,
+      "sku": "NVR-208MH-K/8P",
+      "name": "HiLook by Hikvision Netzwerk-Videorekorder | 8-Kanal PoE NVR | 4K Auflösung | NVR-208MH-K/8P",
+      "categories": [
+        "Videorekorder",
+        "Dual-Objektiv Kameras"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 319.0,
+        "to": 319.0
+      },
+      "url": "https://edelstahl-tuerklingel.de/hilook-by-hikvision-netzwerk-videorekorder-8-kanal-poe-nvr-4k-aufloesung-nvr-208mh-k-8p",
+      "short_description": "Unterstützt bis zu 8 IP-Kamera-Eingänge mit Plug & Play und integrierten 8 PoE-Schnittstellen für eine einfache Installation. Hochauflösende Videoverarbeitung: bis zu 2 Kanäle mit 12 MP oder 8 Kanäle mit 4 MP, unterstützt H.265+/H.265/H.264+/H.264-Videoformate. Intelligente Analysefunktionen inklusive Bewegungserkennung 2.0, 2-Kanal Personen- und Fahrzeugerkennung und fortschrittlicher Gesichtserk",
+      "cross_sell_count": 0,
+      "characteristics": {},
+      "cross_sell": [],
+      "finder_facets": {
+        "Preisklasse": "Premium (> 199 €)"
+      }
+    },
+    {
+      "id": 41828,
+      "sku": "IPC-T280HAD-LUF/SL",
+      "name": "HiLook by Hikvision Netzwerkkamera | 8 MP Smart Hybrid Light | 180° Weitwinkel | IPC-T280HAD-LUF/SL",
+      "categories": [
+        "Sicherheitstechnik",
+        "IP Kameras",
+        "Dual-Objektiv Kameras"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 149.0,
+        "to": 149.0
+      },
+      "url": "https://edelstahl-tuerklingel.de/hilook-by-hikvision-netzwerkkamera-8-mp-smart-hybrid-light-180-weitwinkel-ipc-t280had-luf-sl",
+      "short_description": "180° Dual-Lens Panoramaüberwachung – Zwei fest verbaute Objektive liefern ein nahtloses, extrabreites Sichtfeld für umfassende Arealüberwachung 8 MP Ultra-HD-Auflösung – Detaillierte, scharfe Aufnahmen bei Tag und Nacht für maximale Sicherheit Smart Hybrid Light (IR & Weißlicht, bis 30 m) – Automatische Anpassung der Beleuchtung für beste Nachtsicht Integriertes Zwei-Wege-Audio & Alarmfunktionen –",
+      "cross_sell_count": 3,
+      "characteristics": {
+        "Auflösung": [
+          "8 MP [4K]"
+        ]
+      },
+      "cross_sell": [
+        {
+          "sku": "NVR-208MH-K/8P",
+          "name": "HiLook by Hikvision Netzwerk-Videorekorder | 8-Kanal PoE NVR | 4K Auflösung | NVR-208MH-K/8P"
+        },
+        {
+          "sku": "NVR-216MH-K/16P",
+          "name": "HiLook by Hikvision Network Video Recorder | 16-Kanal PoE | 4K AcuSense NVR | NVR-216MH-K/16P"
+        },
+        {
+          "sku": "DS-1281ZJ-M",
+          "name": "HiLook Schräge Deckenhalterung DS-1281ZJ-M"
+        }
+      ],
+      "finder_facets": {
+        "Auflösung": [
+          "8 MP [4K]"
+        ],
+        "Preisklasse": "Mittelklasse (79–199 €)"
+      }
+    },
+    {
+      "id": 41829,
+      "sku": "IPC-B480HAD-LUF/SL",
+      "name": "HiLook by Hikvision Netzwerkkamera | 8 MP Smart Hybrid Light | Personenerkennung Fahrzeugerkennung | IPC-B480HAD-LUF/SL",
+      "categories": [
+        "Sicherheitstechnik",
+        "IP Kameras",
+        "Dual-Objektiv Kameras"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 149.0,
+        "to": 149.0
+      },
+      "url": "https://edelstahl-tuerklingel.de/hilook-by-hikvision-netzwerkkamera-8-mp-smart-hybrid-light-personenerkennung-fahrzeugerkennung-ipc-b480had-luf-sl",
+      "short_description": "8 Megapixel Ultra-HD-Auflösung – Glasklare Überwachung in beeindruckender Detailtiefe (4256 × 1888 Pixel) 180° Panoramasicht & Dual-Lens-Technologie – Maximaler Überblick für große Flächen, ideal für Parks, Parkplätze und Straßen Smart Hybrid Light (IR & Weißlicht, bis 30 m) – Automatisches Umschalten für beste Bildqualität und effektive Abschreckung bei Tag und Nacht KI-gestützte Erkennung von Pe",
+      "cross_sell_count": 0,
+      "characteristics": {
+        "Auflösung": [
+          "8 MP [4K]"
+        ]
+      },
+      "cross_sell": [],
+      "finder_facets": {
+        "Auflösung": [
+          "8 MP [4K]"
+        ],
+        "Preisklasse": "Mittelklasse (79–199 €)"
+      }
+    },
+    {
+      "id": 37145,
+      "sku": "DS-1272ZJ-120B",
+      "name": "Hikvision DS-1272ZJ-120B Wandhalterung mit Anschlussdose",
+      "categories": [
+        "Sicherheitstechnik",
+        "Anschlussdosen & Zubehör"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 58.31,
+        "to": 58.31
+      },
+      "url": "https://edelstahl-tuerklingel.de/hikvision-ds-1272zj-120b-wandhalterung-mit-anschlussdose",
+      "short_description": "Wandmontagehalterung für Mini-Dome-Kamera (mit Anschlussdose) Hikvision Weiß Werkstoff Aluminium-Legierung Abmessungen:123 mm × 180 mm × 233 mm 1225 g",
+      "cross_sell_count": 19,
+      "characteristics": {},
+      "cross_sell": [
+        {
+          "sku": "HN-AN-ES-200",
+          "name": "Metzler Hausnummer | Edelstahl | Modern | Anthrazitgrau | Höhe 20 cm"
+        },
+        {
+          "sku": "HS-Elbars-Str-AN",
+          "name": "Metzler Individuelle Hausnummer aus Edelstahl"
+        },
+        {
+          "sku": "anCE_HN_sa",
+          "name": "Metzler Hausnummernschild aus Edelstahl Anthrazitgrau RAL 7016"
+        },
+        {
+          "sku": "WEB-L-SO",
+          "name": "Namensschild in Anthrazit mit Lasergravur"
+        },
+        {
+          "sku": "HS-Elbars-AN",
+          "name": "Metzler modernes Hausnummernschild Edelstahl Anthrazit"
+        },
+        {
+          "sku": "Siebert",
+          "name": "Metzler Briefkasten aus hochwertigem Stahl | Siebert"
+        },
+        {
+          "sku": "Hermann",
+          "name": "Metzler Briefkasten mit Lasergravur | Hermann"
+        },
+        {
+          "sku": "Ebenhard",
+          "name": "Metzler Briefkasten austauschbares Namensschild | Ebenhard"
+        },
+        {
+          "sku": "ebenhard-BS",
+          "name": "Metzler Standbriefkasten aus hochwertigem Stahl | Siebert"
+        },
+        {
+          "sku": "Stencil27",
+          "name": "Metzler Briefkasten mit Lasergravur | Stencil"
+        },
+        {
+          "sku": "Modell-G",
+          "name": "Metzler Briefkasten Design | Modell-G"
+        },
+        {
+          "sku": "Stelio",
+          "name": "Metzler Briefkasten pulverbeschichtet | Lasergravur | Stelio"
+        },
+        {
+          "sku": "PBOX-BISPO2-1x",
+          "name": "Metzler Paketbox mit Briefkasten | personalisiert mit Gravur | Edelstahl-Namensschild | mit Briefeinwurf | Bispo 2"
+        },
+        {
+          "sku": "Avalon2",
+          "name": "Metzler Paketbox | personalisiert mit Gravur | Edelstahl-Namensschild | rostfrei & massiv | Avalon 2"
+        },
+        {
+          "sku": "MMB-1-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-3-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | in Holzoptik | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-4-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | Anthrazit RAL 7016 | aus Stahl | mit Sichtstreifen | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-2-2X",
+          "name": "Metzler Mülltonnenbox mit Pflanzdach | 2er | 240l | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-2-1X",
+          "name": "Metzler Mülltonnenbox mit Pflanzdach | 1er | 240l | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        }
+      ],
+      "finder_facets": {
+        "Preisklasse": "Einstieg (< 79 €)"
+      }
+    },
+    {
+      "id": 37150,
+      "sku": "DS-1280ZJ-DM18",
+      "name": "Hikvision DS-1280ZJ-DM18 Montagedose",
+      "categories": [
+        "Sicherheitstechnik",
+        "Anschlussdosen & Zubehör"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 21.42,
+        "to": 21.42
+      },
+      "url": "https://edelstahl-tuerklingel.de/hikvision-ds-1280zj-dm18-montagedose",
+      "short_description": "Montagedose für Dome Kamera Hikvision Weiß Werkstoff Aluminium-Legierung",
+      "cross_sell_count": 19,
+      "characteristics": {},
+      "cross_sell": [
+        {
+          "sku": "HN-AN-ES-200",
+          "name": "Metzler Hausnummer | Edelstahl | Modern | Anthrazitgrau | Höhe 20 cm"
+        },
+        {
+          "sku": "HS-Elbars-Str-AN",
+          "name": "Metzler Individuelle Hausnummer aus Edelstahl"
+        },
+        {
+          "sku": "anCE_HN_sa",
+          "name": "Metzler Hausnummernschild aus Edelstahl Anthrazitgrau RAL 7016"
+        },
+        {
+          "sku": "WEB-L-SO",
+          "name": "Namensschild in Anthrazit mit Lasergravur"
+        },
+        {
+          "sku": "HS-Elbars-AN",
+          "name": "Metzler modernes Hausnummernschild Edelstahl Anthrazit"
+        },
+        {
+          "sku": "Siebert",
+          "name": "Metzler Briefkasten aus hochwertigem Stahl | Siebert"
+        },
+        {
+          "sku": "Hermann",
+          "name": "Metzler Briefkasten mit Lasergravur | Hermann"
+        },
+        {
+          "sku": "Ebenhard",
+          "name": "Metzler Briefkasten austauschbares Namensschild | Ebenhard"
+        },
+        {
+          "sku": "ebenhard-BS",
+          "name": "Metzler Standbriefkasten aus hochwertigem Stahl | Siebert"
+        },
+        {
+          "sku": "Stencil27",
+          "name": "Metzler Briefkasten mit Lasergravur | Stencil"
+        },
+        {
+          "sku": "Modell-G",
+          "name": "Metzler Briefkasten Design | Modell-G"
+        },
+        {
+          "sku": "Stelio",
+          "name": "Metzler Briefkasten pulverbeschichtet | Lasergravur | Stelio"
+        },
+        {
+          "sku": "PBOX-BISPO2-1x",
+          "name": "Metzler Paketbox mit Briefkasten | personalisiert mit Gravur | Edelstahl-Namensschild | mit Briefeinwurf | Bispo 2"
+        },
+        {
+          "sku": "Avalon2",
+          "name": "Metzler Paketbox | personalisiert mit Gravur | Edelstahl-Namensschild | rostfrei & massiv | Avalon 2"
+        },
+        {
+          "sku": "MMB-1-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-3-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | in Holzoptik | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-4-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | Anthrazit RAL 7016 | aus Stahl | mit Sichtstreifen | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-2-2X",
+          "name": "Metzler Mülltonnenbox mit Pflanzdach | 2er | 240l | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-2-1X",
+          "name": "Metzler Mülltonnenbox mit Pflanzdach | 1er | 240l | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        }
+      ],
+      "finder_facets": {
+        "Preisklasse": "Einstieg (< 79 €)"
+      }
+    },
+    {
+      "id": 37146,
+      "sku": "DS-1280ZJ-DM46",
+      "name": "Hikvision DS-1280ZJ-DM46 Anschlussdose",
+      "categories": [
+        "Sicherheitstechnik",
+        "Anschlussdosen & Zubehör"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 26.18,
+        "to": 26.18
+      },
+      "url": "https://edelstahl-tuerklingel.de/hikvision-ds-1280zj-dm46-anschlussdose",
+      "short_description": "Hikvision Weiß Werkstoff Aluminium-Legierung 250 g",
+      "cross_sell_count": 19,
+      "characteristics": {},
+      "cross_sell": [
+        {
+          "sku": "HN-AN-ES-200",
+          "name": "Metzler Hausnummer | Edelstahl | Modern | Anthrazitgrau | Höhe 20 cm"
+        },
+        {
+          "sku": "HS-Elbars-Str-AN",
+          "name": "Metzler Individuelle Hausnummer aus Edelstahl"
+        },
+        {
+          "sku": "anCE_HN_sa",
+          "name": "Metzler Hausnummernschild aus Edelstahl Anthrazitgrau RAL 7016"
+        },
+        {
+          "sku": "WEB-L-SO",
+          "name": "Namensschild in Anthrazit mit Lasergravur"
+        },
+        {
+          "sku": "HS-Elbars-AN",
+          "name": "Metzler modernes Hausnummernschild Edelstahl Anthrazit"
+        },
+        {
+          "sku": "Siebert",
+          "name": "Metzler Briefkasten aus hochwertigem Stahl | Siebert"
+        },
+        {
+          "sku": "Hermann",
+          "name": "Metzler Briefkasten mit Lasergravur | Hermann"
+        },
+        {
+          "sku": "Ebenhard",
+          "name": "Metzler Briefkasten austauschbares Namensschild | Ebenhard"
+        },
+        {
+          "sku": "ebenhard-BS",
+          "name": "Metzler Standbriefkasten aus hochwertigem Stahl | Siebert"
+        },
+        {
+          "sku": "Stencil27",
+          "name": "Metzler Briefkasten mit Lasergravur | Stencil"
+        },
+        {
+          "sku": "Modell-G",
+          "name": "Metzler Briefkasten Design | Modell-G"
+        },
+        {
+          "sku": "Stelio",
+          "name": "Metzler Briefkasten pulverbeschichtet | Lasergravur | Stelio"
+        },
+        {
+          "sku": "PBOX-BISPO2-1x",
+          "name": "Metzler Paketbox mit Briefkasten | personalisiert mit Gravur | Edelstahl-Namensschild | mit Briefeinwurf | Bispo 2"
+        },
+        {
+          "sku": "Avalon2",
+          "name": "Metzler Paketbox | personalisiert mit Gravur | Edelstahl-Namensschild | rostfrei & massiv | Avalon 2"
+        },
+        {
+          "sku": "MMB-1-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-3-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | in Holzoptik | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-4-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | Anthrazit RAL 7016 | aus Stahl | mit Sichtstreifen | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-2-2X",
+          "name": "Metzler Mülltonnenbox mit Pflanzdach | 2er | 240l | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-2-1X",
+          "name": "Metzler Mülltonnenbox mit Pflanzdach | 1er | 240l | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        }
+      ],
+      "finder_facets": {
+        "Preisklasse": "Einstieg (< 79 €)"
+      }
+    },
+    {
+      "id": 37143,
+      "sku": "DS-1280ZJ-DM55",
+      "name": "Hikvision DS-1280ZJ-DM55 Anschlussdose",
+      "categories": [
+        "Sicherheitstechnik",
+        "Anschlussdosen & Zubehör"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 35.7,
+        "to": 35.7
+      },
+      "url": "https://edelstahl-tuerklingel.de/hikvision-ds-1280zj-dm55-anschlussdose",
+      "short_description": "Anschlussdose Hikvision Weiß Werkstoff Aluminium-Legierung 300 g",
+      "cross_sell_count": 19,
+      "characteristics": {},
+      "cross_sell": [
+        {
+          "sku": "HN-AN-ES-200",
+          "name": "Metzler Hausnummer | Edelstahl | Modern | Anthrazitgrau | Höhe 20 cm"
+        },
+        {
+          "sku": "HS-Elbars-Str-AN",
+          "name": "Metzler Individuelle Hausnummer aus Edelstahl"
+        },
+        {
+          "sku": "anCE_HN_sa",
+          "name": "Metzler Hausnummernschild aus Edelstahl Anthrazitgrau RAL 7016"
+        },
+        {
+          "sku": "WEB-L-SO",
+          "name": "Namensschild in Anthrazit mit Lasergravur"
+        },
+        {
+          "sku": "HS-Elbars-AN",
+          "name": "Metzler modernes Hausnummernschild Edelstahl Anthrazit"
+        },
+        {
+          "sku": "Siebert",
+          "name": "Metzler Briefkasten aus hochwertigem Stahl | Siebert"
+        },
+        {
+          "sku": "Hermann",
+          "name": "Metzler Briefkasten mit Lasergravur | Hermann"
+        },
+        {
+          "sku": "Ebenhard",
+          "name": "Metzler Briefkasten austauschbares Namensschild | Ebenhard"
+        },
+        {
+          "sku": "ebenhard-BS",
+          "name": "Metzler Standbriefkasten aus hochwertigem Stahl | Siebert"
+        },
+        {
+          "sku": "Stencil27",
+          "name": "Metzler Briefkasten mit Lasergravur | Stencil"
+        },
+        {
+          "sku": "Modell-G",
+          "name": "Metzler Briefkasten Design | Modell-G"
+        },
+        {
+          "sku": "Stelio",
+          "name": "Metzler Briefkasten pulverbeschichtet | Lasergravur | Stelio"
+        },
+        {
+          "sku": "PBOX-BISPO2-1x",
+          "name": "Metzler Paketbox mit Briefkasten | personalisiert mit Gravur | Edelstahl-Namensschild | mit Briefeinwurf | Bispo 2"
+        },
+        {
+          "sku": "Avalon2",
+          "name": "Metzler Paketbox | personalisiert mit Gravur | Edelstahl-Namensschild | rostfrei & massiv | Avalon 2"
+        },
+        {
+          "sku": "MMB-1-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-3-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | in Holzoptik | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-4-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | Anthrazit RAL 7016 | aus Stahl | mit Sichtstreifen | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-2-2X",
+          "name": "Metzler Mülltonnenbox mit Pflanzdach | 2er | 240l | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-2-1X",
+          "name": "Metzler Mülltonnenbox mit Pflanzdach | 1er | 240l | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        }
+      ],
+      "finder_facets": {
+        "Preisklasse": "Einstieg (< 79 €)"
+      }
+    },
+    {
+      "id": 37148,
+      "sku": "DS-1280ZJ-DM8",
+      "name": "Hikvision DS-1280ZJ-DM8 Anschlussdose",
+      "categories": [
+        "Sicherheitstechnik",
+        "Anschlussdosen & Zubehör"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 17.85,
+        "to": 17.85
+      },
+      "url": "https://edelstahl-tuerklingel.de/hikvision-ds-1280zj-dm8-anschlussdose",
+      "short_description": "Anschlussdose für Dome-Kamera Hikvision Weiß Werkstoff Aluminium-Legierung 210 g",
+      "cross_sell_count": 19,
+      "characteristics": {},
+      "cross_sell": [
+        {
+          "sku": "HN-AN-ES-200",
+          "name": "Metzler Hausnummer | Edelstahl | Modern | Anthrazitgrau | Höhe 20 cm"
+        },
+        {
+          "sku": "HS-Elbars-Str-AN",
+          "name": "Metzler Individuelle Hausnummer aus Edelstahl"
+        },
+        {
+          "sku": "anCE_HN_sa",
+          "name": "Metzler Hausnummernschild aus Edelstahl Anthrazitgrau RAL 7016"
+        },
+        {
+          "sku": "WEB-L-SO",
+          "name": "Namensschild in Anthrazit mit Lasergravur"
+        },
+        {
+          "sku": "HS-Elbars-AN",
+          "name": "Metzler modernes Hausnummernschild Edelstahl Anthrazit"
+        },
+        {
+          "sku": "Siebert",
+          "name": "Metzler Briefkasten aus hochwertigem Stahl | Siebert"
+        },
+        {
+          "sku": "Hermann",
+          "name": "Metzler Briefkasten mit Lasergravur | Hermann"
+        },
+        {
+          "sku": "Ebenhard",
+          "name": "Metzler Briefkasten austauschbares Namensschild | Ebenhard"
+        },
+        {
+          "sku": "ebenhard-BS",
+          "name": "Metzler Standbriefkasten aus hochwertigem Stahl | Siebert"
+        },
+        {
+          "sku": "Stencil27",
+          "name": "Metzler Briefkasten mit Lasergravur | Stencil"
+        },
+        {
+          "sku": "Modell-G",
+          "name": "Metzler Briefkasten Design | Modell-G"
+        },
+        {
+          "sku": "Stelio",
+          "name": "Metzler Briefkasten pulverbeschichtet | Lasergravur | Stelio"
+        },
+        {
+          "sku": "PBOX-BISPO2-1x",
+          "name": "Metzler Paketbox mit Briefkasten | personalisiert mit Gravur | Edelstahl-Namensschild | mit Briefeinwurf | Bispo 2"
+        },
+        {
+          "sku": "Avalon2",
+          "name": "Metzler Paketbox | personalisiert mit Gravur | Edelstahl-Namensschild | rostfrei & massiv | Avalon 2"
+        },
+        {
+          "sku": "MMB-1-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-3-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | in Holzoptik | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-4-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | Anthrazit RAL 7016 | aus Stahl | mit Sichtstreifen | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-2-2X",
+          "name": "Metzler Mülltonnenbox mit Pflanzdach | 2er | 240l | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-2-1X",
+          "name": "Metzler Mülltonnenbox mit Pflanzdach | 1er | 240l | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        }
+      ],
+      "finder_facets": {
+        "Preisklasse": "Einstieg (< 79 €)"
+      }
+    },
+    {
+      "id": 37144,
+      "sku": "DS-1473ZJ-155B",
+      "name": "Hikvision DS-1473ZJ-155B Wandhalterung mit Anschlussdose",
+      "categories": [
+        "Sicherheitstechnik",
+        "Anschlussdosen & Zubehör"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 102.34,
+        "to": 102.34
+      },
+      "url": "https://edelstahl-tuerklingel.de/hikvision-ds-1473zj-155b-wandhalterung-mit-anschlussdose",
+      "short_description": "Wandhalterung mit Anschlussdose Hikvision Weiß Werkstoff Aluminium-Legierung 1750 g",
+      "cross_sell_count": 19,
+      "characteristics": {},
+      "cross_sell": [
+        {
+          "sku": "HN-AN-ES-200",
+          "name": "Metzler Hausnummer | Edelstahl | Modern | Anthrazitgrau | Höhe 20 cm"
+        },
+        {
+          "sku": "HS-Elbars-Str-AN",
+          "name": "Metzler Individuelle Hausnummer aus Edelstahl"
+        },
+        {
+          "sku": "anCE_HN_sa",
+          "name": "Metzler Hausnummernschild aus Edelstahl Anthrazitgrau RAL 7016"
+        },
+        {
+          "sku": "WEB-L-SO",
+          "name": "Namensschild in Anthrazit mit Lasergravur"
+        },
+        {
+          "sku": "HS-Elbars-AN",
+          "name": "Metzler modernes Hausnummernschild Edelstahl Anthrazit"
+        },
+        {
+          "sku": "Siebert",
+          "name": "Metzler Briefkasten aus hochwertigem Stahl | Siebert"
+        },
+        {
+          "sku": "Hermann",
+          "name": "Metzler Briefkasten mit Lasergravur | Hermann"
+        },
+        {
+          "sku": "Ebenhard",
+          "name": "Metzler Briefkasten austauschbares Namensschild | Ebenhard"
+        },
+        {
+          "sku": "ebenhard-BS",
+          "name": "Metzler Standbriefkasten aus hochwertigem Stahl | Siebert"
+        },
+        {
+          "sku": "Stencil27",
+          "name": "Metzler Briefkasten mit Lasergravur | Stencil"
+        },
+        {
+          "sku": "Modell-G",
+          "name": "Metzler Briefkasten Design | Modell-G"
+        },
+        {
+          "sku": "Stelio",
+          "name": "Metzler Briefkasten pulverbeschichtet | Lasergravur | Stelio"
+        },
+        {
+          "sku": "PBOX-BISPO2-1x",
+          "name": "Metzler Paketbox mit Briefkasten | personalisiert mit Gravur | Edelstahl-Namensschild | mit Briefeinwurf | Bispo 2"
+        },
+        {
+          "sku": "Avalon2",
+          "name": "Metzler Paketbox | personalisiert mit Gravur | Edelstahl-Namensschild | rostfrei & massiv | Avalon 2"
+        },
+        {
+          "sku": "MMB-1-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-3-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | in Holzoptik | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-4-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | Anthrazit RAL 7016 | aus Stahl | mit Sichtstreifen | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-2-2X",
+          "name": "Metzler Mülltonnenbox mit Pflanzdach | 2er | 240l | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-2-1X",
+          "name": "Metzler Mülltonnenbox mit Pflanzdach | 1er | 240l | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        }
+      ],
+      "finder_facets": {
+        "Preisklasse": "Mittelklasse (79–199 €)"
+      }
+    },
+    {
+      "id": 36747,
+      "sku": "DS-2CD2046G2-I",
+      "name": "Hikvision DS-2CD2046G2-I(2.8mm)(C) 4MP AcuSense Outdoor Mini Bullet Überwachungskamera",
+      "categories": [
+        "Sicherheitstechnik",
+        "IP Kameras"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 189.0,
+        "to": 189.0
+      },
+      "url": "https://edelstahl-tuerklingel.de/hikvision-ds-2cd2046g2-i28mmc-4mp-acusense-outdoor-mini-bullet-ueberwachungskamera",
+      "short_description": "Hohe Bildqualität mit 4 MP Auflösung Hervorragende Leistung bei schlechten Lichtverhältnissen durch powered by DarkFighter-Technologie Klare Bilder bei starkem Gegenlicht dank 120 dB echter WDR-Technologie Effiziente H.265+ Kompressionstechnologie Fokussierte Klassifizierung von Menschen und Fahrzeugen auf Basis von Deep Learning Wasser- und staubdicht (IP67)",
+      "cross_sell_count": 19,
+      "characteristics": {
+        "Auflösung": [
+          "4 MP"
+        ],
+        "Nachtsicht": [
+          "SW"
+        ],
+        "PTZ-Funktion": [
+          "Nein"
+        ],
+        "POE": [
+          "Ja"
+        ],
+        "Marke": [
+          "Hikvision"
+        ],
+        "Speicherart": [
+          "Intern",
+          "Extern",
+          "Cloud"
+        ],
+        "Farbe": [
+          "Weiß"
+        ]
+      },
+      "cross_sell": [
+        {
+          "sku": "HN-AN-ES-200",
+          "name": "Metzler Hausnummer | Edelstahl | Modern | Anthrazitgrau | Höhe 20 cm"
+        },
+        {
+          "sku": "HS-Elbars-Str-AN",
+          "name": "Metzler Individuelle Hausnummer aus Edelstahl"
+        },
+        {
+          "sku": "anCE_HN_sa",
+          "name": "Metzler Hausnummernschild aus Edelstahl Anthrazitgrau RAL 7016"
+        },
+        {
+          "sku": "WEB-L-SO",
+          "name": "Namensschild in Anthrazit mit Lasergravur"
+        },
+        {
+          "sku": "HS-Elbars-AN",
+          "name": "Metzler modernes Hausnummernschild Edelstahl Anthrazit"
+        },
+        {
+          "sku": "Siebert",
+          "name": "Metzler Briefkasten aus hochwertigem Stahl | Siebert"
+        },
+        {
+          "sku": "Hermann",
+          "name": "Metzler Briefkasten mit Lasergravur | Hermann"
+        },
+        {
+          "sku": "Ebenhard",
+          "name": "Metzler Briefkasten austauschbares Namensschild | Ebenhard"
+        },
+        {
+          "sku": "ebenhard-BS",
+          "name": "Metzler Standbriefkasten aus hochwertigem Stahl | Siebert"
+        },
+        {
+          "sku": "Stencil27",
+          "name": "Metzler Briefkasten mit Lasergravur | Stencil"
+        },
+        {
+          "sku": "Modell-G",
+          "name": "Metzler Briefkasten Design | Modell-G"
+        },
+        {
+          "sku": "Stelio",
+          "name": "Metzler Briefkasten pulverbeschichtet | Lasergravur | Stelio"
+        },
+        {
+          "sku": "PBOX-BISPO2-1x",
+          "name": "Metzler Paketbox mit Briefkasten | personalisiert mit Gravur | Edelstahl-Namensschild | mit Briefeinwurf | Bispo 2"
+        },
+        {
+          "sku": "Avalon2",
+          "name": "Metzler Paketbox | personalisiert mit Gravur | Edelstahl-Namensschild | rostfrei & massiv | Avalon 2"
+        },
+        {
+          "sku": "MMB-1-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-3-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | in Holzoptik | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-4-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | Anthrazit RAL 7016 | aus Stahl | mit Sichtstreifen | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-2-2X",
+          "name": "Metzler Mülltonnenbox mit Pflanzdach | 2er | 240l | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-2-1X",
+          "name": "Metzler Mülltonnenbox mit Pflanzdach | 1er | 240l | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        }
+      ],
+      "finder_facets": {
+        "Auflösung": [
+          "4 MP"
+        ],
+        "Nachtsicht": [
+          "SW"
+        ],
+        "PTZ-Funktion": [
+          "Nein"
+        ],
+        "Marke": [
+          "Hikvision"
+        ],
+        "Speicherart": [
+          "Intern",
+          "Extern",
+          "Cloud"
+        ],
+        "Preisklasse": "Mittelklasse (79–199 €)"
+      }
+    },
+    {
+      "id": 36746,
+      "sku": "DS-2CD2345G0P-I",
+      "name": "Hikvision DS-2CD2345G0P-I(1.68mm) 4 MP Ultraweitwinkel IP Turret Überwachungskamera",
+      "categories": [
+        "Sicherheitstechnik",
+        "IP Kameras"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 199.0,
+        "to": 199.0
+      },
+      "url": "https://edelstahl-tuerklingel.de/hikvision-ds-2cd2345g0p-i168mm-4-mp-ultraweitwinkel-ip-turret-ueberwachungskamera",
+      "short_description": "Hohe Bildqualität mit 4 MP Auflösung 180°superweites Sichtfeld Effiziente H.265+ Kompressionstechnologie Klare Bilder bei starkem Gegenlicht durch 120 dB True WDR Technologie Korrektur von Verzerrungen Robuste Bauweise mit Vollmetallmaterialien",
+      "cross_sell_count": 19,
+      "characteristics": {
+        "Auflösung": [
+          "4 MP"
+        ],
+        "Nachtsicht": [
+          "SW"
+        ],
+        "PTZ-Funktion": [
+          "Nein"
+        ],
+        "POE": [
+          "Ja"
+        ],
+        "Marke": [
+          "Hikvision"
+        ],
+        "Speicherart": [
+          "Intern",
+          "Extern",
+          "Cloud"
+        ],
+        "Farbe": [
+          "Weiß"
+        ]
+      },
+      "cross_sell": [
+        {
+          "sku": "HN-AN-ES-200",
+          "name": "Metzler Hausnummer | Edelstahl | Modern | Anthrazitgrau | Höhe 20 cm"
+        },
+        {
+          "sku": "HS-Elbars-Str-AN",
+          "name": "Metzler Individuelle Hausnummer aus Edelstahl"
+        },
+        {
+          "sku": "anCE_HN_sa",
+          "name": "Metzler Hausnummernschild aus Edelstahl Anthrazitgrau RAL 7016"
+        },
+        {
+          "sku": "WEB-L-SO",
+          "name": "Namensschild in Anthrazit mit Lasergravur"
+        },
+        {
+          "sku": "HS-Elbars-AN",
+          "name": "Metzler modernes Hausnummernschild Edelstahl Anthrazit"
+        },
+        {
+          "sku": "Siebert",
+          "name": "Metzler Briefkasten aus hochwertigem Stahl | Siebert"
+        },
+        {
+          "sku": "Hermann",
+          "name": "Metzler Briefkasten mit Lasergravur | Hermann"
+        },
+        {
+          "sku": "Ebenhard",
+          "name": "Metzler Briefkasten austauschbares Namensschild | Ebenhard"
+        },
+        {
+          "sku": "ebenhard-BS",
+          "name": "Metzler Standbriefkasten aus hochwertigem Stahl | Siebert"
+        },
+        {
+          "sku": "Stencil27",
+          "name": "Metzler Briefkasten mit Lasergravur | Stencil"
+        },
+        {
+          "sku": "Modell-G",
+          "name": "Metzler Briefkasten Design | Modell-G"
+        },
+        {
+          "sku": "Stelio",
+          "name": "Metzler Briefkasten pulverbeschichtet | Lasergravur | Stelio"
+        },
+        {
+          "sku": "PBOX-BISPO2-1x",
+          "name": "Metzler Paketbox mit Briefkasten | personalisiert mit Gravur | Edelstahl-Namensschild | mit Briefeinwurf | Bispo 2"
+        },
+        {
+          "sku": "Avalon2",
+          "name": "Metzler Paketbox | personalisiert mit Gravur | Edelstahl-Namensschild | rostfrei & massiv | Avalon 2"
+        },
+        {
+          "sku": "MMB-1-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-3-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | in Holzoptik | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-4-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | Anthrazit RAL 7016 | aus Stahl | mit Sichtstreifen | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-2-2X",
+          "name": "Metzler Mülltonnenbox mit Pflanzdach | 2er | 240l | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-2-1X",
+          "name": "Metzler Mülltonnenbox mit Pflanzdach | 1er | 240l | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        }
+      ],
+      "finder_facets": {
+        "Auflösung": [
+          "4 MP"
+        ],
+        "Nachtsicht": [
+          "SW"
+        ],
+        "PTZ-Funktion": [
+          "Nein"
+        ],
+        "Marke": [
+          "Hikvision"
+        ],
+        "Speicherart": [
+          "Intern",
+          "Extern",
+          "Cloud"
+        ],
+        "Preisklasse": "Mittelklasse (79–199 €)"
+      }
+    },
+    {
+      "id": 36745,
+      "sku": "DS-2CD2523G2-I",
+      "name": "Hikvision DS-2CD2523G2-I(2.8mm) 2MP AcuSense Mini Dome Netzwerkkamera mit integriertem Mikrofon",
+      "categories": [
+        "Sicherheitstechnik",
+        "IP Kameras"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 189.0,
+        "to": 189.0
+      },
+      "url": "https://edelstahl-tuerklingel.de/hikvision-ds-2cd2523g2-i28mm-2mp-acusense-mini-dome-netzwerkkamera-mit-integriertem-mikrofon",
+      "short_description": "Hohe Bildqualität mit 2 MP Auflösung Klare Bilder bei starkem Gegenlicht dank 120 dB WDR-Technologie Effiziente H.265+ Kompressionstechnologie Fokus auf die Klassifizierung von Menschen und Fahrzeugen basierend auf Deep Learning -S: Audio- und Alarmschnittstelle verfügbar Wasser- und staubgeschützt (IP67) und vandalismusgeschützt (IK08)",
+      "cross_sell_count": 19,
+      "characteristics": {
+        "Auflösung": [
+          "2 MP"
+        ],
+        "Nachtsicht": [
+          "SW"
+        ],
+        "PTZ-Funktion": [
+          "Nein"
+        ],
+        "POE": [
+          "Ja"
+        ],
+        "Marke": [
+          "Hikvision"
+        ],
+        "Speicherart": [
+          "Intern",
+          "Extern",
+          "Cloud"
+        ],
+        "Farbe": [
+          "Weiß"
+        ]
+      },
+      "cross_sell": [
+        {
+          "sku": "HN-AN-ES-200",
+          "name": "Metzler Hausnummer | Edelstahl | Modern | Anthrazitgrau | Höhe 20 cm"
+        },
+        {
+          "sku": "HS-Elbars-Str-AN",
+          "name": "Metzler Individuelle Hausnummer aus Edelstahl"
+        },
+        {
+          "sku": "anCE_HN_sa",
+          "name": "Metzler Hausnummernschild aus Edelstahl Anthrazitgrau RAL 7016"
+        },
+        {
+          "sku": "WEB-L-SO",
+          "name": "Namensschild in Anthrazit mit Lasergravur"
+        },
+        {
+          "sku": "HS-Elbars-AN",
+          "name": "Metzler modernes Hausnummernschild Edelstahl Anthrazit"
+        },
+        {
+          "sku": "Siebert",
+          "name": "Metzler Briefkasten aus hochwertigem Stahl | Siebert"
+        },
+        {
+          "sku": "Hermann",
+          "name": "Metzler Briefkasten mit Lasergravur | Hermann"
+        },
+        {
+          "sku": "Ebenhard",
+          "name": "Metzler Briefkasten austauschbares Namensschild | Ebenhard"
+        },
+        {
+          "sku": "ebenhard-BS",
+          "name": "Metzler Standbriefkasten aus hochwertigem Stahl | Siebert"
+        },
+        {
+          "sku": "Stencil27",
+          "name": "Metzler Briefkasten mit Lasergravur | Stencil"
+        },
+        {
+          "sku": "Modell-G",
+          "name": "Metzler Briefkasten Design | Modell-G"
+        },
+        {
+          "sku": "Stelio",
+          "name": "Metzler Briefkasten pulverbeschichtet | Lasergravur | Stelio"
+        },
+        {
+          "sku": "PBOX-BISPO2-1x",
+          "name": "Metzler Paketbox mit Briefkasten | personalisiert mit Gravur | Edelstahl-Namensschild | mit Briefeinwurf | Bispo 2"
+        },
+        {
+          "sku": "Avalon2",
+          "name": "Metzler Paketbox | personalisiert mit Gravur | Edelstahl-Namensschild | rostfrei & massiv | Avalon 2"
+        },
+        {
+          "sku": "MMB-1-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-3-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | in Holzoptik | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-4-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | Anthrazit RAL 7016 | aus Stahl | mit Sichtstreifen | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-2-2X",
+          "name": "Metzler Mülltonnenbox mit Pflanzdach | 2er | 240l | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-2-1X",
+          "name": "Metzler Mülltonnenbox mit Pflanzdach | 1er | 240l | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        }
+      ],
+      "finder_facets": {
+        "Auflösung": [
+          "2 MP"
+        ],
+        "Nachtsicht": [
+          "SW"
+        ],
+        "PTZ-Funktion": [
+          "Nein"
+        ],
+        "Marke": [
+          "Hikvision"
+        ],
+        "Speicherart": [
+          "Intern",
+          "Extern",
+          "Cloud"
+        ],
+        "Preisklasse": "Mittelklasse (79–199 €)"
+      }
+    },
+    {
+      "id": 36742,
+      "sku": "DS-2CD2646G2-IZS",
+      "name": "Hikvision DS-2CD2646G2-IZS(2.8-12mm)(C) 4 MP IP AcuSense Überwachungskamera",
+      "categories": [
+        "Sicherheitstechnik",
+        "IP Kameras"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 389.0,
+        "to": 389.0
+      },
+      "url": "https://edelstahl-tuerklingel.de/hikvision-ds-2cd2646g2-izs28-12mmc-4-mp-ip-acusense-ueberwachungskamera",
+      "short_description": "Hohe Bildqualität mit 4 MP Auflösung (doppelte FULL HD Auflösung) Hervorragende Leistung bei schlechten Lichtverhältnissen mit Power-by-DarkFighter-Technologie Motorisiertes Varioobjektiv für einfache Installation und Überwachung Klare Bilder bei starkem Gegenlicht dank 120 dB True WDR-Technologie Effiziente H.265+ Komprimierungstechnologie Audio- und Alarmschnittstelle verfügbar Fokus auf die Kla",
+      "cross_sell_count": 19,
+      "characteristics": {
+        "Auflösung": [
+          "4 MP"
+        ],
+        "Nachtsicht": [
+          "SW"
+        ],
+        "PTZ-Funktion": [
+          "Nein"
+        ],
+        "POE": [
+          "Ja"
+        ],
+        "Marke": [
+          "Hikvision"
+        ],
+        "Speicherart": [
+          "Intern",
+          "Extern",
+          "Cloud"
+        ],
+        "Farbe": [
+          "Weiß"
+        ]
+      },
+      "cross_sell": [
+        {
+          "sku": "HN-AN-ES-200",
+          "name": "Metzler Hausnummer | Edelstahl | Modern | Anthrazitgrau | Höhe 20 cm"
+        },
+        {
+          "sku": "HS-Elbars-Str-AN",
+          "name": "Metzler Individuelle Hausnummer aus Edelstahl"
+        },
+        {
+          "sku": "anCE_HN_sa",
+          "name": "Metzler Hausnummernschild aus Edelstahl Anthrazitgrau RAL 7016"
+        },
+        {
+          "sku": "WEB-L-SO",
+          "name": "Namensschild in Anthrazit mit Lasergravur"
+        },
+        {
+          "sku": "HS-Elbars-AN",
+          "name": "Metzler modernes Hausnummernschild Edelstahl Anthrazit"
+        },
+        {
+          "sku": "Siebert",
+          "name": "Metzler Briefkasten aus hochwertigem Stahl | Siebert"
+        },
+        {
+          "sku": "Hermann",
+          "name": "Metzler Briefkasten mit Lasergravur | Hermann"
+        },
+        {
+          "sku": "Ebenhard",
+          "name": "Metzler Briefkasten austauschbares Namensschild | Ebenhard"
+        },
+        {
+          "sku": "ebenhard-BS",
+          "name": "Metzler Standbriefkasten aus hochwertigem Stahl | Siebert"
+        },
+        {
+          "sku": "Stencil27",
+          "name": "Metzler Briefkasten mit Lasergravur | Stencil"
+        },
+        {
+          "sku": "Modell-G",
+          "name": "Metzler Briefkasten Design | Modell-G"
+        },
+        {
+          "sku": "Stelio",
+          "name": "Metzler Briefkasten pulverbeschichtet | Lasergravur | Stelio"
+        },
+        {
+          "sku": "PBOX-BISPO2-1x",
+          "name": "Metzler Paketbox mit Briefkasten | personalisiert mit Gravur | Edelstahl-Namensschild | mit Briefeinwurf | Bispo 2"
+        },
+        {
+          "sku": "Avalon2",
+          "name": "Metzler Paketbox | personalisiert mit Gravur | Edelstahl-Namensschild | rostfrei & massiv | Avalon 2"
+        },
+        {
+          "sku": "MMB-1-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-3-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | in Holzoptik | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-4-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | Anthrazit RAL 7016 | aus Stahl | mit Sichtstreifen | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-2-2X",
+          "name": "Metzler Mülltonnenbox mit Pflanzdach | 2er | 240l | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-2-1X",
+          "name": "Metzler Mülltonnenbox mit Pflanzdach | 1er | 240l | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        }
+      ],
+      "finder_facets": {
+        "Auflösung": [
+          "4 MP"
+        ],
+        "Nachtsicht": [
+          "SW"
+        ],
+        "PTZ-Funktion": [
+          "Nein"
+        ],
+        "Marke": [
+          "Hikvision"
+        ],
+        "Speicherart": [
+          "Intern",
+          "Extern",
+          "Cloud"
+        ],
+        "Preisklasse": "Premium (> 199 €)"
+      }
+    },
+    {
+      "id": 36743,
+      "sku": "DS-2CD2686G2-IZS",
+      "name": "Hikvision DS-2CD2686G2-IZS(2.8-12mm)(C) 8MP AcuSense Motorisierte Varifocal Bullet Kamera Outdoor",
+      "categories": [
+        "Sicherheitstechnik",
+        "IP Kameras"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 439.0,
+        "to": 439.0
+      },
+      "url": "https://edelstahl-tuerklingel.de/hikvision-ds-2cd2686g2-izs28-12mmc-8mp-acusense-motorisierte-varifocal-bullet-kamera-outdoor",
+      "short_description": "Hohe Bildqualität mit 8 MP Auflösung Motorisiertes Vario-Objektiv für einfache Installation und Überwachung Hervorragende Leistung bei schlechten Lichtverhältnissen durch powered-by-DarkFighter-Technologie Effiziente H.265+ Kompressionstechnologie Klare Bilder bei starkem Gegenlicht dank 120 dB echter WDR-Technologie Fokussierung auf die Klassifizierung von Personen- und Fahrzeugzielen basierend a",
+      "cross_sell_count": 19,
+      "characteristics": {
+        "Auflösung": [
+          "8 MP [4K]"
+        ],
+        "Nachtsicht": [
+          "SW"
+        ],
+        "PTZ-Funktion": [
+          "Nein"
+        ],
+        "POE": [
+          "Ja"
+        ],
+        "Marke": [
+          "Hikvision"
+        ],
+        "Speicherart": [
+          "Intern",
+          "Extern",
+          "Cloud"
+        ],
+        "Farbe": [
+          "Weiß"
+        ]
+      },
+      "cross_sell": [
+        {
+          "sku": "HN-AN-ES-200",
+          "name": "Metzler Hausnummer | Edelstahl | Modern | Anthrazitgrau | Höhe 20 cm"
+        },
+        {
+          "sku": "HS-Elbars-Str-AN",
+          "name": "Metzler Individuelle Hausnummer aus Edelstahl"
+        },
+        {
+          "sku": "anCE_HN_sa",
+          "name": "Metzler Hausnummernschild aus Edelstahl Anthrazitgrau RAL 7016"
+        },
+        {
+          "sku": "WEB-L-SO",
+          "name": "Namensschild in Anthrazit mit Lasergravur"
+        },
+        {
+          "sku": "HS-Elbars-AN",
+          "name": "Metzler modernes Hausnummernschild Edelstahl Anthrazit"
+        },
+        {
+          "sku": "Siebert",
+          "name": "Metzler Briefkasten aus hochwertigem Stahl | Siebert"
+        },
+        {
+          "sku": "Hermann",
+          "name": "Metzler Briefkasten mit Lasergravur | Hermann"
+        },
+        {
+          "sku": "Ebenhard",
+          "name": "Metzler Briefkasten austauschbares Namensschild | Ebenhard"
+        },
+        {
+          "sku": "ebenhard-BS",
+          "name": "Metzler Standbriefkasten aus hochwertigem Stahl | Siebert"
+        },
+        {
+          "sku": "Stencil27",
+          "name": "Metzler Briefkasten mit Lasergravur | Stencil"
+        },
+        {
+          "sku": "Modell-G",
+          "name": "Metzler Briefkasten Design | Modell-G"
+        },
+        {
+          "sku": "Stelio",
+          "name": "Metzler Briefkasten pulverbeschichtet | Lasergravur | Stelio"
+        },
+        {
+          "sku": "PBOX-BISPO2-1x",
+          "name": "Metzler Paketbox mit Briefkasten | personalisiert mit Gravur | Edelstahl-Namensschild | mit Briefeinwurf | Bispo 2"
+        },
+        {
+          "sku": "Avalon2",
+          "name": "Metzler Paketbox | personalisiert mit Gravur | Edelstahl-Namensschild | rostfrei & massiv | Avalon 2"
+        },
+        {
+          "sku": "MMB-1-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-3-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | in Holzoptik | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-4-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | Anthrazit RAL 7016 | aus Stahl | mit Sichtstreifen | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-2-2X",
+          "name": "Metzler Mülltonnenbox mit Pflanzdach | 2er | 240l | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-2-1X",
+          "name": "Metzler Mülltonnenbox mit Pflanzdach | 1er | 240l | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        }
+      ],
+      "finder_facets": {
+        "Auflösung": [
+          "8 MP [4K]"
+        ],
+        "Nachtsicht": [
+          "SW"
+        ],
+        "PTZ-Funktion": [
+          "Nein"
+        ],
+        "Marke": [
+          "Hikvision"
+        ],
+        "Speicherart": [
+          "Intern",
+          "Extern",
+          "Cloud"
+        ],
+        "Preisklasse": "Premium (> 199 €)"
+      }
+    },
+    {
+      "id": 36744,
+      "sku": "DS-2CD2743G2-IZS",
+      "name": "Hikvision DS-2CD2743G2-IZS(2.8-12mm) 4MP EXIR IP Dome Überwachungskamera",
+      "categories": [
+        "Sicherheitstechnik",
+        "IP Kameras"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 279.0,
+        "to": 279.0
+      },
+      "url": "https://edelstahl-tuerklingel.de/hikvision-ds-2cd2743g2-izs28-12mm-4mp-exir-ip-dome-ueberwachungskamera",
+      "short_description": "Hohe Bildqualität mit 4 MP Auflösung Motorisiertes Vario-Objektiv für einfache Installation und Überwachung Klare Bilder bei starkem Gegenlicht dank 120 dB WDR-Technologie Effiziente H.265+ Kompressionstechnologie Wasser- und staubdicht (IP67) und vandalismusgeschützt (IK10) Fokus auf die Klassifizierung von Menschen und Fahrzeugen basierend auf Deep Learning",
+      "cross_sell_count": 19,
+      "characteristics": {
+        "Auflösung": [
+          "4 MP"
+        ],
+        "Nachtsicht": [
+          "SW"
+        ],
+        "PTZ-Funktion": [
+          "Nein"
+        ],
+        "POE": [
+          "Ja"
+        ],
+        "Marke": [
+          "Hikvision"
+        ],
+        "Speicherart": [
+          "Intern",
+          "Extern",
+          "Cloud"
+        ],
+        "Farbe": [
+          "Weiß"
+        ]
+      },
+      "cross_sell": [
+        {
+          "sku": "HN-AN-ES-200",
+          "name": "Metzler Hausnummer | Edelstahl | Modern | Anthrazitgrau | Höhe 20 cm"
+        },
+        {
+          "sku": "HS-Elbars-Str-AN",
+          "name": "Metzler Individuelle Hausnummer aus Edelstahl"
+        },
+        {
+          "sku": "anCE_HN_sa",
+          "name": "Metzler Hausnummernschild aus Edelstahl Anthrazitgrau RAL 7016"
+        },
+        {
+          "sku": "WEB-L-SO",
+          "name": "Namensschild in Anthrazit mit Lasergravur"
+        },
+        {
+          "sku": "HS-Elbars-AN",
+          "name": "Metzler modernes Hausnummernschild Edelstahl Anthrazit"
+        },
+        {
+          "sku": "Siebert",
+          "name": "Metzler Briefkasten aus hochwertigem Stahl | Siebert"
+        },
+        {
+          "sku": "Hermann",
+          "name": "Metzler Briefkasten mit Lasergravur | Hermann"
+        },
+        {
+          "sku": "Ebenhard",
+          "name": "Metzler Briefkasten austauschbares Namensschild | Ebenhard"
+        },
+        {
+          "sku": "ebenhard-BS",
+          "name": "Metzler Standbriefkasten aus hochwertigem Stahl | Siebert"
+        },
+        {
+          "sku": "Stencil27",
+          "name": "Metzler Briefkasten mit Lasergravur | Stencil"
+        },
+        {
+          "sku": "Modell-G",
+          "name": "Metzler Briefkasten Design | Modell-G"
+        },
+        {
+          "sku": "Stelio",
+          "name": "Metzler Briefkasten pulverbeschichtet | Lasergravur | Stelio"
+        },
+        {
+          "sku": "PBOX-BISPO2-1x",
+          "name": "Metzler Paketbox mit Briefkasten | personalisiert mit Gravur | Edelstahl-Namensschild | mit Briefeinwurf | Bispo 2"
+        },
+        {
+          "sku": "Avalon2",
+          "name": "Metzler Paketbox | personalisiert mit Gravur | Edelstahl-Namensschild | rostfrei & massiv | Avalon 2"
+        },
+        {
+          "sku": "MMB-1-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-3-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | in Holzoptik | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-4-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | Anthrazit RAL 7016 | aus Stahl | mit Sichtstreifen | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-2-2X",
+          "name": "Metzler Mülltonnenbox mit Pflanzdach | 2er | 240l | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-2-1X",
+          "name": "Metzler Mülltonnenbox mit Pflanzdach | 1er | 240l | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        }
+      ],
+      "finder_facets": {
+        "Auflösung": [
+          "4 MP"
+        ],
+        "Nachtsicht": [
+          "SW"
+        ],
+        "PTZ-Funktion": [
+          "Nein"
+        ],
+        "Marke": [
+          "Hikvision"
+        ],
+        "Speicherart": [
+          "Intern",
+          "Extern",
+          "Cloud"
+        ],
+        "Preisklasse": "Premium (> 199 €)"
+      }
+    },
+    {
+      "id": 36749,
+      "sku": "DS-2DE4A225IW-DE",
+      "name": "Hikvision DS-2DE4A225IW-DE(S6) 2MP 25x Zoom DarkFighter IR Speed Dome PTZ Kamera Smart Tracking",
+      "categories": [
+        "Sicherheitstechnik",
+        "IP Kameras"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 599.0,
+        "to": 599.0
+      },
+      "url": "https://edelstahl-tuerklingel.de/hikvision-ds-2de4a225iw-des6-2mp-25x-zoom-darkfighter-ir-speed-dome-ptz-kamera-smart-tracking",
+      "short_description": "Hohe Bildqualität mit 2 MP Auflösung Hervorragende Leistung bei schlechten Lichtverhältnissen durch powered-by-DarkFighter-Technologie Klare Bilder bei starkem Gegenlicht durch 120 dB WDR-Technologie 25-facher optischer Zoom ermöglicht die nähere Betrachtung von Motiven in weitläufigen Bereichen Bis zu 50 m IR-Reichweite sorgen für Sicherheit bei Nacht Wasser- und staubdicht (IP66)",
+      "cross_sell_count": 19,
+      "characteristics": {
+        "Auflösung": [
+          "2 MP"
+        ],
+        "Nachtsicht": [
+          "SW"
+        ],
+        "PTZ-Funktion": [
+          "Ja"
+        ],
+        "POE": [
+          "Ja"
+        ],
+        "Marke": [
+          "Hikvision"
+        ],
+        "Speicherart": [
+          "Intern",
+          "Extern",
+          "Cloud"
+        ],
+        "Farbe": [
+          "Weiß"
+        ]
+      },
+      "cross_sell": [
+        {
+          "sku": "HN-AN-ES-200",
+          "name": "Metzler Hausnummer | Edelstahl | Modern | Anthrazitgrau | Höhe 20 cm"
+        },
+        {
+          "sku": "HS-Elbars-Str-AN",
+          "name": "Metzler Individuelle Hausnummer aus Edelstahl"
+        },
+        {
+          "sku": "anCE_HN_sa",
+          "name": "Metzler Hausnummernschild aus Edelstahl Anthrazitgrau RAL 7016"
+        },
+        {
+          "sku": "WEB-L-SO",
+          "name": "Namensschild in Anthrazit mit Lasergravur"
+        },
+        {
+          "sku": "HS-Elbars-AN",
+          "name": "Metzler modernes Hausnummernschild Edelstahl Anthrazit"
+        },
+        {
+          "sku": "Siebert",
+          "name": "Metzler Briefkasten aus hochwertigem Stahl | Siebert"
+        },
+        {
+          "sku": "Hermann",
+          "name": "Metzler Briefkasten mit Lasergravur | Hermann"
+        },
+        {
+          "sku": "Ebenhard",
+          "name": "Metzler Briefkasten austauschbares Namensschild | Ebenhard"
+        },
+        {
+          "sku": "ebenhard-BS",
+          "name": "Metzler Standbriefkasten aus hochwertigem Stahl | Siebert"
+        },
+        {
+          "sku": "Stencil27",
+          "name": "Metzler Briefkasten mit Lasergravur | Stencil"
+        },
+        {
+          "sku": "Modell-G",
+          "name": "Metzler Briefkasten Design | Modell-G"
+        },
+        {
+          "sku": "Stelio",
+          "name": "Metzler Briefkasten pulverbeschichtet | Lasergravur | Stelio"
+        },
+        {
+          "sku": "PBOX-BISPO2-1x",
+          "name": "Metzler Paketbox mit Briefkasten | personalisiert mit Gravur | Edelstahl-Namensschild | mit Briefeinwurf | Bispo 2"
+        },
+        {
+          "sku": "Avalon2",
+          "name": "Metzler Paketbox | personalisiert mit Gravur | Edelstahl-Namensschild | rostfrei & massiv | Avalon 2"
+        },
+        {
+          "sku": "MMB-1-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-3-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | in Holzoptik | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-4-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | Anthrazit RAL 7016 | aus Stahl | mit Sichtstreifen | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-2-2X",
+          "name": "Metzler Mülltonnenbox mit Pflanzdach | 2er | 240l | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-2-1X",
+          "name": "Metzler Mülltonnenbox mit Pflanzdach | 1er | 240l | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        }
+      ],
+      "finder_facets": {
+        "Auflösung": [
+          "2 MP"
+        ],
+        "Nachtsicht": [
+          "SW"
+        ],
+        "PTZ-Funktion": [
+          "Ja"
+        ],
+        "Marke": [
+          "Hikvision"
+        ],
+        "Speicherart": [
+          "Intern",
+          "Extern",
+          "Cloud"
+        ],
+        "Preisklasse": "Premium (> 199 €)"
+      }
+    },
+    {
+      "id": 36752,
+      "sku": "DS-2DE5425IW-AE",
+      "name": "Hikvision DS-2DE5425IW-AE(T5) 4MP 25X Zoom Darkfighter Netzwerk PTZ Kamera",
+      "categories": [
+        "Sicherheitstechnik",
+        "IP Kameras"
+      ],
+      "variants_count": 0,
+      "price_eur_gross": {
+        "from": 599.0,
+        "to": 599.0
+      },
+      "url": "https://edelstahl-tuerklingel.de/hikvision-ds-2de5425iw-aet5-4mp-25x-zoom-darkfighter-netzwerk-ptz-kamera",
+      "short_description": "1/2,8\" Progressive Scan CMOS. Hohe Bildqualität mit 4MP Auflösung Konzentriert sich auf die Klassifizierung von Menschen und Fahrzeugen auf basierend auf Deep Learning Hervorragende Leistung bei schlechten Lichtverhältnissen mit powered-by-DarkFighter-Technologie 25-facher optischer und 16-facher digitaler Zoom für Nahaufnahmen Nahaufnahmen über weitläufige Gebiete WDR, HLC, BLC, 3D DNR, Defog, re",
+      "cross_sell_count": 19,
+      "characteristics": {
+        "Auflösung": [
+          "4 MP"
+        ],
+        "Nachtsicht": [
+          "SW"
+        ],
+        "PTZ-Funktion": [
+          "Ja"
+        ],
+        "POE": [
+          "Ja"
+        ],
+        "Marke": [
+          "Hikvision"
+        ],
+        "Speicherart": [
+          "Intern",
+          "Extern",
+          "Cloud"
+        ],
+        "Farbe": [
+          "Weiß"
+        ]
+      },
+      "cross_sell": [
+        {
+          "sku": "HN-AN-ES-200",
+          "name": "Metzler Hausnummer | Edelstahl | Modern | Anthrazitgrau | Höhe 20 cm"
+        },
+        {
+          "sku": "HS-Elbars-Str-AN",
+          "name": "Metzler Individuelle Hausnummer aus Edelstahl"
+        },
+        {
+          "sku": "anCE_HN_sa",
+          "name": "Metzler Hausnummernschild aus Edelstahl Anthrazitgrau RAL 7016"
+        },
+        {
+          "sku": "WEB-L-SO",
+          "name": "Namensschild in Anthrazit mit Lasergravur"
+        },
+        {
+          "sku": "HS-Elbars-AN",
+          "name": "Metzler modernes Hausnummernschild Edelstahl Anthrazit"
+        },
+        {
+          "sku": "Siebert",
+          "name": "Metzler Briefkasten aus hochwertigem Stahl | Siebert"
+        },
+        {
+          "sku": "Hermann",
+          "name": "Metzler Briefkasten mit Lasergravur | Hermann"
+        },
+        {
+          "sku": "Ebenhard",
+          "name": "Metzler Briefkasten austauschbares Namensschild | Ebenhard"
+        },
+        {
+          "sku": "ebenhard-BS",
+          "name": "Metzler Standbriefkasten aus hochwertigem Stahl | Siebert"
+        },
+        {
+          "sku": "Stencil27",
+          "name": "Metzler Briefkasten mit Lasergravur | Stencil"
+        },
+        {
+          "sku": "Modell-G",
+          "name": "Metzler Briefkasten Design | Modell-G"
+        },
+        {
+          "sku": "Stelio",
+          "name": "Metzler Briefkasten pulverbeschichtet | Lasergravur | Stelio"
+        },
+        {
+          "sku": "PBOX-BISPO2-1x",
+          "name": "Metzler Paketbox mit Briefkasten | personalisiert mit Gravur | Edelstahl-Namensschild | mit Briefeinwurf | Bispo 2"
+        },
+        {
+          "sku": "Avalon2",
+          "name": "Metzler Paketbox | personalisiert mit Gravur | Edelstahl-Namensschild | rostfrei & massiv | Avalon 2"
+        },
+        {
+          "sku": "MMB-1-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-3-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | in Holzoptik | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-4-2X",
+          "name": "Metzler Mülltonnenbox | 2er | 240l | Anthrazit RAL 7016 | aus Stahl | mit Sichtstreifen | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-2-2X",
+          "name": "Metzler Mülltonnenbox mit Pflanzdach | 2er | 240l | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        },
+        {
+          "sku": "MMB-2-1X",
+          "name": "Metzler Mülltonnenbox mit Pflanzdach | 1er | 240l | Anthrazit RAL 7016 | aus Stahl | rostfrei & massiv | Türgriff mit Schloss"
+        }
+      ],
+      "finder_facets": {
+        "Auflösung": [
+          "4 MP"
+        ],
+        "Nachtsicht": [
+          "SW"
+        ],
+        "PTZ-Funktion": [
+          "Ja"
+        ],
+        "Marke": [
+          "Hikvision"
+        ],
+        "Speicherart": [
+          "Intern",
+          "Extern",
+          "Cloud"
+        ],
+        "Preisklasse": "Premium (> 199 €)"
+      }
+    }
+  ],
+  "decision_tree": {
+    "how_to_read": "Fixed question order (the category's most-used filters). Each node shows how many models remain; dead_end:true = that answer leaves 0. Models with several values appear under each, so counts can exceed the parent. Branches stop at <=3 models and list the SKUs.",
+    "question_order": [
+      "Auflösung",
+      "Nachtsicht",
+      "PTZ-Funktion"
+    ],
+    "tree": {
+      "remaining": 51,
+      "question": "Auflösung",
+      "options": {
+        "4 MP": {
+          "remaining": 12,
+          "question": "Nachtsicht",
+          "options": {
+            "Farbe": {
+              "remaining": 4,
+              "question": "PTZ-Funktion",
+              "options": {
+                "Ja": {
+                  "remaining": 3,
+                  "models": [
+                    "13962",
+                    "13965",
+                    "14641"
+                  ]
+                },
+                "Nein": {
+                  "remaining": 1,
+                  "models": [
+                    "14640"
+                  ]
+                }
+              }
+            },
+            "SW": {
+              "remaining": 5,
+              "question": "PTZ-Funktion",
+              "options": {
+                "Ja": {
+                  "remaining": 1,
+                  "models": [
+                    "DS-2DE5425IW-AE"
+                  ]
+                },
+                "Nein": {
+                  "remaining": 4,
+                  "models": [
+                    "DS-2CD2046G2-I",
+                    "DS-2CD2345G0P-I",
+                    "DS-2CD2646G2-IZS",
+                    "DS-2CD2743G2-IZS"
+                  ]
+                }
+              }
+            },
+            "(ohne Angabe)": {
+              "remaining": 3,
+              "models": [
+                "13715",
+                "13717",
+                "13887"
+              ]
+            }
+          }
+        },
+        "2 MP": {
+          "remaining": 3,
+          "models": [
+            "DS-2CD2523G2-I",
+            "DS-2DE4A225IW-DE",
+            "VDM10-BULLET-CAM"
+          ]
+        },
+        "8 MP [4K]": {
+          "remaining": 9,
+          "question": "Nachtsicht",
+          "options": {
+            "Farbe": {
+              "remaining": 0,
+              "dead_end": true
+            },
+            "SW": {
+              "remaining": 1,
+              "models": [
+                "DS-2CD2686G2-IZS"
+              ]
+            },
+            "(ohne Angabe)": {
+              "remaining": 8,
+              "question": "PTZ-Funktion",
+              "options": {
+                "Ja": {
+                  "remaining": 0,
+                  "dead_end": true
+                },
+                "Nein": {
+                  "remaining": 0,
+                  "dead_end": true
+                },
+                "(ohne Angabe)": {
+                  "remaining": 8,
+                  "models": [
+                    "13579",
+                    "13580",
+                    "DUAL-LENS-SET-IPC-B480HAD-LUF/SL",
+                    "DUAL-LENS-SET-IPC-T280HAD-LUF/SL",
+                    "IK28P-480B",
+                    "IK28P-480T",
+                    "IPC-B480HAD-LUF/SL",
+                    "IPC-T280HAD-LUF/SL"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "6 MP": {
+          "remaining": 2,
+          "models": [
+            "IK28P-460B",
+            "IK28P-460T"
+          ]
+        },
+        "(ohne Angabe)": {
+          "remaining": 25,
+          "question": "Nachtsicht",
+          "options": {
+            "Farbe": {
+              "remaining": 0,
+              "dead_end": true
+            },
+            "SW": {
+              "remaining": 0,
+              "dead_end": true
+            },
+            "(ohne Angabe)": {
+              "remaining": 25,
+              "question": "PTZ-Funktion",
+              "options": {
+                "Ja": {
+                  "remaining": 0,
+                  "dead_end": true
+                },
+                "Nein": {
+                  "remaining": 0,
+                  "dead_end": true
+                },
+                "(ohne Angabe)": {
+                  "remaining": 25,
+                  "models": [
+                    "13581",
+                    "13582",
+                    "13588",
+                    "13719",
+                    "13826",
+                    "13886",
+                    "14171",
+                    "14172",
+                    "14173",
+                    "14174",
+                    "14175",
+                    "14176",
+                    "14177",
+                    "14583",
+                    "42491",
+                    "DS-1272ZJ-120B",
+                    "DS-1273ZJ-130-TRL",
+                    "DS-1280ZJ-DM18",
+                    "DS-1280ZJ-DM46",
+                    "DS-1280ZJ-DM55",
+                    "DS-1280ZJ-DM8",
+                    "DS-1281ZJ-M",
+                    "DS-1473ZJ-155B",
+                    "NVR-208MH-K/8P",
+                    "NVR-216MH-K/16P"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "finder_guide": {
+    "recommended_questions": [
+      {
+        "merkmal": "Auflösung",
+        "answers": [
+          "4 MP",
+          "2 MP",
+          "8 MP [4K]",
+          "6 MP"
+        ],
+        "covers_models": 26
+      },
+      {
+        "merkmal": "Nachtsicht",
+        "answers": [
+          "Farbe",
+          "SW"
+        ],
+        "covers_models": 12
+      },
+      {
+        "merkmal": "PTZ-Funktion",
+        "answers": [
+          "Ja",
+          "Nein"
+        ],
+        "covers_models": 12
+      },
+      {
+        "merkmal": "Marke",
+        "answers": [
+          "Hilook",
+          "Hikvision"
+        ],
+        "covers_models": 9
+      },
+      {
+        "merkmal": "Speicherart",
+        "answers": [
+          "Intern",
+          "Cloud",
+          "Extern"
+        ],
+        "covers_models": 9
+      }
+    ],
+    "skip_single_value": {
+      "POE": "Ja",
+      "Farbe": "Weiß"
+    },
+    "note": "recommended_questions = the strongest filters for a guided finder (most-used Merkmale first). skip_single_value lists Merkmale with only one value across the category – not useful as a finder question. A finder narrows models by matching answers against each product's characteristics."
+  }
+}

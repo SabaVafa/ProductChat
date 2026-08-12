@@ -1,0 +1,35 @@
+# Slim dependency set for running ProductChat locally without Docker.
+#
+# Versions are PINNED to the set verified working on Python 3.14 (Aug 2026).
+# Pinning prevents a venv rebuild from silently pulling a newer library with
+# breaking changes — e.g. qdrant-client 1.19 removed the .search() method the
+# app used, which silently broke retrieval after an environment rebuild.
+#
+# For an exact, fully-reproducible environment (all transitive deps too), use
+# the generated snapshot instead:  pip install -r requirements-lock.txt
+#
+# Deliberately omitted vs the original requirements.txt:
+#   psycopg2-binary       -> using SQLite, no Postgres
+#   redis                 -> rate limiter uses in-memory storage
+#   langchain*, openai    -> never imported by the code
+#   pandas                -> only needed for optional CSV import (see below)
+#   python-jose, passlib  -> never imported by the code
+#   mistralai             -> Mistral is called via its REST API with `requests`
+#                            (services/mistral.py, services/embeddings.py); the
+#                            SDK pins an old orjson with no wheels for Py 3.14.
+
+fastapi==0.141.1
+uvicorn[standard]==0.52.1
+sqlalchemy==2.0.51
+pydantic==2.13.4
+pydantic-settings==2.15.0
+python-dotenv==1.2.2
+cryptography==50.0.0
+slowapi==0.1.10
+qdrant-client==1.19.0
+requests==2.34.2
+apscheduler==3.11.3
+python-multipart==0.0.32
+
+# Optional: uncomment to enable CSV product import via the Admin UI.
+# pandas

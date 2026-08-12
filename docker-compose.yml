@@ -1,0 +1,79 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: productchat-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: productchat
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: productchat-qdrant
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+
+  redis:
+    image: redis:7-alpine
+    container_name: productchat-redis
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: productchat-backend
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/productchat
+      QDRANT_URL: http://qdrant:6333
+      REDIS_URL: redis://redis:6379/0
+      SECRET_KEY: your-secret-key-here-change-in-production
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:-AUWqlM9ZVbi0r-a1myqufJh6SnXB3VoZ1l3sCVg_AJs=}
+      CORS_ORIGINS: http://localhost:3000,http://localhost:80
+      MISTRAL_API_KEY: ${MISTRAL_API_KEY:-your-mistral-api-key-here}
+      # Auto-sync scheduler: re-scrapes the catalog every N hours and indexes
+      # only changed/new products. Set SCRAPE_ON_STARTUP=true to also populate
+      # once ~30s after boot (the first full run embeds every product, so it
+      # costs one Mistral embedding call per product).
+      SYNC_INTERVAL_HOURS: ${SYNC_INTERVAL_HOURS:-6}
+      SCRAPE_ON_STARTUP: ${SCRAPE_ON_STARTUP:-false}
+      SCRAPE_MAX_PRODUCTS: ${SCRAPE_MAX_PRODUCTS:-0}
+    depends_on:
+      - postgres
+      - qdrant
+      - redis
+    volumes:
+      - ./backend:/app
+      - ./data:/app/data
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: productchat-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+  qdrant_data:
+  redis_data:
