@@ -170,29 +170,37 @@ class IndexingService:
                 raise RuntimeError(f"Failed to upsert {len(points)} points to Qdrant")
     
     def import_products_from_json(self, data: List[Dict[str, Any]]) -> Dict[str, Any]:
-        """Import products from JSON data."""
+        """Import products from JSON data.
+
+        On update, name/description/category/brand/price/attributes are refreshed
+        from the incoming item, but image_url and product_url are only overwritten
+        when a non-empty value is supplied — so importing from a source that omits
+        images (e.g. a JTL finder export) never wipes media a previous source
+        (like the scraper) already provided.
+        """
         imported = 0
         errors = []
-        
+
         for item in data:
             try:
                 product = Product(
-                    product_id=str(item.get("id") or item.get("product_id")),
+                    product_id=str(item.get("product_id") or item.get("id")),
                     name=item.get("name"),
                     description=item.get("description"),
                     category=item.get("category"),
                     brand=item.get("brand"),
                     price=item.get("price"),
                     image_url=item.get("image_url"),
+                    product_url=item.get("product_url"),
                     attributes=item.get("attributes"),
                     indexed=0
                 )
-                
+
                 # Check if exists
                 existing = self.db.query(Product).filter(
                     Product.product_id == product.product_id
                 ).first()
-                
+
                 if existing:
                     # Update existing
                     existing.name = product.name
@@ -200,14 +208,18 @@ class IndexingService:
                     existing.category = product.category
                     existing.brand = product.brand
                     existing.price = product.price
-                    existing.image_url = product.image_url
                     existing.attributes = product.attributes
+                    # Preserve existing media/links if the new source omits them.
+                    if product.image_url:
+                        existing.image_url = product.image_url
+                    if product.product_url:
+                        existing.product_url = product.product_url
                     existing.indexed = 0
                 else:
                     self.db.add(product)
-                
+
                 imported += 1
-                
+
             except Exception as e:
                 errors.append(f"Error importing item: {str(e)}")
                 logger.error(f"Import error: {e}")

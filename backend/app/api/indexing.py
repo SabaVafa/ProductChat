@@ -1,7 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Body
+from typing import Any
 from sqlalchemy.orm import Session
 from app.database import get_db, SessionLocal
 from app.api.deps import require_admin
+from app.services.jtl_adapter import map_jtl_finder, extract_items
 from app.schemas.indexing import IndexingStatusResponse, ImportRequest
 from app.services.indexing import IndexingService
 from app.services.settings_service import SettingsService
@@ -92,6 +94,37 @@ async def import_products(
         return result
     except Exception as e:
         logger.error(f"Import error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/import/jtl", response_model=Dict[str, Any])
+async def import_jtl_export(
+    payload: Any = Body(...),
+    db: Session = Depends(get_db),
+    _: None = Depends(require_admin),
+):
+    """
+    Import a raw JTL-Shop 'finder' export — either the wrapper object
+    (`{"products": [...]}`) or a bare list of finder items.
+
+    The export schema is mapped to the internal product shape automatically
+    (sku→product_id, price_eur_gross→price, characteristics+finder_facets→
+    attributes, url→product_url, leaf category, etc.). Products still need
+    indexing afterwards (POST /index/start?incremental=true) to be searchable.
+    """
+    try:
+        items = extract_items(payload)
+        if not items:
+            raise HTTPException(status_code=400, detail="No products found in the payload")
+        mapped = map_jtl_finder(items)
+        result = IndexingService(db).import_products_from_json(mapped)
+        result["received"] = len(items)
+        result["mapped"] = len(mapped)
+        return result
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"JTL import error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
