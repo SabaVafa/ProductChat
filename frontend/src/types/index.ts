@@ -44,6 +44,7 @@ export interface IndexingStatus {
 export interface Settings {
   mistral: {
     api_key: string;
+    api_key_set?: boolean;
     model: string;
     temperature: number;
     max_tokens: number;

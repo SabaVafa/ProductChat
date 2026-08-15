@@ -9,6 +9,33 @@ const api = axios.create({
   },
 });
 
+const ADMIN_TOKEN_KEY = 'pc_admin_token';
+
+// Attach the saved admin token to every request (harmless on public endpoints,
+// required by the guarded admin/write ones).
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem(ADMIN_TOKEN_KEY);
+  if (token) config.headers['X-Admin-Token'] = token;
+  return config;
+});
+
+// When a guarded endpoint rejects the token, ask for it once and retry.
+api.interceptors.response.use(
+  (res) => res,
+  (error) => {
+    if (error?.response?.status === 401) {
+      const entered = window.prompt(
+        'Admin token required for this action (set as ADMIN_TOKEN in backend/.env):'
+      );
+      if (entered) {
+        localStorage.setItem(ADMIN_TOKEN_KEY, entered.trim());
+        window.location.reload();
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 export const chatAPI = {
   sendMessage: async (
     message: string,

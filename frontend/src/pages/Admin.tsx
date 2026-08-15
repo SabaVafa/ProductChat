@@ -368,8 +368,14 @@ export default function Admin() {
                     type="password"
                     value={settings.mistral.api_key}
                     onChange={(e) => updateSetting('mistral', 'api_key', e.target.value)}
+                    placeholder={settings.mistral.api_key_set ? '•••••••• key configured — leave blank to keep' : 'Enter your Mistral API key'}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
+                  <p className="text-xs text-gray-500 mt-1">
+                    {settings.mistral.api_key_set
+                      ? 'A key is stored (encrypted) and never shown. Enter a new value only to replace it.'
+                      : 'No key configured yet.'}
+                  </p>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Model</label>

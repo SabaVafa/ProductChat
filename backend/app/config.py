@@ -27,6 +27,9 @@ class Settings(BaseSettings):
     # Security
     SECRET_KEY: str = "your-secret-key-here-change-in-production"
     ENCRYPTION_KEY: str = "your-32-byte-encryption-key-here"
+    # Token required (via the X-Admin-Token header) for admin/write endpoints.
+    # If empty: allowed in development (with a warning), denied otherwise.
+    ADMIN_TOKEN: str = ""
     
     # Application
     API_PREFIX: str = "/api"

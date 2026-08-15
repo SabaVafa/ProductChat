@@ -4,6 +4,7 @@ from app.database import get_db, SessionLocal
 from app.services.scraper import ScraperService, get_sync_status, SYNC_STATE
 from app.services.suggestions import SuggestionsService
 from app.services.settings_service import SettingsService
+from app.api.deps import require_admin
 from typing import Dict, Any, List
 import threading
 import logging
@@ -57,7 +58,7 @@ async def sync_status(db: Session = Depends(get_db)):
 
 
 @router.post("/sync/run", response_model=Dict[str, Any])
-async def sync_run(max_products: int = 0):
+async def sync_run(max_products: int = 0, _: None = Depends(require_admin)):
     """Kick off a sync now (operational/testing). Returns immediately.
 
     max_products: cap products upserted this run (0 = unlimited). Useful for a

@@ -6,6 +6,7 @@ from app.schemas.chat import ChatRequest, ChatResponse, FeedbackRequest
 from app.services.rag import RAGService
 from app.services.settings_service import SettingsService
 from app.services import interactions
+from app.api.deps import require_admin
 import logging
 
 logger = logging.getLogger(__name__)
@@ -57,6 +58,10 @@ async def submit_feedback(request: FeedbackRequest, db: Session = Depends(get_db
 
 
 @router.get("/interactions", response_model=Dict[str, Any])
-async def list_interactions(limit: int = 50, db: Session = Depends(get_db)):
+async def list_interactions(
+    limit: int = 50,
+    db: Session = Depends(get_db),
+    _: None = Depends(require_admin),
+):
     """Recent chat interactions plus a thumbs-up/down summary (for review)."""
     return interactions.recent_interactions(db, limit=limit)

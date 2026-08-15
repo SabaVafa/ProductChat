@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from sqlalchemy.orm import Session
 from app.database import get_db, SessionLocal
+from app.api.deps import require_admin
 from app.schemas.indexing import IndexingStatusResponse, ImportRequest
 from app.services.indexing import IndexingService
 from app.services.settings_service import SettingsService
@@ -32,7 +33,8 @@ def _run_indexing_job(incremental: bool):
 @router.post("/start", response_model=Dict[str, Any])
 async def start_indexing(
     incremental: bool = False,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _: None = Depends(require_admin),
 ):
     """
     Start the product indexing process (runs in the background).
@@ -78,7 +80,8 @@ async def get_indexing_status(db: Session = Depends(get_db)):
 @router.post("/import", response_model=Dict[str, Any])
 async def import_products(
     request: ImportRequest,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _: None = Depends(require_admin),
 ):
     """
     Import products from JSON data.
@@ -95,7 +98,8 @@ async def import_products(
 @router.post("/import/file", response_model=Dict[str, Any])
 async def import_products_from_file(
     file: UploadFile = File(...),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _: None = Depends(require_admin),
 ):
     """
     Import products from a file (JSON or CSV).

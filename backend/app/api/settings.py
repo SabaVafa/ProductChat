@@ -4,11 +4,33 @@ from typing import Dict, Any
 from app.database import get_db
 from app.schemas.settings import SettingsResponse, SettingsUpdate, CategorySettings
 from app.services.settings_service import SettingsService
+from app.api.deps import require_admin
 import logging
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/settings", tags=["settings"])
+
+_PLACEHOLDER_KEYS = ("your-mistral-api-key-here", "your_api_key_here")
+
+
+def _redact_mistral(mistral: Dict[str, Any]) -> Dict[str, Any]:
+    """Never return the API key. Expose only whether one is configured."""
+    mistral = dict(mistral or {})
+    key = (mistral.get("api_key") or "").strip()
+    mistral["api_key_set"] = bool(key and key not in _PLACEHOLDER_KEYS)
+    mistral["api_key"] = ""
+    return mistral
+
+
+def _keep_existing_api_key(mistral: Dict[str, Any]) -> Dict[str, Any]:
+    """Drop a blank/placeholder api_key on save so the stored key isn't wiped."""
+    if not mistral:
+        return mistral
+    key = (mistral.get("api_key") or "").strip()
+    if not key or key in _PLACEHOLDER_KEYS:
+        return {k: v for k, v in mistral.items() if k != "api_key"}
+    return mistral
 
 
 @router.get("", response_model=SettingsResponse)
@@ -20,6 +42,7 @@ async def get_settings(db: Session = Depends(get_db)):
         settings_service = SettingsService(db)
         settings_service.initialize_default_settings()
         all_settings = settings_service.get_all_settings()
+        all_settings["mistral"] = _redact_mistral(all_settings.get("mistral", {}))
         return SettingsResponse(**all_settings)
     except Exception as e:
         logger.error(f"Settings retrieval error: {e}")
@@ -29,22 +52,23 @@ async def get_settings(db: Session = Depends(get_db)):
 @router.post("", response_model=Dict[str, str])
 async def update_settings(
     request: SettingsUpdate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _: None = Depends(require_admin),
 ):
     """
     Update application settings.
-    
+
     Only include the categories you want to update.
     API keys will be encrypted automatically.
     """
     try:
         settings_service = SettingsService(db)
-        
+
         # Update each category if provided
         if request.mistral:
             settings_service.set_category_settings(
-                "mistral", 
-                request.mistral, 
+                "mistral",
+                _keep_existing_api_key(request.mistral),
                 ["api_key"]
             )
         
@@ -74,6 +98,8 @@ async def get_category_settings(category: str, db: Session = Depends(get_db)):
     try:
         settings_service = SettingsService(db)
         settings_dict = settings_service.get_category_settings(category)
+        if category == "mistral":
+            settings_dict = _redact_mistral(settings_dict)
         return settings_dict
     except Exception as e:
         logger.error(f"Category settings retrieval error: {e}")
@@ -84,22 +110,25 @@ async def get_category_settings(category: str, db: Session = Depends(get_db)):
 async def update_category_settings(
     category: str,
     request: CategorySettings,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _: None = Depends(require_admin),
 ):
     """
     Update settings for a specific category.
     """
     try:
         settings_service = SettingsService(db)
-        
+
         # Determine which keys to encrypt
         encryption_keys = []
+        payload = request.settings
         if category == "mistral":
             encryption_keys = ["api_key"]
-        
+            payload = _keep_existing_api_key(payload)
+
         settings_service.set_category_settings(
-            category, 
-            request.settings, 
+            category,
+            payload,
             encryption_keys
         )
         
