@@ -23,6 +23,14 @@ def ChatMessage(role: str, content: str) -> Dict[str, str]:
     return {"role": role, "content": content}
 
 
+def _as_bool(value) -> bool:
+    """Settings round-trip through the DB as strings ('False'/'True'), so a bare
+    truthiness check is wrong ('False' is truthy). Coerce robustly."""
+    if isinstance(value, bool):
+        return value
+    return str(value).strip().lower() in ("true", "1", "yes", "on")
+
+
 class MistralService:
     def __init__(self, api_key: Optional[str] = None):
         self.api_key = api_key or settings.MISTRAL_API_KEY
@@ -123,6 +131,19 @@ class MistralService:
                 product_context += f"  Attributes: {product['attributes']}\n"
 
         num_recommendations = config.get('num_recommendations', 3)
+        include_follow_up = _as_bool(config.get('include_follow_up', False))
+        if include_follow_up:
+            follow_up_rule = (
+                '8. You MAY set "follow_up_question" to ONE short question offering a genuinely NEW '
+                'refinement (a different option or trade-off). NEVER repeat it inside "answer", and '
+                'never ask about something the user already specified.'
+            )
+        else:
+            follow_up_rule = (
+                '8. Do NOT ask the user a question. Set "follow_up_question" to "" and do not end '
+                '"answer" with a question. If the exact item is unavailable, DIRECTLY recommend the '
+                'closest available products instead of asking whether to show them.'
+            )
 
         # Build system prompt
         system_prompt = f"""You are a product recommendation assistant. Your task is to help users find the best products based on their needs.
@@ -135,7 +156,7 @@ IMPORTANT RULES:
 5. Only return an empty "recommendations" array when the provided list is genuinely irrelevant to the request; then explain why in "answer".
 6. Be concise and direct, and honest about partial matches — say what fits and what does not.
 7. Recommend at most {num_recommendations} products, ordered best match first.
-8. Set "follow_up_question" when the closest matches differ from what was asked in a way the user should decide on (a different product type, a trade-off, or a choice between options) — ask ONE short question that helps them choose. Otherwise set it to "".
+{follow_up_rule}
 9. Earlier turns of the conversation may appear before this message. Use them to resolve references like "it", "that one", "cheaper", or "with LED" so follow-ups make sense in context. Recommendations must STILL come only from the Available products list below, which reflects the current request.
 
 You must respond with a JSON object matching exactly this schema:
@@ -221,6 +242,10 @@ Available products:
                 ]
                 if debug is not None and dropped:
                     debug["dropped_hallucinated_ids"] = dropped
+
+            # Enforce the follow-up setting regardless of what the model returned.
+            if not include_follow_up:
+                result["follow_up_question"] = ""
 
             return result
 
