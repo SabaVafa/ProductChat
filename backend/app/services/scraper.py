@@ -158,7 +158,10 @@ class ScraperService:
             _price_probe = float(_offers.get("price")) if isinstance(_offers, dict) and _offers.get("price") is not None else None
         except (TypeError, ValueError):
             _price_probe = None
-        if not _desc and (not _price_probe or _price_probe <= 0):
+        if not _price_probe or _price_probe <= 0:
+            # Everything sellable has a positive price; price-0 "products" are
+            # variation options (e.g. "LAN / PoE", "Schriftart 12") — even when
+            # they carry a description. Skip them.
             return None
 
         # Price + currency from offers.

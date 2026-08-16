@@ -3,7 +3,7 @@ from typing import Any
 from sqlalchemy.orm import Session
 from app.database import get_db, SessionLocal
 from app.api.deps import require_admin
-from app.services.jtl_adapter import map_jtl_finder, extract_items
+from app.services.jtl_adapter import map_jtl_finder, extract_items, enrich_from_jtl
 from app.schemas.indexing import IndexingStatusResponse, ImportRequest
 from app.services.indexing import IndexingService
 from app.services.settings_service import SettingsService
@@ -100,6 +100,7 @@ async def import_products(
 @router.post("/import/jtl", response_model=Dict[str, Any])
 async def import_jtl_export(
     payload: Any = Body(...),
+    enrich: bool = False,
     db: Session = Depends(get_db),
     _: None = Depends(require_admin),
 ):
@@ -107,24 +108,78 @@ async def import_jtl_export(
     Import a raw JTL-Shop 'finder' export — either the wrapper object
     (`{"products": [...]}`) or a bare list of finder items.
 
-    The export schema is mapped to the internal product shape automatically
-    (sku→product_id, price_eur_gross→price, characteristics+finder_facets→
-    attributes, url→product_url, leaf category, etc.). Products still need
-    indexing afterwards (POST /index/start?incremental=true) to be searchable.
+    - enrich=false (default): create/update products from the export.
+    - enrich=true: only MERGE variant data (characteristics + finder facets —
+      colours, Montageart, material...) into EXISTING products, filling missing
+      links; scraped name/description/price/image are never overwritten.
+
+    Changed products are flagged for re-embedding; run
+    POST /index/start?incremental=true afterwards to make them searchable.
     """
     try:
         items = extract_items(payload)
         if not items:
             raise HTTPException(status_code=400, detail="No products found in the payload")
-        mapped = map_jtl_finder(items)
-        result = IndexingService(db).import_products_from_json(mapped)
+        if enrich:
+            result: Dict[str, Any] = enrich_from_jtl(db, items)
+        else:
+            mapped = map_jtl_finder(items)
+            result = IndexingService(db).import_products_from_json(mapped)
+            result["mapped"] = len(mapped)
         result["received"] = len(items)
-        result["mapped"] = len(mapped)
         return result
     except HTTPException:
         raise
     except Exception as e:
         logger.error(f"JTL import error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/dedupe", response_model=Dict[str, Any])
+async def dedupe_products(
+    db: Session = Depends(get_db),
+    _: None = Depends(require_admin),
+):
+    """Merge duplicate products sharing the same product_url (e.g. a JTL import
+    keyed by sku next to the scraper's record keyed by article id). Keeps the
+    richer record (image > numeric id), merges attributes, deletes the other
+    row AND its vector so it can't linger in search results."""
+    try:
+        from app.models.product import Product
+        from app.services.indexing import product_id_to_point_id
+        from app.services.qdrant_service import QdrantService
+
+        groups: Dict[str, list] = {}
+        for p in db.query(Product).filter(Product.product_url.isnot(None)).all():
+            groups.setdefault(p.product_url, []).append(p)
+
+        removed, merged = [], 0
+        qs = QdrantService()
+        for url, plist in groups.items():
+            if len(plist) < 2:
+                continue
+            # Prefer the record with an image; tiebreak: numeric (scraper) id.
+            plist.sort(key=lambda p: (bool(p.image_url), str(p.product_id).isdigit()), reverse=True)
+            keeper, rest = plist[0], plist[1:]
+            for dup in rest:
+                extra = dup.attributes if isinstance(dup.attributes, dict) else {}
+                if extra:
+                    base = keeper.attributes if isinstance(keeper.attributes, dict) else {}
+                    combined = {**extra, **base}
+                    if combined != base:
+                        keeper.attributes = combined
+                        keeper.indexed = 0
+                        merged += 1
+                removed.append(dup.product_id)
+                db.delete(dup)
+        if removed:
+            qs.delete_points([product_id_to_point_id(pid) for pid in removed])
+        db.commit()
+        return {"duplicate_urls": len([g for g in groups.values() if len(g) > 1]),
+                "removed": len(removed), "attr_merged_into_keeper": merged,
+                "removed_ids": removed[:20]}
+    except Exception as e:
+        logger.error(f"Dedupe error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 

@@ -158,6 +158,7 @@ IMPORTANT RULES:
 7. Recommend at most {num_recommendations} products, ordered best match first.
 {follow_up_rule}
 9. Earlier turns of the conversation may appear before this message. Use them to resolve references like "it", "that one", "cheaper", or "with LED" so follow-ups make sense in context. Recommendations must STILL come only from the Available products list below, which reflects the current request.
+10. Product Attributes often contain VARIANT OPTION LISTS (e.g. Farbe: ['Schwarz', 'Anthrazit', 'Weiß'], Montageart, Material). A value appearing in such a list means the product IS AVAILABLE in that option. If the user asks for a colour/feature that appears in a product's attribute list, recommend that product as a real match and mention it is a selectable variant — never claim the option doesn't exist when the attributes list it.
 
 You must respond with a JSON object matching exactly this schema:
 {{

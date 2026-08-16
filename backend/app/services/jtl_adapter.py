@@ -67,7 +67,9 @@ def map_jtl_finder(items: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         if it.get("categories"):
             attributes["categories"] = it["categories"]
 
-        product_id = it.get("sku") or it.get("id")
+        # Prefer the numeric article id — it equals the scraped JSON-LD sku, so
+        # imports update the scraper's records instead of creating duplicates.
+        product_id = it.get("id") if it.get("id") is not None else it.get("sku")
         mapped.append({
             "product_id": str(product_id) if product_id is not None else None,
             "name": it.get("name"),
@@ -83,3 +85,62 @@ def map_jtl_finder(items: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
 
     # Only keep rows that have the minimum needed to index and display.
     return [p for p in mapped if p["product_id"] and p["name"]]
+
+
+def enrich_from_jtl(db, items: List[Dict[str, Any]]) -> Dict[str, int]:
+    """Enrich EXISTING products with JTL finder variant data (characteristics +
+    finder_facets: colours, Montageart, material, ...).
+
+    The scraper only sees the default variant's JSON-LD, so colour options like
+    "Anthrazit" are invisible to search without this. Matching is by the finder
+    numeric id (== scraped JSON-LD sku), the finder sku string, or the product
+    URL. Scraper-authoritative fields (name/description/price/category/image)
+    are NEVER overwritten — only attributes are merged and missing links filled.
+    Products whose attributes changed are flagged indexed=0 for re-embedding.
+    """
+    from app.models.product import Product  # local import avoids cycles
+
+    stats = {"matched": 0, "attrs_updated": 0, "url_filled": 0, "not_found": 0}
+
+    # Build lookups once.
+    products = db.query(Product).all()
+    by_id = {p.product_id: p for p in products}
+    by_url = {p.product_url: p for p in products if p.product_url}
+
+    for it in items:
+        if not isinstance(it, dict):
+            continue
+        candidates = [str(it["id"])] if it.get("id") is not None else []
+        if it.get("sku"):
+            candidates.append(str(it["sku"]))
+        target = next((by_id[c] for c in candidates if c in by_id), None)
+        if target is None and it.get("url"):
+            target = by_url.get(it["url"])
+        if target is None:
+            stats["not_found"] += 1
+            continue
+
+        stats["matched"] += 1
+
+        incoming: Dict[str, Any] = {}
+        for src in ("characteristics", "finder_facets"):
+            if isinstance(it.get(src), dict):
+                incoming.update(it[src])
+        if it.get("categories"):
+            incoming["categories"] = it["categories"]
+
+        if incoming:
+            current = target.attributes if isinstance(target.attributes, dict) else {}
+            merged = dict(current)
+            merged.update(incoming)  # finder data wins for facet keys (richer)
+            if merged != current:
+                target.attributes = merged
+                target.indexed = 0
+                stats["attrs_updated"] += 1
+
+        if not target.product_url and it.get("url"):
+            target.product_url = it["url"]
+            stats["url_filled"] += 1
+
+    db.commit()
+    return stats
