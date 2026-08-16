@@ -9,11 +9,13 @@ from typing import List, Optional
 from app.config import settings
 import requests
 import logging
+import time
 
 logger = logging.getLogger(__name__)
 
 MISTRAL_API_BASE = "https://api.mistral.ai/v1"
 REQUEST_TIMEOUT = 60
+MAX_RETRIES = 5
 
 
 class EmbeddingsService:
@@ -26,19 +28,37 @@ class EmbeddingsService:
         self.api_key = api_key
 
     def _embed(self, inputs: List[str]) -> List[List[float]]:
-        resp = requests.post(
-            f"{MISTRAL_API_BASE}/embeddings",
-            headers={
-                "Authorization": f"Bearer {self.api_key}",
-                "Content-Type": "application/json",
-                "Accept": "application/json",
-            },
-            json={"model": self.model, "input": inputs},
-            timeout=REQUEST_TIMEOUT,
-        )
-        resp.raise_for_status()
-        data = resp.json()
-        return [item["embedding"] for item in data["data"]]
+        """Call the embeddings API, retrying on rate limits (429) and 5xx.
+
+        Without retries, a 429 during a large indexing run silently drops
+        products from the vector index — they exist in the DB but can never be
+        found by search.
+        """
+        last_exc: Optional[Exception] = None
+        for attempt in range(MAX_RETRIES):
+            resp = requests.post(
+                f"{MISTRAL_API_BASE}/embeddings",
+                headers={
+                    "Authorization": f"Bearer {self.api_key}",
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                },
+                json={"model": self.model, "input": inputs},
+                timeout=REQUEST_TIMEOUT,
+            )
+            if resp.status_code == 429 or resp.status_code >= 500:
+                retry_after = resp.headers.get("Retry-After")
+                wait = float(retry_after) if retry_after else min(2 ** attempt, 15)
+                logger.warning(
+                    f"Embeddings HTTP {resp.status_code}, retry {attempt+1}/{MAX_RETRIES} in {wait}s"
+                )
+                time.sleep(wait)
+                last_exc = requests.HTTPError(f"HTTP {resp.status_code}", response=resp)
+                continue
+            resp.raise_for_status()
+            data = resp.json()
+            return [item["embedding"] for item in data["data"]]
+        raise last_exc or RuntimeError("Embeddings request failed after retries")
 
     def embed_text(self, text: str) -> List[float]:
         """Generate embedding for a single text."""
@@ -56,8 +76,17 @@ class EmbeddingsService:
             logger.error(f"Error generating embeddings: {e}")
             raise
 
+    @staticmethod
+    def compose_product_text(product: dict) -> str:
+        """Build the text that represents a product for embedding."""
+        return EmbeddingsService._compose(product)
+
     def embed_product(self, product: dict) -> List[float]:
         """Generate embedding for a product by combining relevant fields."""
+        return self.embed_text(self._compose(product))
+
+    @staticmethod
+    def _compose(product: dict) -> str:
         text_parts = []
 
         if product.get("name"):
@@ -84,5 +113,4 @@ class EmbeddingsService:
         if product.get("price"):
             text_parts.append(f"Price: ${product['price']}")
 
-        combined_text = " | ".join(text_parts)
-        return self.embed_text(combined_text)
+        return " | ".join(text_parts)

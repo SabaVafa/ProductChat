@@ -91,27 +91,34 @@ class IndexingService:
             # Small batches so the processed count (and the progress bar in
             # the Admin UI polling /index/status) advances visibly.
             batch_size = 5
+            succeeded_ids = set()
             for i in range(0, total, batch_size):
                 batch = products[i:i + batch_size]
-                self._process_batch(batch)
-                
+                succeeded_ids.update(self._process_batch(batch))
+
                 # Update status
                 status.processed = min(i + batch_size, total)
                 self.db.commit()
-            
-            # Mark all as indexed
+
+            # Mark ONLY the products whose vectors actually landed in Qdrant.
+            # Marking everything would leave silently-failed products flagged
+            # as indexed while being invisible to search.
             for product in products:
-                product.indexed = 1
-            
-            # Update final status
+                if product.product_id in succeeded_ids:
+                    product.indexed = 1
+
+            failed = total - len(succeeded_ids)
             status.status = "completed"
             status.completed_at = datetime.utcnow()
+            if failed:
+                status.error_message = f"{failed} products failed embedding and remain unindexed"
             self.db.commit()
-            
+
             return {
                 "success": True,
-                "message": f"Successfully indexed {total} products",
-                "total": total
+                "message": f"Indexed {len(succeeded_ids)} of {total} products"
+                           + (f" ({failed} failed — rerun incremental indexing)" if failed else ""),
+                "total": len(succeeded_ids)
             }
             
         except Exception as e:
@@ -125,49 +132,50 @@ class IndexingService:
                 "message": f"Indexing failed: {str(e)}"
             }
     
-    def _process_batch(self, products: List[Product]):
-        """Process a batch of products."""
+    def _process_batch(self, products: List[Product]) -> set:
+        """Process a batch of products. Returns the product_ids whose vectors
+        were successfully upserted (callers must only flag those as indexed)."""
+        # One embeddings API call for the whole batch (fewer calls → far fewer
+        # rate-limit failures than embedding each product individually).
+        texts = [
+            self.embeddings.compose_product_text({
+                "name": p.name,
+                "description": p.description,
+                "category": p.category,
+                "brand": p.brand,
+                "price": p.price,
+                "attributes": p.attributes,
+            })
+            for p in products
+        ]
+        try:
+            vectors = self.embeddings.embed_texts(texts)
+        except Exception as e:
+            logger.error(f"Batch embedding failed for {len(products)} products: {e}")
+            return set()
+
         points = []
-        
-        for product in products:
-            try:
-                # Generate embedding
-                product_dict = {
+        for product, embedding in zip(products, vectors):
+            points.append(PointStruct(
+                id=product_id_to_point_id(product.product_id),
+                vector=embedding,
+                payload={
+                    "product_id": product.product_id,
                     "name": product.name,
                     "description": product.description,
                     "category": product.category,
                     "brand": product.brand,
                     "price": product.price,
+                    "image_url": product.image_url,
+                    "product_url": product.product_url,
                     "attributes": product.attributes
                 }
-                embedding = self.embeddings.embed_product(product_dict)
-                
-                # Create point
-                point = PointStruct(
-                    id=product_id_to_point_id(product.product_id),
-                    vector=embedding,
-                    payload={
-                        "product_id": product.product_id,
-                        "name": product.name,
-                        "description": product.description,
-                        "category": product.category,
-                        "brand": product.brand,
-                        "price": product.price,
-                        "image_url": product.image_url,
-                        "product_url": product.product_url,
-                        "attributes": product.attributes
-                    }
-                )
-                points.append(point)
-                
-            except Exception as e:
-                logger.error(f"Error processing product {product.product_id}: {e}")
-                continue
-        
-        # Upsert batch
+            ))
+
         if points:
             if not self.qdrant.upsert_points(points):
                 raise RuntimeError(f"Failed to upsert {len(points)} points to Qdrant")
+        return {p.product_id for p in products}
     
     def import_products_from_json(self, data: List[Dict[str, Any]]) -> Dict[str, Any]:
         """Import products from JSON data.

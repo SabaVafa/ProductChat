@@ -147,6 +147,20 @@ class ScraperService:
         if not sku:
             return None
 
+        # JTL variation options (e.g. "Schriftart 12", "Unterputz", "Schloss
+        # links") emit their own Product JSON-LD blocks with no description and
+        # price 0. They aren't real products and pollute retrieval — skip them.
+        _desc = self._clean(product.get("description"))
+        _offers = product.get("offers") or {}
+        if isinstance(_offers, list):
+            _offers = _offers[0] if _offers else {}
+        try:
+            _price_probe = float(_offers.get("price")) if isinstance(_offers, dict) and _offers.get("price") is not None else None
+        except (TypeError, ValueError):
+            _price_probe = None
+        if not _desc and (not _price_probe or _price_probe <= 0):
+            return None
+
         # Price + currency from offers.
         offers = product.get("offers") or {}
         if isinstance(offers, list):
