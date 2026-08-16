@@ -155,12 +155,15 @@ class RAGService:
             #    immediately preceding turn for context;
             #  - any other typed question is a NEW topic and drives retrieval on
             #    its own, so asking about a different product switches context.
-            if prior_user and (is_refinement or _looks_like_followup(message)):
-                # Keep the current subject: anchor on the most recent topic turn.
+            if is_refinement and prior_user:
+                # A tapped refine chip ("With LED") keeps the CURRENT subject —
+                # anchor on the most recent topic turn.
                 subject = _active_subject(prior_user)
                 retrieval_query = (subject + " " + message).strip() if subject else message.strip()
             else:
-                # New typed question -> it drives retrieval on its own.
+                # Every typed question searches for exactly what was typed — no
+                # bleed from earlier turns. This is the precise, stateless search
+                # behaviour; a new question always switches topic cleanly.
                 retrieval_query = message.strip()
 
             # Retrieve relevant products (vector search in Qdrant)
@@ -208,12 +211,16 @@ class RAGService:
 
             # Generate recommendation (LLM re-ranks + explains)
             llm_debug: Dict[str, Any] = {}
+            # Give the model prior turns ONLY for a refine chip (so it can keep
+            # the subject). A typed question is answered statelessly — precise,
+            # no drift to an earlier topic.
+            llm_history = history_list if is_refinement else []
             response = mistral.generate_recommendation(
                 query=message,
                 retrieved_products=retrieved_products,
                 config=output_settings,
                 debug=llm_debug,
-                history=history_list,
+                history=llm_history,
                 is_refinement=is_refinement
             )
 
