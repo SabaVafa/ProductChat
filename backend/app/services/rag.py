@@ -7,6 +7,36 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+# Short connective phrases that signal a typed message is a follow-up refining
+# the previous turn (so it should keep context) rather than a new topic.
+_FOLLOWUP_PREFIXES = (
+    "and ", "also ", "or ", "what about", "how about", "cheaper", "cheapest",
+    "under ", "over ", "with ", "without ", "in ", "same ", "any ", "more ", "less ",
+)
+
+
+def _looks_like_followup(message: str) -> bool:
+    """True if a typed message reads like a refinement of the previous turn.
+
+    Detected by connective wording only — NOT by length, so a short but
+    self-contained new topic like "show me mailboxes" is treated as a new
+    subject, not a refinement of whatever came before.
+    """
+    m = (message or "").strip().lower()
+    if not m:
+        return False
+    return m.startswith(_FOLLOWUP_PREFIXES)
+
+
+def _active_subject(prior_user: list) -> str:
+    """The most recent user turn that established a subject (i.e. not itself a
+    follow-up), so refinements/follow-ups anchor on the CURRENT topic rather
+    than the conversation's first message."""
+    for turn in reversed(prior_user):
+        if turn and not _looks_like_followup(turn):
+            return turn
+    return prior_user[-1] if prior_user else ""
+
 
 class RAGService:
     def __init__(self, db: Session):
@@ -118,16 +148,20 @@ class RAGService:
                 for h in history_list
                 if h.get("role") == "user" and (h.get("content") or "").strip()
             ]
-            # A refinement (a tapped chip like "With LED") must never drop the
-            # subject, so anchor on the FIRST user turn plus the most recent
-            # ones. A normal message just needs a little recent context.
-            if is_refinement and prior_user:
-                anchor = [prior_user[0]] + prior_user[-2:]
-                seen = set()
-                ctx = [t for t in anchor if not (t in seen or seen.add(t))]
-                retrieval_query = " ".join(ctx + [message]).strip()
+            # Build the retrieval query so it lands on the RIGHT products:
+            #  - a refinement chip ("With LED") must keep the current subject, so
+            #    anchor on the first + most recent user turns;
+            #  - a short typed follow-up ("cheaper?", "in anthracite?") keeps the
+            #    immediately preceding turn for context;
+            #  - any other typed question is a NEW topic and drives retrieval on
+            #    its own, so asking about a different product switches context.
+            if prior_user and (is_refinement or _looks_like_followup(message)):
+                # Keep the current subject: anchor on the most recent topic turn.
+                subject = _active_subject(prior_user)
+                retrieval_query = (subject + " " + message).strip() if subject else message.strip()
             else:
-                retrieval_query = " ".join(prior_user[-2:] + [message]).strip()
+                # New typed question -> it drives retrieval on its own.
+                retrieval_query = message.strip()
 
             # Retrieve relevant products (vector search in Qdrant)
             retrieved_products = self.retrieval.retrieve(
