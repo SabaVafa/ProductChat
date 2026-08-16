@@ -164,6 +164,7 @@ class RAGService:
                 # Every typed question searches for exactly what was typed — no
                 # bleed from earlier turns. This is the precise, stateless search
                 # behaviour; a new question always switches topic cleanly.
+                subject = ""
                 retrieval_query = message.strip()
 
             # Retrieve relevant products (vector search in Qdrant)
@@ -172,6 +173,24 @@ class RAGService:
                 limit=num_retrieved,
                 score_threshold=similarity_threshold
             )
+
+            # For a refinement, ALSO retrieve for the subject alone and merge.
+            # The added attribute ("With Anthrazit") can otherwise pull the
+            # search so far toward that attribute that the subject's own
+            # products (e.g. the only Unterputz mailboxes) vanish from the
+            # candidate set — making it impossible for the model to say
+            # "that combination doesn't exist, but here are the base options".
+            if is_refinement and subject:
+                seen_ids = {p.get("product_id") for p in retrieved_products}
+                anchor_products = self.retrieval.retrieve(
+                    query=subject,
+                    limit=max(5, num_retrieved // 2),
+                    score_threshold=similarity_threshold
+                )
+                for p in anchor_products:
+                    if p.get("product_id") not in seen_ids:
+                        retrieved_products.append(p)
+                        seen_ids.add(p.get("product_id"))
 
             add_step(
                 "2_vector_search",
