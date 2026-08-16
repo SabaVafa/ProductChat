@@ -1,9 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse, HTMLResponse
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 from app.config import settings
+import os
 from app.api import (
     chat_router, indexing_router, settings_router, retrieval_router,
     scraper_router, products_router, proxy_router
@@ -111,6 +113,38 @@ async def root():
 async def health_check():
     """Health check endpoint."""
     return {"status": "healthy"}
+
+
+_STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
+
+
+@app.get("/productchat-widget.js")
+def widget_js():
+    """Serve the embeddable widget. Include it on any page (e.g. a JTL NOVA
+    template) with: <script src="<backend>/productchat-widget.js" defer></script>."""
+    resp = FileResponse(
+        os.path.join(_STATIC_DIR, "productchat-widget.js"),
+        media_type="application/javascript",
+    )
+    resp.headers["Cache-Control"] = "public, max-age=300"
+    return resp
+
+
+@app.get("/widget-demo", response_class=HTMLResponse)
+def widget_demo():
+    """A minimal page that embeds the widget exactly as a shop page would —
+    for local testing without touching the real storefront."""
+    return """<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ProductChat widget demo</title></head>
+<body style="font-family:system-ui,sans-serif;max-width:720px;margin:60px auto;padding:0 20px;color:#334155">
+<h1 style="color:#0f172a">Storefront (demo)</h1>
+<p>This blank page embeds the ProductChat assistant with a single script tag —
+the same way it would sit on a live JTL-Shop (NOVA) page. Look for the
+<b>"Ask the assistant"</b> button in the bottom-right corner.</p>
+<pre style="background:#f1f5f9;padding:14px;border-radius:10px;overflow:auto">&lt;script src="/productchat-widget.js" defer&gt;&lt;/script&gt;</pre>
+<script src="/productchat-widget.js" defer></script>
+</body></html>"""
 
 
 if __name__ == "__main__":

@@ -1,0 +1,182 @@
+/*!
+ * ProductChat embeddable widget — drop-in for JTL-Shop (NOVA) or any site.
+ * Usage:  <script src="https://<backend>/productchat-widget.js" defer></script>
+ * Config (optional): data-api="https://<backend>"  data-category="Doorbells"
+ *                    or window.ProductChatConfig = { api, category }.
+ * Self-contained: renders in a Shadow DOM so it never clashes with the shop CSS.
+ * Talks only to the PUBLIC endpoints (/api/chat, /api/suggestions, /api/chat/feedback).
+ */
+(function () {
+  "use strict";
+  if (window.__productChatLoaded) return;
+  window.__productChatLoaded = true;
+
+  var script = document.currentScript;
+  var cfg = window.ProductChatConfig || {};
+  var API = (cfg.api || (script && script.getAttribute("data-api")) ||
+             (script && script.src ? new URL(script.src).origin : "")).replace(/\/+$/, "");
+
+  // ---- category detection (context-aware suggestions) ----------------------
+  var CATEGORY_BY_SLUG = [
+    { m: "tuerklingel", c: "Doorbells" }, { m: "klingel", c: "Doorbells" },
+    { m: "briefkasten", c: "Mailboxes" }, { m: "tuersprech", c: "Intercoms" },
+    { m: "sprechanlage", c: "Intercoms" }, { m: "paketbox", c: "Package Boxes" },
+    { m: "paketkasten", c: "Package Boxes" }, { m: "hausnummer", c: "House Numbers" },
+    { m: "muelltonnenbox", c: "Waste-bin boxes" }, { m: "sicherheit", c: "Security" },
+  ];
+  function detectCategory() {
+    if (cfg.category || (script && script.getAttribute("data-category")))
+      return cfg.category || script.getAttribute("data-category");
+    var p = (location.pathname || "").toLowerCase();
+    for (var i = 0; i < CATEGORY_BY_SLUG.length; i++)
+      if (p.indexOf(CATEGORY_BY_SLUG[i].m) !== -1) return CATEGORY_BY_SLUG[i].c;
+    return null;
+  }
+
+  // ---- state ---------------------------------------------------------------
+  var state = { open: false, loading: false, messages: [], suggestions: [], category: detectCategory() };
+
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function api(path, opts) {
+    return fetch(API + path, Object.assign({ headers: { "Content-Type": "application/json" } }, opts))
+      .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); });
+  }
+
+  // ---- styles (scoped inside the shadow root) ------------------------------
+  var CSS = "\
+  :host{ all: initial; }\
+  *{ box-sizing:border-box; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; }\
+  .launch{ position:fixed; bottom:24px; right:24px; z-index:2147483000; display:flex; align-items:center; gap:8px;\
+    padding:13px 18px; border:0; border-radius:999px; cursor:pointer; color:#fff;\
+    background:linear-gradient(135deg,#4f46e5,#7c3aed); box-shadow:0 8px 24px -8px rgba(79,70,229,.6);\
+    font-size:14px; font-weight:600; transition:transform .15s, box-shadow .15s; }\
+  .launch:hover{ transform:translateY(-1px); box-shadow:0 12px 28px -8px rgba(79,70,229,.7); }\
+  .panel{ position:fixed; bottom:24px; right:24px; z-index:2147483000; width:400px; max-width:calc(100vw - 32px);\
+    height:600px; max-height:calc(100vh - 48px); background:#fff; border:1px solid #e2e8f0; border-radius:16px;\
+    box-shadow:0 24px 60px -20px rgba(15,23,42,.45); display:flex; flex-direction:column; overflow:hidden; }\
+  .hd{ display:flex; align-items:center; justify-content:space-between; padding:14px 16px; color:#fff;\
+    background:linear-gradient(135deg,#4f46e5,#7c3aed); }\
+  .hd b{ font-size:14px; } .hd small{ display:block; font-size:11px; opacity:.8; }\
+  .hd button{ background:rgba(255,255,255,.2); border:0; color:#fff; width:28px; height:28px; border-radius:8px; cursor:pointer; font-size:16px; }\
+  .body{ flex:1; overflow-y:auto; padding:16px; background:#f8fafc; display:flex; flex-direction:column; gap:12px; }\
+  .row{ display:flex; } .row.u{ justify-content:flex-end; } .row.a{ justify-content:flex-start; }\
+  .bub{ max-width:88%; padding:9px 13px; border-radius:14px; font-size:13.5px; line-height:1.4; }\
+  .u .bub{ background:#4f46e5; color:#fff; border-bottom-right-radius:4px; }\
+  .a .bub{ background:#fff; color:#334155; border:1px solid #e2e8f0; border-bottom-left-radius:4px; }\
+  .card{ display:flex; gap:10px; margin-top:8px; padding:9px; background:#fff; border:1px solid #e2e8f0; border-radius:12px; text-decoration:none; }\
+  .card:hover{ border-color:#a5b4fc; } .card img{ width:52px; height:52px; border-radius:8px; object-fit:cover; background:#f1f5f9; flex:none; }\
+  .card .nm{ font-size:12px; font-weight:600; color:#0f172a; }\
+  .card .pr{ font-size:13px; font-weight:700; color:#059669; margin-top:3px; }\
+  .card .vw{ font-size:11px; color:#4f46e5; } \
+  .fu{ margin-top:8px; font-size:12px; color:#3730a3; background:#eef2ff; border:1px solid #e0e7ff; border-radius:10px; padding:8px 11px; }\
+  .fb{ display:flex; gap:4px; margin-top:6px; } .fb button{ border:0; background:none; cursor:pointer; padding:4px; border-radius:6px; color:#94a3b8; font-size:13px; }\
+  .fb button.on-up{ color:#059669; background:#ecfdf5; } .fb button.on-dn{ color:#e11d48; background:#fff1f2; }\
+  .chips{ display:flex; flex-wrap:wrap; gap:6px; padding:10px 12px; background:#f8fafc; border-top:1px solid #eef2f6; }\
+  .chip{ font-size:12px; padding:6px 10px; background:#fff; border:1px solid #e2e8f0; border-radius:999px; cursor:pointer; color:#475569; }\
+  .chip:hover{ border-color:#818cf8; color:#4f46e5; }\
+  .inp{ display:flex; gap:8px; padding:12px; background:#fff; border-top:1px solid #e2e8f0; }\
+  .inp input{ flex:1; padding:10px 12px; font-size:13.5px; background:#f1f5f9; border:0; border-radius:10px; outline:none; }\
+  .inp input:focus{ background:#fff; box-shadow:0 0 0 2px #6366f1; }\
+  .inp button{ width:40px; border:0; border-radius:10px; background:#4f46e5; color:#fff; cursor:pointer; font-size:16px; }\
+  .inp button:disabled{ background:#cbd5e1; } .muted{ color:#94a3b8; font-size:12px; } .empty{ text-align:center; color:#64748b; font-size:13px; padding-top:12px; }\
+  ";
+
+  // ---- mount ---------------------------------------------------------------
+  var host = document.createElement("div");
+  document.body.appendChild(host);
+  var root = host.attachShadow({ mode: "open" });
+  var styleEl = document.createElement("style"); styleEl.textContent = CSS; root.appendChild(styleEl);
+  var wrap = document.createElement("div"); root.appendChild(wrap);
+
+  function lastUserAssistant() { // history for the backend
+    return state.messages.slice(-8).map(function (m) { return { role: m.role, content: m.text }; });
+  }
+
+  function loadSuggestions() {
+    var q = state.category ? "?category=" + encodeURIComponent(state.category) : "";
+    api("/api/suggestions" + q).then(function (d) { state.suggestions = (d && d.suggestions) || []; render(); }).catch(function () {});
+  }
+
+  function send(text, isRefinement) {
+    var q = (text || "").trim();
+    if (!q || state.loading) return;
+    var history = lastUserAssistant();
+    state.messages.push({ role: "user", text: q });
+    state.loading = true; render();
+    api("/api/chat", { method: "POST", body: JSON.stringify({ message: q, history: history, is_refinement: !!isRefinement }) })
+      .then(function (res) {
+        state.messages.push({ role: "assistant", text: res.answer, products: res.products || [],
+          refine: res.refine_suggestions || [], followUp: res.follow_up_question || "", interactionId: res.interaction_id });
+      })
+      .catch(function () { state.messages.push({ role: "assistant", text: "Sorry, something went wrong. Please try again." }); })
+      .then(function () { state.loading = false; render(); });
+  }
+
+  function rate(idx, rating) {
+    var m = state.messages[idx]; if (!m || !m.interactionId) return;
+    var next = m.feedback === rating ? "none" : rating;
+    m.feedback = next === "none" ? null : next; render();
+    api("/api/chat/feedback", { method: "POST", body: JSON.stringify({ interaction_id: m.interactionId, rating: next }) }).catch(function () {});
+  }
+
+  function render() {
+    if (!state.open) {
+      wrap.innerHTML = '<button class="launch" id="pc-open">💬 <span>Ask the assistant</span></button>';
+      root.getElementById("pc-open").onclick = function () { state.open = true; if (!state.suggestions.length) loadSuggestions(); render(); };
+      return;
+    }
+    var msgs = state.messages.map(function (m, i) {
+      var html = '<div class="row ' + (m.role === "u" || m.role === "user" ? "u" : "a") + '"><div>';
+      html += '<div class="bub">' + esc(m.text) + "</div>";
+      if (m.products && m.products.length) {
+        html += m.products.map(function (p) {
+          return '<a class="card" href="' + esc(p.url || "#") + '" target="_blank" rel="noopener">' +
+            (p.image ? '<img src="' + esc(p.image) + '" onerror="this.style.display=\'none\'">' : "") +
+            '<div><div class="nm">' + esc(p.name) + "</div>" +
+            (p.price != null ? '<div class="pr">€' + Number(p.price).toFixed(2) + "</div>" : "") +
+            (p.url ? '<div class="vw">View ↗</div>' : "") + "</div></a>";
+        }).join("");
+      }
+      if (m.followUp) html += '<div class="fu">' + esc(m.followUp) + "</div>";
+      if ((m.role === "assistant") && m.interactionId)
+        html += '<div class="fb"><button data-i="' + i + '" data-r="up" class="' + (m.feedback === "up" ? "on-up" : "") + '">👍</button>' +
+                '<button data-i="' + i + '" data-r="down" class="' + (m.feedback === "down" ? "on-dn" : "") + '">👎</button></div>';
+      return html + "</div></div>";
+    }).join("");
+
+    var empty = state.messages.length ? "" :
+      '<div class="empty">' + (state.category ? "Questions about " + esc(state.category.toLowerCase()) : "Not sure where to start?") + '<br>Pick one below or type your own.</div>';
+    var loading = state.loading ? '<div class="muted">Thinking…</div>' : "";
+
+    var lastA = null;
+    for (var k = state.messages.length - 1; k >= 0; k--) if (state.messages[k].role === "assistant") { lastA = state.messages[k]; break; }
+    var chipList = state.messages.length ? (state.loading ? [] : (lastA && lastA.refine) || []) : state.suggestions;
+    var chips = chipList.slice(0, 5).map(function (s) { return '<button class="chip" data-c="' + esc(s) + '">' + esc(s) + "</button>"; }).join("");
+
+    wrap.innerHTML =
+      '<div class="panel"><div class="hd"><div><b>Product Assistant</b><small>' +
+      (state.category ? "Browsing: " + esc(state.category) : "How can I help you find a product?") + "</small></div>" +
+      '<button id="pc-close">✕</button></div>' +
+      '<div class="body" id="pc-body">' + empty + msgs + loading + "</div>" +
+      (chips ? '<div class="chips">' + chips + "</div>" : "") +
+      '<form class="inp" id="pc-form"><input id="pc-in" placeholder="Type your question…" ' + (state.loading ? "disabled" : "") + ">" +
+      '<button type="submit" ' + (state.loading ? "disabled" : "") + ">➤</button></form></div>";
+
+    root.getElementById("pc-close").onclick = function () { state.open = false; render(); };
+    root.getElementById("pc-form").onsubmit = function (e) { e.preventDefault(); var inp = root.getElementById("pc-in"); send(inp.value); };
+    Array.prototype.forEach.call(root.querySelectorAll(".chip"), function (b) {
+      b.onclick = function () { send(b.getAttribute("data-c"), state.messages.length > 0); };
+    });
+    Array.prototype.forEach.call(root.querySelectorAll(".fb button"), function (b) {
+      b.onclick = function () { rate(parseInt(b.getAttribute("data-i"), 10), b.getAttribute("data-r")); };
+    });
+    var body = root.getElementById("pc-body"); if (body) body.scrollTop = body.scrollHeight;
+    var input = root.getElementById("pc-in"); if (input && !state.loading) input.focus();
+  }
+
+  render();
+})();
