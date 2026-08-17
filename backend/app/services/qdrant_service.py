@@ -141,6 +141,27 @@ class QdrantService:
             logger.error(f"Error searching: {e}")
             return []
     
+    def set_payload_for_points(self, point_ids: List[str], payload: Dict[str, Any]) -> bool:
+        """Merge `payload` into the given points WITHOUT touching their vectors.
+
+        Used to patch a ranking signal (bestseller_rank) onto already-indexed
+        points, avoiding a full re-embed (which would burn Mistral rate limits).
+        Missing points are skipped by Qdrant rather than erroring.
+        """
+        if not point_ids:
+            return True
+        try:
+            with _client_lock:
+                self.client.set_payload(
+                    collection_name=self.collection_name,
+                    payload=payload,
+                    points=point_ids,
+                )
+            return True
+        except Exception as e:
+            logger.error(f"Error setting payload on {len(point_ids)} points: {e}")
+            return False
+
     def delete_points(self, point_ids: List[str]) -> bool:
         """Delete points by IDs."""
         try:

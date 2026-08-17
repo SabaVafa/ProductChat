@@ -17,6 +17,10 @@ class Product(Base):
     image_url = Column(String(1000), nullable=True)
     # Canonical link back to the source product page (shown on the card).
     product_url = Column(String(1000), nullable=True)
+    # Best (lowest) position this product reaches in any category's shop
+    # "Bestseller" listing (?Sortierung=11); NULL = not a ranked bestseller.
+    # Used only as a relevance-gated tie-break in retrieval, never a hard sort.
+    bestseller_rank = Column(Integer, nullable=True, index=True)
     # Scraper change-detection fields: sitemap <lastmod> and a content hash.
     source = Column(String(50), nullable=True)  # e.g. "scraper", "manual"
     lastmod = Column(String(64), nullable=True)

@@ -175,7 +175,8 @@ class IndexingService:
                     "price": product.price,
                     "image_url": product.image_url,
                     "product_url": product.product_url,
-                    "attributes": product.attributes
+                    "attributes": product.attributes,
+                    "bestseller_rank": product.bestseller_rank,
                 }
             ))
 

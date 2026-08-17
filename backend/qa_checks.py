@@ -222,6 +222,19 @@ GROUND_TRUTHS = [
      lambda ps: cat_in_top(ps, "paketbox") and prices_under(ps, 500),
      "'package box under 500' -> Paketboxen, all <= €500"),
 
+    # --- bestseller tie-break (relevance-gated) ----------------------------
+    # For a broad, popular category the relevance-gated tie-break should float a
+    # genuine shop bestseller to the head of the (correctly-routed) results,
+    # WITHOUT changing which category wins. Rank values shift nightly, but a
+    # ranked product leading a broad category is stable.
+    ("SEARCH-bestseller-leads", "Briefkasten",
+     lambda ps: bool(ps) and "briefk" in _cat(ps[0])
+                and ps[0].get("bestseller_rank") is not None,
+     "broad category query -> a real bestseller leads, category routing intact"),
+    ("SEARCH-bestseller-surfaced", "Türklingel",
+     lambda ps: sum(1 for p in ps[:5] if p.get("bestseller_rank") is not None) >= 2,
+     "popular category -> bestsellers surface among the top relevant results"),
+
     # --- robustness ---------------------------------------------------------
     ("SEARCH-gibberish", "xyzzy qwerty zzz nonsense",
      lambda ps: isinstance(ps, list),

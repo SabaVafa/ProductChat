@@ -7,6 +7,41 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+# --- Bestseller tie-break tuning --------------------------------------------
+# Popularity must never override relevance, so we only let it reorder results
+# that are ALREADY comparably relevant. Scores within TIER_WIDTH of each other
+# form one "relevance tier"; within a tier, a better bestseller band wins, then
+# raw score. A stronger semantic match in a higher tier is never displaced.
+# TIER_WIDTH is deliberately small (cosine scores of good matches sit ~0.7–0.85
+# and adjacent results differ by ~0.005–0.02) so only genuine near-ties reorder.
+_TIER_WIDTH = 0.02
+
+
+def _bestseller_band(rank: Optional[int]) -> int:
+    """Coarse popularity band (lower = more popular; 4 = unranked)."""
+    if rank is None:
+        return 4
+    if rank <= 5:
+        return 0
+    if rank <= 15:
+        return 1
+    if rank <= 50:
+        return 2
+    return 3
+
+
+def _apply_bestseller_tiebreak(products: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Relevance-gated, banded tie-break (see _TIER_WIDTH). Stable within ties."""
+    if len(products) < 2:
+        return products
+
+    def sort_key(p: Dict[str, Any]):
+        score = p.get("score") or 0.0
+        tier = int(score / _TIER_WIDTH)          # higher tier = more relevant
+        return (-tier, _bestseller_band(p.get("bestseller_rank")), -score)
+
+    return sorted(products, key=sort_key)
+
 
 class RetrievalService:
     def __init__(self, db: Optional[Session] = None):
@@ -36,6 +71,7 @@ class RetrievalService:
                 "image_url": payload.get("image_url"),
                 "product_url": payload.get("product_url"),
                 "attributes": payload.get("attributes"),
+                "bestseller_rank": payload.get("bestseller_rank"),
                 "score": result.get("score", 0.0)
             })
         return products
@@ -81,7 +117,9 @@ class RetrievalService:
                 )
                 products = self._format(results)
 
-            return products
+            # Relevance-gated bestseller tie-break: reorders only comparably
+            # relevant results, so category/price routing above is preserved.
+            return _apply_bestseller_tiebreak(products)
 
         except Exception as e:
             logger.error(f"Retrieval error: {e}")

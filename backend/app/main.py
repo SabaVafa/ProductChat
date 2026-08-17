@@ -11,7 +11,7 @@ from app.api import (
     scraper_router, products_router, proxy_router, ops_router
 )
 from app.database import engine, Base
-from sqlalchemy import text
+from sqlalchemy import text, inspect
 import logging
 
 # Configure logging: console + a rotating file. The file is the flight
@@ -70,6 +70,28 @@ def _migrate_product_columns():
 # lightweight migration is only needed for existing Postgres databases.
 if engine.dialect.name == "postgresql":
     _migrate_product_columns()
+
+
+def _ensure_columns():
+    """Add columns introduced after a DB was first created (both dialects).
+
+    create_all() never ALTERs an existing table, and SQLite lacks
+    'ADD COLUMN IF NOT EXISTS', so we introspect the live columns and ALTER
+    only the missing ones. Idempotent and safe to run on every startup.
+    """
+    wanted = {"bestseller_rank": "INTEGER"}
+    try:
+        with engine.begin() as conn:
+            existing = {c["name"] for c in inspect(conn).get_columns("products")}
+            for col, ddl in wanted.items():
+                if col not in existing:
+                    conn.execute(text(f"ALTER TABLE products ADD COLUMN {col} {ddl}"))
+                    logger.info("Added products.%s column", col)
+    except Exception as e:
+        logger.error(f"_ensure_columns failed: {e}")
+
+
+_ensure_columns()
 
 # Shared rate limiter (defined in app.limiter so routers can apply per-route limits)
 from app.limiter import limiter

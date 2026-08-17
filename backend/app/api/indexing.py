@@ -137,6 +137,45 @@ async def import_jtl_export(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+def _run_bestseller_capture():
+    """Crawl the shop's per-category Bestseller listings in a background thread."""
+    from app.services.bestsellers import BestsellerService
+    db = SessionLocal()
+    try:
+        BestsellerService(db).capture()
+    except Exception as e:
+        logger.error(f"Background bestseller capture failed: {e}")
+    finally:
+        db.close()
+
+
+@router.post("/import/bestsellers", response_model=Dict[str, Any])
+async def capture_bestsellers(
+    _: None = Depends(require_admin),
+):
+    """Capture per-category "Bestseller" rank from the live shop (background).
+
+    Crawls each category's ?Sortierung=11 listing, records each product's best
+    position, and patches `bestseller_rank` onto the Qdrant payload WITHOUT
+    re-embedding. Retrieval then uses it as a relevance-gated tie-break.
+
+    Returns immediately; poll GET /index/bestsellers/status for progress, or see
+    the "bestsellers" entry in GET /ops once done.
+    """
+    from app.services.bestsellers import get_capture_status
+    if get_capture_status()["status"] == "running":
+        return {"success": False, "message": "Bestseller capture already in progress"}
+    thread = threading.Thread(target=_run_bestseller_capture, daemon=True)
+    thread.start()
+    return {"success": True, "message": "Bestseller capture started", "status": "running"}
+
+
+@router.get("/bestsellers/status", response_model=Dict[str, Any])
+async def bestseller_status(_: None = Depends(require_admin)):
+    from app.services.bestsellers import get_capture_status
+    return get_capture_status()
+
+
 @router.post("/dedupe", response_model=Dict[str, Any])
 async def dedupe_products(
     db: Session = Depends(get_db),
