@@ -18,6 +18,8 @@ parser.add_argument("--api", default="http://127.0.0.1:8000")
 parser.add_argument("--db", default="productchat.db")
 parser.add_argument("--live-sample", type=int, default=4,
                     help="products to price-check against the live site (0 = skip)")
+parser.add_argument("--token", default="",
+                    help="admin token; when set, the result is recorded in the operations journal")
 args = parser.parse_args()
 
 FAILS, WARNS = [], []
@@ -181,4 +183,18 @@ print(f"RESULT: {len(FAILS)} FAIL, {len(WARNS)} WARN")
 if FAILS:
     print("failed:", ", ".join(sorted(set(FAILS))))
 print("=" * 74)
+
+# Record the run in the operations journal (best-effort).
+if args.token:
+    try:
+        requests.post(f"{args.api}/api/ops",
+                      headers={"X-Admin-Token": args.token},
+                      json={"kind": "qa", "status": "completed" if not FAILS else "error",
+                            "detail": {"fails": sorted(set(FAILS)), "warns": len(WARNS),
+                                       "total_products": total}},
+                      timeout=15)
+        print("(result recorded in operations journal)")
+    except Exception as e:
+        print(f"(could not record result: {e})")
+
 sys.exit(len(set(FAILS)))

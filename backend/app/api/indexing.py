@@ -127,6 +127,8 @@ async def import_jtl_export(
             result = IndexingService(db).import_products_from_json(mapped)
             result["mapped"] = len(mapped)
         result["received"] = len(items)
+        from app.services.ops import record_operation
+        record_operation(db, "enrich" if enrich else "import-jtl", "completed", result)
         return result
     except HTTPException:
         raise
@@ -175,9 +177,13 @@ async def dedupe_products(
         if removed:
             qs.delete_points([product_id_to_point_id(pid) for pid in removed])
         db.commit()
-        return {"duplicate_urls": len([g for g in groups.values() if len(g) > 1]),
-                "removed": len(removed), "attr_merged_into_keeper": merged,
-                "removed_ids": removed[:20]}
+        result = {"duplicate_urls": len([g for g in groups.values() if len(g) > 1]),
+                  "removed": len(removed), "attr_merged_into_keeper": merged,
+                  "removed_ids": removed[:20]}
+        from app.services.ops import record_operation
+        record_operation(db, "dedupe", "completed",
+                         {k: v for k, v in result.items() if k != "removed_ids"})
+        return result
     except Exception as e:
         logger.error(f"Dedupe error: {e}")
         raise HTTPException(status_code=500, detail=str(e))

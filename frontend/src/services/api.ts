@@ -64,6 +64,13 @@ export const chatAPI = {
   },
 };
 
+export const opsAPI = {
+  list: async (limit = 20) => {
+    const response = await api.get('/ops', { params: { limit } });
+    return response.data;
+  },
+};
+
 export const indexingAPI = {
   getStatus: async () => {
     const response = await api.get('/index/status');

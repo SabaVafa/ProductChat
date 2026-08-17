@@ -114,6 +114,11 @@ class IndexingService:
                 status.error_message = f"{failed} products failed embedding and remain unindexed"
             self.db.commit()
 
+            from app.services.ops import record_operation
+            record_operation(self.db, "index", "completed", {
+                "incremental": incremental, "succeeded": len(succeeded_ids), "failed": failed,
+            })
+
             return {
                 "success": True,
                 "message": f"Indexed {len(succeeded_ids)} of {total} products"
@@ -127,6 +132,8 @@ class IndexingService:
             status.error_message = str(e)
             status.completed_at = datetime.utcnow()
             self.db.commit()
+            from app.services.ops import record_operation
+            record_operation(self.db, "index", "error", {"error": str(e)})
             return {
                 "success": False,
                 "message": f"Indexing failed: {str(e)}"

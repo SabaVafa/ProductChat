@@ -313,6 +313,12 @@ class ScraperService:
             # backend restart (SYNC_STATE is in-memory only).
             self._persist_last_run(finished)
             logger.info(f"Scraper sync done: {len(changed_ids)} changed/new indexed")
+            from app.services.ops import record_operation
+            record_operation(self.db, "sync", "completed", {
+                "scanned": SYNC_STATE["scanned"], "total_urls": SYNC_STATE["total_urls"],
+                "changed": len(changed_ids), "removed": SYNC_STATE["removed"],
+                "indexed": SYNC_STATE["indexed"],
+            })
             return {"success": True, "changed": len(changed_ids)}
 
         except Exception as e:
@@ -322,6 +328,8 @@ class ScraperService:
                     "status": "error", "phase": None, "error": str(e),
                     "finished_at": datetime.now(timezone.utc).isoformat(),
                 })
+            from app.services.ops import record_operation
+            record_operation(self.db, "sync", "error", {"error": str(e)})
             return {"success": False, "error": str(e)}
 
     def _persist_last_run(self, finished_at: str):

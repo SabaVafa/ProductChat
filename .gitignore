@@ -15,6 +15,9 @@ build/
 # Local vector store (embedded Qdrant)
 qdrant_local/
 
+# Application logs
+backend/logs/
+
 # Office temp/lock files
 ~$*
 

@@ -8,18 +8,36 @@ from app.config import settings
 import os
 from app.api import (
     chat_router, indexing_router, settings_router, retrieval_router,
-    scraper_router, products_router, proxy_router
+    scraper_router, products_router, proxy_router, ops_router
 )
 from app.database import engine, Base
 from sqlalchemy import text
 import logging
 
-# Configure logging
+# Configure logging: console + a rotating file. The file is the flight
+# recorder — silent failures (embedding 429s, scraper skips, Qdrant errors)
+# stay on disk instead of vanishing with the console window.
+from logging.handlers import RotatingFileHandler
+
+_LOG_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "logs")
+os.makedirs(_LOG_DIR, exist_ok=True)
+
+_fmt = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+_file_handler = RotatingFileHandler(
+    os.path.join(_LOG_DIR, "app.log"),
+    maxBytes=5 * 1024 * 1024,  # 5 MB per file
+    backupCount=5,             # keep app.log.1 … app.log.5
+    encoding="utf-8",
+)
+_file_handler.setFormatter(_fmt)
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
+logging.getLogger().addHandler(_file_handler)
 logger = logging.getLogger(__name__)
+logger.info("=== backend starting; file log at %s ===", os.path.join(_LOG_DIR, "app.log"))
 
 # Create tables
 Base.metadata.create_all(bind=engine)
@@ -84,6 +102,7 @@ app.include_router(retrieval_router, prefix=settings.API_PREFIX)
 app.include_router(scraper_router, prefix=settings.API_PREFIX)
 app.include_router(products_router, prefix=settings.API_PREFIX)
 app.include_router(proxy_router, prefix=settings.API_PREFIX)
+app.include_router(ops_router, prefix=settings.API_PREFIX)
 
 
 @app.on_event("startup")

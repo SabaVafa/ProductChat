@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Settings as SettingsType } from '../types';
-import { settingsAPI, indexingAPI, syncAPI } from '../services/api';
-import { Save, RefreshCw, Upload, Database, Brain, Search, Sliders, Globe } from 'lucide-react';
+import { settingsAPI, indexingAPI, syncAPI, opsAPI } from '../services/api';
+import { Save, RefreshCw, Upload, Database, Brain, Search, Sliders, Globe, ScrollText } from 'lucide-react';
 
 export default function Admin() {
   const [settings, setSettings] = useState<SettingsType | null>(null);
@@ -9,12 +9,14 @@ export default function Admin() {
   const [saving, setSaving] = useState(false);
   const [indexingStatus, setIndexingStatus] = useState<any>(null);
   const [syncStatus, setSyncStatus] = useState<any>(null);
+  const [ops, setOps] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState('mistral');
 
   useEffect(() => {
     loadSettings();
     loadIndexingStatus();
     loadSyncStatus();
+    opsAPI.list(15).then(setOps).catch((e) => console.error('ops load failed', e));
   }, []);
 
   const loadSyncStatus = async () => {
@@ -253,6 +255,51 @@ export default function Admin() {
             A full sync scrapes every product page and embeds only the ones that changed. The first
             full run indexes the whole catalog (one embedding call per product).
           </p>
+        </div>
+
+        {/* Operations Journal */}
+        <div className="bg-white rounded-lg shadow p-6 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <ScrollText className="w-5 h-5 text-purple-600" />
+              <h2 className="text-xl font-semibold text-gray-900">Operations Journal</h2>
+            </div>
+            <button
+              onClick={() => opsAPI.list(15).then(setOps).catch(() => {})}
+              className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800"
+            >
+              <RefreshCw className="w-3.5 h-3.5" /> Refresh
+            </button>
+          </div>
+          <p className="text-sm text-gray-500 mb-3">
+            Every pipeline run (sync, indexing, import, enrich, dedupe, QA) leaves a permanent record here.
+            Detailed error traces are in <code className="bg-gray-100 px-1 rounded">backend/logs/app.log</code>.
+          </p>
+          {ops.length === 0 ? (
+            <p className="text-sm text-gray-400">No operations recorded yet.</p>
+          ) : (
+            <div className="divide-y divide-gray-100">
+              {ops.map((o) => (
+                <div key={o.id} className="py-2 flex items-start gap-3 text-sm">
+                  <span
+                    className={`mt-0.5 px-2 py-0.5 rounded-full text-xs font-medium ${
+                      o.status === 'completed'
+                        ? 'bg-emerald-50 text-emerald-700'
+                        : 'bg-red-50 text-red-700'
+                    }`}
+                  >
+                    {o.kind}
+                  </span>
+                  <span className="flex-1 text-gray-600 font-mono text-xs break-all">
+                    {o.detail ? JSON.stringify(o.detail) : ''}
+                  </span>
+                  <span className="text-xs text-gray-400 whitespace-nowrap">
+                    {o.created_at ? new Date(o.created_at).toLocaleString() : ''}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Indexing Status */}
