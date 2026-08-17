@@ -112,6 +112,11 @@ GROUND_TRUTHS = [
                     and "anthrazit" in json.dumps(p.get("attributes") or {}, ensure_ascii=False).lower()
                     for p in ps),
      "Hugo/Hugo 2 retrieved WITH Anthrazit in their variant attributes"),
+    ("SEARCH-mailbox-not-paketbox",
+     "i need a mailbox",
+     lambda ps: sum(1 for p in ps[:5] if "briefk" in (p.get("category") or "").lower()) >= 2
+                and "paketbox" not in (ps[0].get("category") or "").lower(),
+     "'mailbox' returns standalone Briefkästen, not package boxes, at the top"),
     ("SEARCH-durchwurf",
      "Durchwurfbriefkasten Mauerdurchwurf",
      lambda ps: any("durchwurf" in (p.get("name") or "").lower() for p in ps[:5]),

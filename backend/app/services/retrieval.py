@@ -8,6 +8,41 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+def _fold(s: str) -> str:
+    """Lowercase + umlaut-fold so 'Briefkästen' matches 'briefkast'."""
+    s = (s or "").lower()
+    for a, b in (("ä", "a"), ("ö", "o"), ("ü", "u"), ("ß", "ss")):
+        s = s.replace(a, b)
+    return s
+
+
+# When a query names a product type, prefer products whose CATEGORY matches.
+# This stops pure semantic search from returning "Paketbox mit Briefkasten"
+# (a package box) for "mailbox" just because it contains the word Briefkasten.
+# (query trigger terms, category-name substrings to prefer) — all umlaut-folded.
+_CATEGORY_HINTS = [
+    (("mailbox", "briefkast", "letterbox", "letter box", "postbox"), ("briefkast",)),
+    (("paketbox", "package box", "parcel", "paketkasten"), ("paketbox",)),
+    (("doorbell", "turklingel", "funkklingel", "door bell", "klingel"),
+     ("turklingel", "funkklingel")),
+    (("intercom", "sprechanlage", "tursprech"), ("sprechanlage",)),
+    (("house number", "hausnummer"), ("hausnummer",)),
+    (("camera", "kamera", "surveillance", "cctv"), ("kamera",)),
+    (("mulltonne", "waste bin", "trash", "bin box", "dustbin"), ("mulltonne",)),
+    (("gong", "chime"), ("gong",)),
+    (("outdoor light", "leuchte", "lamp", "lighting"), ("leuchte", "garten")),
+]
+
+
+def _preferred_categories(query: str):
+    q = _fold(query)
+    subs = set()
+    for triggers, cats in _CATEGORY_HINTS:
+        if any(t in q for t in triggers):
+            subs.update(cats)
+    return subs
+
+
 class RetrievalService:
     def __init__(self, db: Optional[Session] = None):
         self.qdrant = QdrantService()
@@ -28,19 +63,29 @@ class RetrievalService:
         score_threshold: float = 0.0,
         filters: Optional[Dict[str, Any]] = None
     ) -> List[Dict[str, Any]]:
-        """Retrieve relevant products for a query."""
+        """Retrieve relevant products for a query.
+
+        When the query names a product type (e.g. "mailbox"), over-fetch a larger
+        candidate pool and re-rank so products in the matching CATEGORY come
+        first — otherwise semantically-close but wrong-type products (a package
+        box that mentions "Briefkasten") can crowd out the real ones.
+        """
         try:
             # Generate query embedding
             query_vector = self.embeddings.embed_text(query)
-            
-            # Search in Qdrant
+
+            preferred = _preferred_categories(query)
+            # Over-fetch when we intend to re-rank, so category matches that the
+            # pure vector ranked lower still make it into the candidate pool.
+            fetch = max(limit * 6, 60) if preferred else limit
+
             results = self.qdrant.search(
                 query_vector=query_vector,
-                limit=limit,
+                limit=fetch,
                 score_threshold=score_threshold,
                 filter_conditions=filters
             )
-            
+
             # Format results
             products = []
             for result in results:
@@ -57,7 +102,19 @@ class RetrievalService:
                     "attributes": payload.get("attributes"),
                     "score": result.get("score", 0.0)
                 })
-            
+
+            if preferred:
+                def is_pref(p):
+                    cat = _fold(p.get("category"))
+                    return any(sub in cat for sub in preferred)
+                # Stable partition: category matches first (keeping vector order
+                # within each group), then the rest as fallback.
+                matches = [p for p in products if is_pref(p)]
+                rest = [p for p in products if not is_pref(p)]
+                products = (matches + rest)[:limit]
+            else:
+                products = products[:limit]
+
             return products
             
         except Exception as e:
