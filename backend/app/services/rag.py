@@ -1,21 +1,41 @@
 from app.services.mistral import MistralService
 from app.services.retrieval import RetrievalService
 from app.services.settings_service import SettingsService
-from app.services.query_understanding import understand_query
-from app.models.product import Product
 from sqlalchemy.orm import Session
 from typing import Dict, Any, List, Optional
 import logging
 
 logger = logging.getLogger(__name__)
 
+# Short connective phrases that signal a typed message is a follow-up refining
+# the previous turn (so it should keep context) rather than a new topic.
+_FOLLOWUP_PREFIXES = (
+    "and ", "also ", "or ", "what about", "how about", "cheaper", "cheapest",
+    "under ", "over ", "with ", "without ", "in ", "same ", "any ", "more ", "less ",
+)
 
-def _catalog_categories(db: Session) -> List[str]:
-    """Distinct non-empty catalog categories, for the query-understanding step."""
-    rows = db.query(Product.category).distinct().filter(
-        Product.category.isnot(None), Product.category != ""
-    ).all()
-    return [r[0] for r in rows if r[0]]
+
+def _looks_like_followup(message: str) -> bool:
+    """True if a typed message reads like a refinement of the previous turn.
+
+    Detected by connective wording only — NOT by length, so a short but
+    self-contained new topic like "show me mailboxes" is treated as a new
+    subject, not a refinement of whatever came before.
+    """
+    m = (message or "").strip().lower()
+    if not m:
+        return False
+    return m.startswith(_FOLLOWUP_PREFIXES)
+
+
+def _active_subject(prior_user: list) -> str:
+    """The most recent user turn that established a subject (i.e. not itself a
+    follow-up), so refinements/follow-ups anchor on the CURRENT topic rather
+    than the conversation's first message."""
+    for turn in reversed(prior_user):
+        if turn and not _looks_like_followup(turn):
+            return turn
+    return prior_user[-1] if prior_user else ""
 
 
 class RAGService:
@@ -117,53 +137,65 @@ class RAGService:
                 enable_metadata_filters=enable_filters,
             )
 
+            # Build a retrieval query that carries recent context, so short
+            # follow-ups ("and with LED?", "cheaper?") still search sensibly.
+            # The generation step gets the full turn history separately; here we
+            # only need enough context for the vector search to land in the
+            # right neighbourhood, so the last couple of user turns is plenty.
             history_list = history or []
             prior_user = [
                 (h.get("content") or "").strip()
                 for h in history_list
                 if h.get("role") == "user" and (h.get("content") or "").strip()
             ]
-
-            # Text to understand: a typed question stands alone (precise, stateless);
-            # a refinement chip carries recent context so "With LED" is parsed
-            # against the current subject.
+            # Build the retrieval query so it lands on the RIGHT products:
+            #  - a refinement chip ("With LED") must keep the current subject, so
+            #    anchor on the first + most recent user turns;
+            #  - a short typed follow-up ("cheaper?", "in anthracite?") keeps the
+            #    immediately preceding turn for context;
+            #  - any other typed question is a NEW topic and drives retrieval on
+            #    its own, so asking about a different product switches context.
             if is_refinement and prior_user:
-                understand_text = " ".join(prior_user[-2:] + [message]).strip()
+                # A tapped refine chip ("With LED") keeps the CURRENT subject —
+                # anchor on the most recent topic turn.
+                subject = _active_subject(prior_user)
+                retrieval_query = (subject + " " + message).strip() if subject else message.strip()
             else:
-                understand_text = message.strip()
+                # Every typed question searches for exactly what was typed — no
+                # bleed from earlier turns. This is the precise, stateless search
+                # behaviour; a new question always switches topic cleanly.
+                subject = ""
+                retrieval_query = message.strip()
 
-            # LLM query understanding -> structured query (primary categories,
-            # clean search phrase, price bounds). This replaces the old keyword
-            # heuristics; the categories/price are applied as Qdrant filters.
-            mistral_settings = settings_dict.get("mistral", {})
-            uq_service = MistralService(api_key=mistral_settings.get("api_key"))
-            parsed = understand_query(uq_service, _catalog_categories(self.db), understand_text)
-
-            add_step(
-                "1b_query_understanding",
-                understand_text=understand_text,
-                categories=parsed["categories"],
-                search_text=parsed["search_text"],
-                price_min=parsed["price_min"],
-                price_max=parsed["price_max"],
-            )
-
-            # Filtered semantic retrieval — category + price enforced by the
-            # vector DB (with an unfiltered fallback if the filter is too tight).
+            # Retrieve relevant products (vector search in Qdrant)
             retrieved_products = self.retrieval.retrieve(
-                query=parsed["search_text"],
+                query=retrieval_query,
                 limit=num_retrieved,
-                score_threshold=similarity_threshold,
-                categories=parsed["categories"] or None,
-                price_min=parsed["price_min"],
-                price_max=parsed["price_max"],
+                score_threshold=similarity_threshold
             )
+
+            # For a refinement, ALSO retrieve for the subject alone and merge.
+            # The added attribute ("With Anthrazit") can otherwise pull the
+            # search so far toward that attribute that the subject's own
+            # products (e.g. the only Unterputz mailboxes) vanish from the
+            # candidate set — making it impossible for the model to say
+            # "that combination doesn't exist, but here are the base options".
+            if is_refinement and subject:
+                seen_ids = {p.get("product_id") for p in retrieved_products}
+                anchor_products = self.retrieval.retrieve(
+                    query=subject,
+                    limit=max(5, num_retrieved // 2),
+                    score_threshold=similarity_threshold
+                )
+                for p in anchor_products:
+                    if p.get("product_id") not in seen_ids:
+                        retrieved_products.append(p)
+                        seen_ids.add(p.get("product_id"))
 
             add_step(
                 "2_vector_search",
                 embedding_model=self.retrieval.embeddings.model,
-                retrieval_query=parsed["search_text"],
-                filtered_categories=parsed["categories"],
+                retrieval_query=retrieval_query,
                 retrieved_count=len(retrieved_products),
                 results=[
                     {

@@ -1,7 +1,5 @@
 from qdrant_client import QdrantClient
-from qdrant_client.models import (
-    Distance, VectorParams, PointStruct, Filter, FieldCondition, MatchValue, MatchAny, Range,
-)
+from qdrant_client.models import Distance, VectorParams, PointStruct, Filter, FieldCondition, MatchValue
 from typing import List, Dict, Any, Optional
 from app.config import settings
 import logging
@@ -86,25 +84,22 @@ class QdrantService:
         query_vector: List[float],
         limit: int = 10,
         score_threshold: float = 0.0,
-        filter_conditions: Optional[Dict[str, Any]] = None,
-        categories: Optional[List[str]] = None,
-        price_min: Optional[float] = None,
-        price_max: Optional[float] = None,
+        filter_conditions: Optional[Dict[str, Any]] = None
     ) -> List[Dict[str, Any]]:
-        """Search for similar vectors, optionally filtered by category (any of)
-        and price range — structured filters applied by the vector DB itself."""
+        """Search for similar vectors."""
         try:
-            conditions = []
+            search_filter = None
             if filter_conditions:
+                conditions = []
                 for key, value in filter_conditions.items():
-                    conditions.append(FieldCondition(key=key, match=MatchValue(value=value)))
-            if categories:
-                conditions.append(FieldCondition(key="category", match=MatchAny(any=categories)))
-            if price_min is not None or price_max is not None:
-                conditions.append(FieldCondition(
-                    key="price", range=Range(gte=price_min, lte=price_max)))
-            search_filter = Filter(must=conditions) if conditions else None
-
+                    conditions.append(
+                        FieldCondition(
+                            key=key,
+                            match=MatchValue(value=value)
+                        )
+                    )
+                search_filter = Filter(must=conditions)
+            
             # Use query_points (the current API). The old .search() method was
             # removed in qdrant-client 1.19, so calling it silently returned no
             # results. query_points works on both embedded and server mode.
