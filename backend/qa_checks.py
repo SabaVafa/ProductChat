@@ -117,6 +117,12 @@ GROUND_TRUTHS = [
      lambda ps: sum(1 for p in ps[:5] if "briefk" in (p.get("category") or "").lower()) >= 2
                 and "paketbox" not in (ps[0].get("category") or "").lower(),
      "'mailbox' returns standalone Briefkästen, not package boxes, at the top"),
+    ("SEARCH-mailbox-with-bell",
+     "mailbox with tuerklingel",
+     lambda ps: sum(1 for p in ps[:3]
+                    if "briefk" in (p.get("category") or "").lower()
+                    and "paketbox" not in (p.get("name") or "").lower()) >= 2,
+     "compound 'mailbox with doorbell' -> Briefkästen with Funkklingel, not Paketbox"),
     ("SEARCH-durchwurf",
      "Durchwurfbriefkasten Mauerdurchwurf",
      lambda ps: any("durchwurf" in (p.get("name") or "").lower() for p in ps[:5]),

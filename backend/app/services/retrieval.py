@@ -35,12 +35,35 @@ _CATEGORY_HINTS = [
 
 
 def _preferred_categories(query: str):
+    """Categories of the PRIMARY product type — the one mentioned FIRST in the
+    query. In "mailbox with türklingel" the primary type is mailbox (the
+    türklingel is a wanted feature), so we prefer Briefkasten categories, not
+    a 50/50 mix of mailboxes and doorbells."""
     q = _fold(query)
-    subs = set()
+    best = None  # (position, categories)
     for triggers, cats in _CATEGORY_HINTS:
-        if any(t in q for t in triggers):
-            subs.update(cats)
-    return subs
+        positions = [q.find(t) for t in triggers if t in q]
+        if not positions:
+            continue
+        pos = min(positions)
+        if best is None or pos < best[0]:
+            best = (pos, set(cats))
+    return best[1] if best else set()
+
+
+def _demote_name_terms(query: str):
+    """Name tokens to push DOWN: a product type the user did NOT ask for but
+    that hybrid products carry in their name. E.g. someone asking for a mailbox
+    (not a package box) should not be shown 'Funk-Paketbox mit ... Briefkasten'
+    above a plain 'Briefkasten mit Funkklingel', even though both are filed under
+    a Briefkasten category."""
+    q = _fold(query)
+    demote = set()
+    wants_mailbox = any(t in q for t in ("mailbox", "briefkast", "letterbox", "postbox"))
+    wants_package = any(t in q for t in ("paket", "package", "parcel"))
+    if wants_mailbox and not wants_package:
+        demote.add("paketbox")
+    return demote
 
 
 class RetrievalService:
@@ -104,14 +127,21 @@ class RetrievalService:
                 })
 
             if preferred:
-                def is_pref(p):
-                    cat = _fold(p.get("category"))
-                    return any(sub in cat for sub in preferred)
-                # Stable partition: category matches first (keeping vector order
-                # within each group), then the rest as fallback.
-                matches = [p for p in products if is_pref(p)]
-                rest = [p for p in products if not is_pref(p)]
-                products = (matches + rest)[:limit]
+                demote = _demote_name_terms(query)
+
+                def tier(p):
+                    cat_match = any(sub in _fold(p.get("category")) for sub in preferred)
+                    demoted = any(t in _fold(p.get("name")) for t in demote)
+                    if cat_match and not demoted:
+                        return 0   # right category, right product type
+                    if not cat_match and not demoted:
+                        return 1   # other, but not an unwanted type
+                    if cat_match and demoted:
+                        return 2   # right category but a hybrid of the wrong type
+                    return 3       # wrong category AND unwanted type
+
+                # sorted() is stable, so vector order is preserved within a tier.
+                products = sorted(products, key=tier)[:limit]
             else:
                 products = products[:limit]
 
