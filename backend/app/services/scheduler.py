@@ -35,6 +35,22 @@ def _sync_job():
         db.close()
 
 
+def _bestseller_job():
+    """Refresh per-category bestseller ranks (the shop recomputes them nightly)."""
+    from app.services.bestsellers import BestsellerService, CAPTURE_STATE
+    if CAPTURE_STATE.get("status") == "running":
+        logger.info("Scheduler: bestseller capture still running, skipping this tick")
+        return
+    db = SessionLocal()
+    try:
+        logger.info("Scheduler: starting bestseller capture")
+        BestsellerService(db).capture()
+    except Exception as e:
+        logger.error(f"Scheduler bestseller job failed: {e}")
+    finally:
+        db.close()
+
+
 def start_scheduler():
     global _scheduler
     if _scheduler is not None:
@@ -59,10 +75,25 @@ def start_scheduler():
             id="catalog_sync_startup",
         )
 
+    # Daily bestseller-rank refresh, a bit after the shop's ~01:00 recompute.
+    if settings.BESTSELLER_CAPTURE_ENABLED:
+        hour = max(0, min(23, settings.BESTSELLER_CAPTURE_HOUR))
+        _scheduler.add_job(
+            _bestseller_job,
+            "cron",
+            hour=hour,
+            id="bestseller_capture",
+            max_instances=1,
+            coalesce=True,
+        )
+
     _scheduler.start()
     logger.info(
         f"Scheduler started: catalog sync every {interval}h "
-        f"(startup run: {settings.SCRAPE_ON_STARTUP})"
+        f"(startup run: {settings.SCRAPE_ON_STARTUP}); "
+        f"bestseller capture: "
+        + (f"daily @ {settings.BESTSELLER_CAPTURE_HOUR:02d}:00"
+           if settings.BESTSELLER_CAPTURE_ENABLED else "disabled")
     )
 
 

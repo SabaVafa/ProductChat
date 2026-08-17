@@ -99,6 +99,16 @@ export const indexingAPI = {
     });
     return response.data;
   },
+
+  captureBestsellers: async () => {
+    const response = await api.post('/index/import/bestsellers');
+    return response.data;
+  },
+
+  getBestsellerStatus: async () => {
+    const response = await api.get('/index/bestsellers/status');
+    return response.data;
+  },
 };
 
 export const settingsAPI = {

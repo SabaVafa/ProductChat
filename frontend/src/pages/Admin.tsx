@@ -9,6 +9,7 @@ export default function Admin() {
   const [saving, setSaving] = useState(false);
   const [indexingStatus, setIndexingStatus] = useState<any>(null);
   const [syncStatus, setSyncStatus] = useState<any>(null);
+  const [bestsellerStatus, setBestsellerStatus] = useState<any>(null);
   const [ops, setOps] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState('mistral');
 
@@ -16,8 +17,43 @@ export default function Admin() {
     loadSettings();
     loadIndexingStatus();
     loadSyncStatus();
+    loadBestsellerStatus();
     opsAPI.list(15).then(setOps).catch((e) => console.error('ops load failed', e));
   }, []);
+
+  const loadBestsellerStatus = async () => {
+    try {
+      setBestsellerStatus(await indexingAPI.getBestsellerStatus());
+    } catch (error) {
+      console.error('Failed to load bestseller status:', error);
+    }
+  };
+
+  // Poll bestseller-capture status while a capture is running.
+  useEffect(() => {
+    if (bestsellerStatus?.status !== 'running') return;
+    const interval = setInterval(loadBestsellerStatus, 1500);
+    return () => clearInterval(interval);
+  }, [bestsellerStatus?.status]);
+
+  const handleCaptureBestsellers = async () => {
+    try {
+      setBestsellerStatus((prev: any) => ({
+        ...(prev || {}),
+        status: 'running',
+        categories_done: 0,
+        categories_total: 0,
+        products_ranked: 0,
+        error: null,
+      }));
+      await indexingAPI.captureBestsellers();
+      loadBestsellerStatus();
+    } catch (error) {
+      alert('Failed to start bestseller capture');
+      console.error(error);
+      loadBestsellerStatus();
+    }
+  };
 
   const loadSyncStatus = async () => {
     try {
@@ -254,6 +290,85 @@ export default function Admin() {
           <p className="text-xs text-gray-400 mt-2">
             A full sync scrapes every product page and embeds only the ones that changed. The first
             full run indexes the whole catalog (one embedding call per product).
+          </p>
+        </div>
+
+        {/* Bestseller rank capture */}
+        <div className="bg-white rounded-lg shadow p-6 mb-6">
+          <div className="flex items-center gap-2 mb-4">
+            <RefreshCw className="w-5 h-5 text-purple-600" />
+            <h2 className="text-xl font-semibold text-gray-900">Bestseller Ranks</h2>
+          </div>
+          <p className="text-sm text-gray-500 mb-4">
+            Crawls each category's shop "Bestseller" order and stores a per-product rank, used as a
+            relevance-gated tie-break in search. Runs automatically each night; trigger a refresh
+            here anytime. No re-embedding — ranks are patched onto the existing index.
+          </p>
+          {bestsellerStatus && (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div>
+                <p className="text-sm text-gray-500">Status</p>
+                <p className="font-semibold capitalize flex items-center gap-2">
+                  {bestsellerStatus.status === 'running' && (
+                    <RefreshCw className="w-4 h-4 animate-spin text-purple-600" />
+                  )}
+                  {bestsellerStatus.status || 'idle'}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Categories</p>
+                <p className="font-semibold">
+                  {bestsellerStatus.categories_done ?? 0} / {bestsellerStatus.categories_total ?? 0}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Products ranked</p>
+                <p className="font-semibold">{bestsellerStatus.products_ranked ?? 0}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Last finished</p>
+                <p className="font-semibold">
+                  {bestsellerStatus.finished_at
+                    ? new Date(bestsellerStatus.finished_at).toLocaleString()
+                    : 'Never'}
+                </p>
+              </div>
+            </div>
+          )}
+          {bestsellerStatus?.status === 'running' && bestsellerStatus.categories_total > 0 && (
+            <div className="mt-4">
+              <div className="w-full bg-gray-200 rounded-full h-2.5">
+                <div
+                  className="h-2.5 rounded-full bg-purple-600 transition-all duration-300"
+                  style={{
+                    width: `${Math.min(100, Math.round((bestsellerStatus.categories_done / bestsellerStatus.categories_total) * 100))}%`,
+                  }}
+                />
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                Crawling categories ({bestsellerStatus.categories_done} of{' '}
+                {bestsellerStatus.categories_total})
+              </p>
+            </div>
+          )}
+          {bestsellerStatus?.error && (
+            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+              {bestsellerStatus.error}
+            </div>
+          )}
+          <div className="flex gap-2 flex-wrap mt-4">
+            <button
+              onClick={handleCaptureBestsellers}
+              disabled={bestsellerStatus?.status === 'running'}
+              className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:bg-gray-400 transition-colors"
+            >
+              <RefreshCw className={`w-4 h-4 ${bestsellerStatus?.status === 'running' ? 'animate-spin' : ''}`} />
+              Refresh bestseller ranks
+            </button>
+          </div>
+          <p className="text-xs text-gray-400 mt-2">
+            The shop recomputes bestsellers nightly (~01:00); the automatic capture runs shortly
+            after. A manual run takes a few minutes (one polite request per category page).
           </p>
         </div>
 

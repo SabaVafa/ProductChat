@@ -43,6 +43,10 @@ class Settings(BaseSettings):
     SYNC_INTERVAL_HOURS: int = 6        # how often the catalog is re-synced
     SCRAPE_ON_STARTUP: bool = False     # run one sync ~30s after boot
     SCRAPE_MAX_PRODUCTS: int = 0        # 0 = unlimited (cap products per sync)
+
+    # Bestseller-rank auto-capture (the shop recomputes bestsellers nightly ~01:00)
+    BESTSELLER_CAPTURE_ENABLED: bool = True  # run the daily capture on schedule
+    BESTSELLER_CAPTURE_HOUR: int = 2         # local hour to run it (after 01:00)
     
     @property
     def cors_origins_list(self) -> List[str]:
