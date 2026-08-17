@@ -8,64 +8,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def _fold(s: str) -> str:
-    """Lowercase + umlaut-fold so 'Briefkästen' matches 'briefkast'."""
-    s = (s or "").lower()
-    for a, b in (("ä", "a"), ("ö", "o"), ("ü", "u"), ("ß", "ss")):
-        s = s.replace(a, b)
-    return s
-
-
-# When a query names a product type, prefer products whose CATEGORY matches.
-# This stops pure semantic search from returning "Paketbox mit Briefkasten"
-# (a package box) for "mailbox" just because it contains the word Briefkasten.
-# (query trigger terms, category-name substrings to prefer) — all umlaut-folded.
-_CATEGORY_HINTS = [
-    (("mailbox", "briefkast", "letterbox", "letter box", "postbox"), ("briefkast",)),
-    (("paketbox", "package box", "parcel", "paketkasten"), ("paketbox",)),
-    (("doorbell", "turklingel", "funkklingel", "door bell", "klingel"),
-     ("turklingel", "funkklingel")),
-    (("intercom", "sprechanlage", "tursprech"), ("sprechanlage",)),
-    (("house number", "hausnummer"), ("hausnummer",)),
-    (("camera", "kamera", "surveillance", "cctv"), ("kamera",)),
-    (("mulltonne", "waste bin", "trash", "bin box", "dustbin"), ("mulltonne",)),
-    (("gong", "chime"), ("gong",)),
-    (("outdoor light", "leuchte", "lamp", "lighting"), ("leuchte", "garten")),
-]
-
-
-def _preferred_categories(query: str):
-    """Categories of the PRIMARY product type — the one mentioned FIRST in the
-    query. In "mailbox with türklingel" the primary type is mailbox (the
-    türklingel is a wanted feature), so we prefer Briefkasten categories, not
-    a 50/50 mix of mailboxes and doorbells."""
-    q = _fold(query)
-    best = None  # (position, categories)
-    for triggers, cats in _CATEGORY_HINTS:
-        positions = [q.find(t) for t in triggers if t in q]
-        if not positions:
-            continue
-        pos = min(positions)
-        if best is None or pos < best[0]:
-            best = (pos, set(cats))
-    return best[1] if best else set()
-
-
-def _demote_name_terms(query: str):
-    """Name tokens to push DOWN: a product type the user did NOT ask for but
-    that hybrid products carry in their name. E.g. someone asking for a mailbox
-    (not a package box) should not be shown 'Funk-Paketbox mit ... Briefkasten'
-    above a plain 'Briefkasten mit Funkklingel', even though both are filed under
-    a Briefkasten category."""
-    q = _fold(query)
-    demote = set()
-    wants_mailbox = any(t in q for t in ("mailbox", "briefkast", "letterbox", "postbox"))
-    wants_package = any(t in q for t in ("paket", "package", "parcel"))
-    if wants_mailbox and not wants_package:
-        demote.add("paketbox")
-    return demote
-
-
 class RetrievalService:
     def __init__(self, db: Optional[Session] = None):
         self.qdrant = QdrantService()
@@ -79,74 +21,68 @@ class RetrievalService:
             if api_key:
                 self.embeddings.set_api_key(api_key)
     
+    @staticmethod
+    def _format(results) -> List[Dict[str, Any]]:
+        products = []
+        for result in results:
+            payload = result.get("payload", {})
+            products.append({
+                "product_id": payload.get("product_id"),
+                "name": payload.get("name"),
+                "description": payload.get("description"),
+                "category": payload.get("category"),
+                "brand": payload.get("brand"),
+                "price": payload.get("price"),
+                "image_url": payload.get("image_url"),
+                "product_url": payload.get("product_url"),
+                "attributes": payload.get("attributes"),
+                "score": result.get("score", 0.0)
+            })
+        return products
+
     def retrieve(
         self,
         query: str,
         limit: int = 10,
         score_threshold: float = 0.0,
-        filters: Optional[Dict[str, Any]] = None
+        filters: Optional[Dict[str, Any]] = None,
+        categories: Optional[List[str]] = None,
+        price_min: Optional[float] = None,
+        price_max: Optional[float] = None,
     ) -> List[Dict[str, Any]]:
-        """Retrieve relevant products for a query.
-
-        When the query names a product type (e.g. "mailbox"), over-fetch a larger
-        candidate pool and re-rank so products in the matching CATEGORY come
-        first — otherwise semantically-close but wrong-type products (a package
-        box that mentions "Briefkasten") can crowd out the real ones.
+        """Retrieve products by semantic similarity, with structured filters
+        (category / price) applied by the vector DB. If the filtered search
+        returns too few results (e.g. the parsed category was off), fall back to
+        an unfiltered semantic search so the user still gets useful matches.
         """
         try:
-            # Generate query embedding
             query_vector = self.embeddings.embed_text(query)
-
-            preferred = _preferred_categories(query)
-            # Over-fetch when we intend to re-rank, so category matches that the
-            # pure vector ranked lower still make it into the candidate pool.
-            fetch = max(limit * 6, 60) if preferred else limit
 
             results = self.qdrant.search(
                 query_vector=query_vector,
-                limit=fetch,
+                limit=limit,
                 score_threshold=score_threshold,
-                filter_conditions=filters
+                filter_conditions=filters,
+                categories=categories,
+                price_min=price_min,
+                price_max=price_max,
             )
+            products = self._format(results)
 
-            # Format results
-            products = []
-            for result in results:
-                payload = result.get("payload", {})
-                products.append({
-                    "product_id": payload.get("product_id"),
-                    "name": payload.get("name"),
-                    "description": payload.get("description"),
-                    "category": payload.get("category"),
-                    "brand": payload.get("brand"),
-                    "price": payload.get("price"),
-                    "image_url": payload.get("image_url"),
-                    "product_url": payload.get("product_url"),
-                    "attributes": payload.get("attributes"),
-                    "score": result.get("score", 0.0)
-                })
-
-            if preferred:
-                demote = _demote_name_terms(query)
-
-                def tier(p):
-                    cat_match = any(sub in _fold(p.get("category")) for sub in preferred)
-                    demoted = any(t in _fold(p.get("name")) for t in demote)
-                    if cat_match and not demoted:
-                        return 0   # right category, right product type
-                    if not cat_match and not demoted:
-                        return 1   # other, but not an unwanted type
-                    if cat_match and demoted:
-                        return 2   # right category but a hybrid of the wrong type
-                    return 3       # wrong category AND unwanted type
-
-                # sorted() is stable, so vector order is preserved within a tier.
-                products = sorted(products, key=tier)[:limit]
-            else:
-                products = products[:limit]
+            # A category/price filter that yields almost nothing is worse than
+            # plain semantic search — retry unfiltered as a safety net.
+            if (categories or price_min is not None or price_max is not None) and len(products) < 3:
+                logger.info("Filtered search returned %d; falling back to unfiltered", len(products))
+                results = self.qdrant.search(
+                    query_vector=query_vector,
+                    limit=limit,
+                    score_threshold=score_threshold,
+                    filter_conditions=filters,
+                )
+                products = self._format(results)
 
             return products
-            
+
         except Exception as e:
             logger.error(f"Retrieval error: {e}")
             return []
