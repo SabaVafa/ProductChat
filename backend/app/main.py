@@ -71,8 +71,8 @@ def _migrate_product_columns():
 if engine.dialect.name == "postgresql":
     _migrate_product_columns()
 
-# Initialize rate limiter
-limiter = Limiter(key_func=get_remote_address)
+# Shared rate limiter (defined in app.limiter so routers can apply per-route limits)
+from app.limiter import limiter
 
 # Create FastAPI app
 app = FastAPI(

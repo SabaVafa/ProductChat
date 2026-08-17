@@ -81,7 +81,7 @@ def _inject_head(html: str) -> str:
 
 @router.get("/site")
 @router.get("/site/{path:path}")
-async def proxy_site(path: str = "", request: Request = None):
+def proxy_site(path: str = "", request: Request = None):
     target = f"{SITE}/{path}"
     if request and request.url.query:
         target += f"?{request.url.query}"

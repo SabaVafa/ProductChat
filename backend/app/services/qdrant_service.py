@@ -4,9 +4,17 @@ from qdrant_client.models import (
 )
 from typing import List, Dict, Any, Optional
 from app.config import settings
+import threading
 import logging
 
 logger = logging.getLogger(__name__)
+
+# Requests now run in a threadpool (handlers are sync), and indexing runs in its
+# own thread — so multiple threads can touch the single shared client at once.
+# Embedded/local Qdrant is not built for that, so serialize access with a lock.
+# Operations are fast (ms), so the lock is held only briefly; the slow work
+# (LLM/embedding HTTP calls) happens outside it and still runs in parallel.
+_client_lock = threading.RLock()
 
 # A single shared client for the whole process.
 #
@@ -42,18 +50,19 @@ class QdrantService:
     def create_collection(self) -> bool:
         """Create the collection if it doesn't exist."""
         try:
-            collections = self.client.get_collections().collections
-            collection_names = [c.name for c in collections]
-            
-            if self.collection_name not in collection_names:
-                self.client.create_collection(
-                    collection_name=self.collection_name,
-                    vectors_config=VectorParams(
-                        size=self.vector_size,
-                        distance=Distance.COSINE
+            with _client_lock:
+                collections = self.client.get_collections().collections
+                collection_names = [c.name for c in collections]
+
+                if self.collection_name not in collection_names:
+                    self.client.create_collection(
+                        collection_name=self.collection_name,
+                        vectors_config=VectorParams(
+                            size=self.vector_size,
+                            distance=Distance.COSINE
+                        )
                     )
-                )
-                logger.info(f"Created collection: {self.collection_name}")
+                    logger.info(f"Created collection: {self.collection_name}")
             return True
         except Exception as e:
             logger.error(f"Error creating collection: {e}")
@@ -62,7 +71,8 @@ class QdrantService:
     def delete_collection(self) -> bool:
         """Delete the collection."""
         try:
-            self.client.delete_collection(self.collection_name)
+            with _client_lock:
+                self.client.delete_collection(self.collection_name)
             logger.info(f"Deleted collection: {self.collection_name}")
             return True
         except Exception as e:
@@ -72,10 +82,11 @@ class QdrantService:
     def upsert_points(self, points: List[PointStruct]) -> bool:
         """Upsert points to the collection."""
         try:
-            self.client.upsert(
-                collection_name=self.collection_name,
-                points=points
-            )
+            with _client_lock:
+                self.client.upsert(
+                    collection_name=self.collection_name,
+                    points=points
+                )
             return True
         except Exception as e:
             logger.error(f"Error upserting points: {e}")
@@ -108,14 +119,15 @@ class QdrantService:
             # Use query_points (the current API). The old .search() method was
             # removed in qdrant-client 1.19, so calling it silently returned no
             # results. query_points works on both embedded and server mode.
-            response = self.client.query_points(
-                collection_name=self.collection_name,
-                query=query_vector,
-                limit=limit,
-                score_threshold=score_threshold,
-                query_filter=search_filter,
-                with_payload=True,
-            )
+            with _client_lock:
+                response = self.client.query_points(
+                    collection_name=self.collection_name,
+                    query=query_vector,
+                    limit=limit,
+                    score_threshold=score_threshold,
+                    query_filter=search_filter,
+                    with_payload=True,
+                )
 
             return [
                 {
@@ -132,10 +144,11 @@ class QdrantService:
     def delete_points(self, point_ids: List[str]) -> bool:
         """Delete points by IDs."""
         try:
-            self.client.delete(
-                collection_name=self.collection_name,
-                points_selector=point_ids
-            )
+            with _client_lock:
+                self.client.delete(
+                    collection_name=self.collection_name,
+                    points_selector=point_ids
+                )
             return True
         except Exception as e:
             logger.error(f"Error deleting points: {e}")
@@ -144,7 +157,8 @@ class QdrantService:
     def get_collection_info(self) -> Dict[str, Any]:
         """Get collection information."""
         try:
-            info = self.client.get_collection(self.collection_name)
+            with _client_lock:
+                info = self.client.get_collection(self.collection_name)
             return {
                 "name": info.config.params.vectors.size,
                 "points_count": info.points_count,
@@ -157,7 +171,8 @@ class QdrantService:
     def count_points(self) -> int:
         """Count total points in collection."""
         try:
-            info = self.client.get_collection(self.collection_name)
+            with _client_lock:
+                info = self.client.get_collection(self.collection_name)
             return info.points_count
         except Exception as e:
             logger.error(f"Error counting points: {e}")

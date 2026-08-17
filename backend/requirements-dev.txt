@@ -1,0 +1,2 @@
+# Dev/test-only dependencies (install on top of requirements-local.txt)
+pytest

@@ -15,7 +15,7 @@ router = APIRouter(prefix="/test", tags=["testing"])
 
 
 @router.post("/retrieval", response_model=RetrievalResponse)
-async def test_retrieval(
+def test_retrieval(
     request: RetrievalRequest,
     db: Session = Depends(get_db)
 ):

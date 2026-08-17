@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from typing import Dict, Any
 from sqlalchemy.orm import Session
 from app.database import get_db
@@ -7,6 +7,7 @@ from app.services.rag import RAGService
 from app.services.settings_service import SettingsService
 from app.services import interactions
 from app.api.deps import require_admin
+from app.limiter import limiter
 import logging
 
 logger = logging.getLogger(__name__)
@@ -15,14 +16,17 @@ router = APIRouter(prefix="/chat", tags=["chat"])
 
 
 @router.post("", response_model=ChatResponse)
-async def chat(
-    request: ChatRequest,
+@limiter.limit("30/minute")
+def chat(
+    request: Request,           # required by the rate limiter (per-IP key)
+    payload: ChatRequest,
     db: Session = Depends(get_db)
 ):
     """
     Process a chat message using RAG architecture.
 
     Returns AI-generated answer with product recommendations.
+    Rate-limited per IP because each call costs an LLM request.
     """
     try:
         # Initialize settings
@@ -33,13 +37,13 @@ async def chat(
         rag_service = RAGService(db)
 
         # Process chat (with prior turns for context)
-        history = [{"role": t.role, "content": t.content} for t in request.history]
+        history = [{"role": t.role, "content": t.content} for t in payload.history]
         response = rag_service.chat(
-            request.message, history=history, is_refinement=request.is_refinement
+            payload.message, history=history, is_refinement=payload.is_refinement
         )
 
         # Best-effort logging of the exchange; attach its id for feedback.
-        response["interaction_id"] = interactions.log_interaction(db, response, request.message)
+        response["interaction_id"] = interactions.log_interaction(db, response, payload.message)
 
         return ChatResponse(**response)
 
@@ -49,7 +53,7 @@ async def chat(
 
 
 @router.post("/feedback", response_model=Dict[str, Any])
-async def submit_feedback(request: FeedbackRequest, db: Session = Depends(get_db)):
+def submit_feedback(request: FeedbackRequest, db: Session = Depends(get_db)):
     """Attach a thumbs rating to a logged interaction."""
     ok = interactions.set_feedback(db, request.interaction_id, request.rating, request.comment)
     if not ok:
@@ -58,7 +62,7 @@ async def submit_feedback(request: FeedbackRequest, db: Session = Depends(get_db
 
 
 @router.get("/interactions", response_model=Dict[str, Any])
-async def list_interactions(
+def list_interactions(
     limit: int = 50,
     db: Session = Depends(get_db),
     _: None = Depends(require_admin),
