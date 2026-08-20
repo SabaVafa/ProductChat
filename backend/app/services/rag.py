@@ -1,5 +1,5 @@
 from app.services.mistral import MistralService
-from app.services.retrieval import RetrievalService
+from app.services.retrieval import RetrievalService, _bestseller_band, _TIER_WIDTH
 from app.services.settings_service import SettingsService
 from app.services.query_understanding import understand_query
 from app.models.product import Product
@@ -16,6 +16,53 @@ def _catalog_categories(db: Session) -> List[str]:
         Product.category.isnot(None), Product.category != ""
     ).all()
     return [r[0] for r in rows if r[0]]
+
+
+def _order_recommendations(
+    recommendations: List[Dict[str, Any]],
+    retrieved_products: List[Dict[str, Any]],
+) -> List[Dict[str, Any]]:
+    """Turn the LLM's chosen recommendations into API product cards.
+
+    The LLM selects which products to show (relevance/intent) and writes the
+    reasons, but it never sees bestseller_rank — so on its own the popularity
+    tie-break never reaches the user. To fix that (finding C-1) we re-apply the
+    SAME relevance-gated banded tie-break as the retrieval layer, but to the
+    LLM's SELECTED set. Tiering uses the objective retrieval score (not the
+    LLM's self-reported score), so a clearly-more-relevant pick is never demoted
+    by popularity — popularity only reorders comparably-relevant picks.
+    """
+    by_id = {p.get("product_id"): p for p in retrieved_products}
+    ordered: List[Dict[str, Any]] = []
+    for rec in recommendations:
+        details = by_id.get(rec.get("product_id"))
+        if not details:
+            continue  # skip hallucinated ids not in the retrieved set
+        ordered.append({
+            "id": details.get("product_id"),
+            "name": details.get("name"),
+            "price": details.get("price"),
+            "image": details.get("image_url"),
+            "url": details.get("product_url"),
+            "reason": rec.get("reason", ""),
+            "score": rec.get("score", details.get("score", 0.0)),
+            # internal tie-break inputs, dropped before returning
+            "_retr_score": details.get("score", 0.0) or 0.0,
+            "_rank": details.get("bestseller_rank"),
+        })
+
+    # Relevance-gated banded tie-break (same key as retrieval._apply_bestseller_tiebreak):
+    # more-relevant tier first, then better bestseller band, then higher score.
+    # Python's sort is stable, so equal keys keep the LLM's original order.
+    ordered.sort(key=lambda it: (
+        -int(it["_retr_score"] / _TIER_WIDTH),
+        _bestseller_band(it["_rank"]),
+        -it["_retr_score"],
+    ))
+    for it in ordered:
+        it.pop("_retr_score", None)
+        it.pop("_rank", None)
+    return ordered
 
 
 class RAGService:
@@ -228,24 +275,9 @@ class RAGService:
             )
 
             # Format response for API
-            formatted_products = []
-            if "recommendations" in response:
-                for rec in response["recommendations"]:
-                    # Find full product details
-                    product_details = next(
-                        (p for p in retrieved_products if p.get("product_id") == rec.get("product_id")),
-                        None
-                    )
-                    if product_details:
-                        formatted_products.append({
-                            "id": product_details.get("product_id"),
-                            "name": product_details.get("name"),
-                            "price": product_details.get("price"),
-                            "image": product_details.get("image_url"),
-                            "url": product_details.get("product_url"),
-                            "reason": rec.get("reason", ""),
-                            "score": rec.get("score", product_details.get("score", 0.0))
-                        })
+            formatted_products = _order_recommendations(
+                response.get("recommendations", []), retrieved_products
+            )
 
             add_step(
                 "5_final_products",
