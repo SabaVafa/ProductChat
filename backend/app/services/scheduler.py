@@ -7,6 +7,7 @@ only products whose sitemap <lastmod> changed are re-fetched and re-embedded.
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 from app.config import settings
 from app.database import SessionLocal
 from app.services.scraper import ScraperService, SYNC_STATE
@@ -16,6 +17,16 @@ import logging
 logger = logging.getLogger(__name__)
 
 _scheduler: BackgroundScheduler | None = None
+
+
+def _scheduler_tz():
+    """Pinned scheduler timezone; fall back to UTC if the name is unknown (M-3)."""
+    try:
+        return ZoneInfo(settings.SCHEDULER_TIMEZONE)
+    except Exception as e:
+        logger.warning("Unknown SCHEDULER_TIMEZONE %r (%s); using UTC",
+                       settings.SCHEDULER_TIMEZONE, e)
+        return ZoneInfo("UTC")
 
 
 def _sync_job():
@@ -37,9 +48,12 @@ def _sync_job():
 
 def _bestseller_job():
     """Refresh per-category bestseller ranks (the shop recomputes them nightly)."""
-    from app.services.bestsellers import BestsellerService, CAPTURE_STATE
-    if CAPTURE_STATE.get("status") == "running":
-        logger.info("Scheduler: bestseller capture still running, skipping this tick")
+    from app.services.bestsellers import BestsellerService
+    # Don't run alongside a catalog sync — both write `products`, and on SQLite
+    # that risks lock contention (M-2). The capture is idempotent and runs daily,
+    # so skipping one tick is harmless; capture() also self-guards re-entry (M-1).
+    if SYNC_STATE.get("status") == "running":
+        logger.info("Scheduler: catalog sync running, skipping bestseller capture this tick")
         return
     db = SessionLocal()
     try:
@@ -56,7 +70,7 @@ def start_scheduler():
     if _scheduler is not None:
         return
 
-    _scheduler = BackgroundScheduler(daemon=True)
+    _scheduler = BackgroundScheduler(daemon=True, timezone=_scheduler_tz())
     interval = max(1, settings.SYNC_INTERVAL_HOURS)
     _scheduler.add_job(
         _sync_job,
@@ -92,7 +106,7 @@ def start_scheduler():
         f"Scheduler started: catalog sync every {interval}h "
         f"(startup run: {settings.SCRAPE_ON_STARTUP}); "
         f"bestseller capture: "
-        + (f"daily @ {settings.BESTSELLER_CAPTURE_HOUR:02d}:00"
+        + (f"daily @ {settings.BESTSELLER_CAPTURE_HOUR:02d}:00 {settings.SCHEDULER_TIMEZONE}"
            if settings.BESTSELLER_CAPTURE_ENABLED else "disabled")
     )
 

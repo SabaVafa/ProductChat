@@ -46,7 +46,10 @@ class Settings(BaseSettings):
 
     # Bestseller-rank auto-capture (the shop recomputes bestsellers nightly ~01:00)
     BESTSELLER_CAPTURE_ENABLED: bool = True  # run the daily capture on schedule
-    BESTSELLER_CAPTURE_HOUR: int = 2         # local hour to run it (after 01:00)
+    BESTSELLER_CAPTURE_HOUR: int = 2         # hour (in SCHEDULER_TIMEZONE) to run it
+    # Pinned so "run after the shop's ~01:00 recompute" holds regardless of the
+    # host's local timezone (M-3). The shop is a German store.
+    SCHEDULER_TIMEZONE: str = "Europe/Berlin"
     
     @property
     def cors_origins_list(self) -> List[str]:

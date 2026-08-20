@@ -1,5 +1,5 @@
 from app.services.mistral import MistralService
-from app.services.retrieval import RetrievalService, _bestseller_band, _TIER_WIDTH
+from app.services.retrieval import RetrievalService, _apply_bestseller_tiebreak
 from app.services.settings_service import SettingsService
 from app.services.query_understanding import understand_query
 from app.models.product import Product
@@ -33,36 +33,29 @@ def _order_recommendations(
     by popularity — popularity only reorders comparably-relevant picks.
     """
     by_id = {p.get("product_id"): p for p in retrieved_products}
-    ordered: List[Dict[str, Any]] = []
+    picked: List[Dict[str, Any]] = []
     for rec in recommendations:
         details = by_id.get(rec.get("product_id"))
         if not details:
             continue  # skip hallucinated ids not in the retrieved set
-        ordered.append({
-            "id": details.get("product_id"),
-            "name": details.get("name"),
-            "price": details.get("price"),
-            "image": details.get("image_url"),
-            "url": details.get("product_url"),
-            "reason": rec.get("reason", ""),
-            "score": rec.get("score", details.get("score", 0.0)),
-            # internal tie-break inputs, dropped before returning
-            "_retr_score": details.get("score", 0.0) or 0.0,
-            "_rank": details.get("bestseller_rank"),
+        picked.append({
+            # tie-break inputs: the OBJECTIVE retrieval score + rank
+            "score": details.get("score", 0.0) or 0.0,
+            "bestseller_rank": details.get("bestseller_rank"),
+            "_card": {
+                "id": details.get("product_id"),
+                "name": details.get("name"),
+                "price": details.get("price"),
+                "image": details.get("image_url"),
+                "url": details.get("product_url"),
+                "reason": rec.get("reason", ""),
+                "score": rec.get("score", details.get("score", 0.0)),
+            },
         })
 
-    # Relevance-gated banded tie-break (same key as retrieval._apply_bestseller_tiebreak):
-    # more-relevant tier first, then better bestseller band, then higher score.
-    # Python's sort is stable, so equal keys keep the LLM's original order.
-    ordered.sort(key=lambda it: (
-        -int(it["_retr_score"] / _TIER_WIDTH),
-        _bestseller_band(it["_rank"]),
-        -it["_retr_score"],
-    ))
-    for it in ordered:
-        it.pop("_retr_score", None)
-        it.pop("_rank", None)
-    return ordered
+    # Reuse the retrieval layer's relevance-gated banded tie-break verbatim, so
+    # the chat path and /test/retrieval order identically (single source of truth).
+    return [it["_card"] for it in _apply_bestseller_tiebreak(picked)]
 
 
 class RAGService:

@@ -31,14 +31,24 @@ def _bestseller_band(rank: Optional[int]) -> int:
 
 
 def _apply_bestseller_tiebreak(products: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    """Relevance-gated, banded tie-break (see _TIER_WIDTH). Stable within ties."""
+    """Relevance-gated, banded tie-break. Stable within ties.
+
+    Relevance tiers are measured as distance BELOW the top score (in _TIER_WIDTH
+    bands), not against a fixed absolute grid — so eligibility to be reordered
+    depends on how close two results actually are, not on where their scores
+    happen to fall relative to a global 0/0.02/0.04 lattice (M-4). Within a tier,
+    a better bestseller band wins, then the higher score; a clearly-more-relevant
+    result (a lower tier number) is never displaced by popularity.
+    """
     if len(products) < 2:
         return products
 
+    top = max((p.get("score") or 0.0) for p in products)
+
     def sort_key(p: Dict[str, Any]):
         score = p.get("score") or 0.0
-        tier = int(score / _TIER_WIDTH)          # higher tier = more relevant
-        return (-tier, _bestseller_band(p.get("bestseller_rank")), -score)
+        tier = round((top - score) / _TIER_WIDTH)   # 0 = within a band of the top
+        return (tier, _bestseller_band(p.get("bestseller_rank")), -score)
 
     return sorted(products, key=sort_key)
 

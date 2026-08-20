@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Body
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Body, Request
 from typing import Any
 from sqlalchemy.orm import Session
 from app.database import get_db, SessionLocal
 from app.api.deps import require_admin
+from app.limiter import limiter
 from app.services.jtl_adapter import map_jtl_finder, extract_items, enrich_from_jtl
 from app.schemas.indexing import IndexingStatusResponse, ImportRequest
 from app.services.indexing import IndexingService
@@ -150,7 +151,9 @@ def _run_bestseller_capture():
 
 
 @router.post("/import/bestsellers", response_model=Dict[str, Any])
+@limiter.limit("6/hour")
 async def capture_bestsellers(
+    request: Request,               # required by the rate limiter (per-IP key)
     _: None = Depends(require_admin),
 ):
     """Capture per-category "Bestseller" rank from the live shop (background).
@@ -159,8 +162,9 @@ async def capture_bestsellers(
     position, and patches `bestseller_rank` onto the Qdrant payload WITHOUT
     re-embedding. Retrieval then uses it as a relevance-gated tie-break.
 
-    Returns immediately; poll GET /index/bestsellers/status for progress, or see
-    the "bestsellers" entry in GET /ops once done.
+    Rate-limited (this launches a multi-minute outbound crawl). Returns
+    immediately; poll GET /index/bestsellers/status for progress, or see the
+    "bestsellers" entry in GET /ops once done.
     """
     from app.services.bestsellers import get_capture_status
     if get_capture_status()["status"] == "running":
