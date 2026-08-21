@@ -1,0 +1,190 @@
+<title>ProductChat Request Flow</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+
+<style>
+  :root {
+    --bg: #eef1f5; --surface: #ffffff; --surface-2: #e9edf3;
+    --ink: #1a1e26; --muted: #5a6472; --faint: #8a93a1;
+    --stroke: #b9c2ce; --border: #dde2e9;
+    --accent: #2f6fb0;      /* the "search" step — the mechanism in focus */
+    --mistral: #a9741a;     /* external Mistral API call (repeats 3x) */
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #12151b; --surface: #1c212b; --surface-2: #262c38;
+      --ink: #e6e9ef; --muted: #9aa3b1; --faint: #6f7887;
+      --stroke: #3a414d; --border: #2a303a;
+      --accent: #6fa6e0; --mistral: #d7ab53;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #12151b; --surface: #1c212b; --surface-2: #262c38;
+    --ink: #e6e9ef; --muted: #9aa3b1; --faint: #6f7887;
+    --stroke: #3a414d; --border: #2a303a;
+    --accent: #6fa6e0; --mistral: #d7ab53;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+    font-family: "IBM Plex Sans", system-ui, sans-serif; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 64rem; margin: 0 auto; padding: clamp(1.25rem,4vw,3rem) clamp(1rem,4vw,2rem) 3.5rem; }
+  .eyebrow { font-family: "IBM Plex Mono", monospace; font-size: .72rem; letter-spacing: .18em;
+    text-transform: uppercase; color: var(--accent); font-weight: 500; margin: 0 0 .6rem; }
+  h1 { font-size: clamp(1.7rem,4.5vw,2.5rem); line-height: 1.05; letter-spacing: -.02em; font-weight: 700;
+    margin: 0 0 .7rem; text-wrap: balance; }
+  .intro { color: var(--muted); max-width: 44rem; margin: 0 0 1.8rem; }
+  figure { margin: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 1.2rem clamp(.6rem,2vw,1.4rem) 1rem; box-shadow: 0 1px 2px rgba(20,28,45,.06), 0 10px 30px rgba(20,28,45,.05); }
+  .diagram { width: 100%; height: auto; display: block; color: var(--ink); }
+  figcaption { color: var(--muted); font-size: .9rem; margin-top: 1rem; padding-top: .9rem;
+    border-top: 1px solid var(--border); }
+  figcaption b { color: var(--ink); font-weight: 600; }
+  code { font-family: "IBM Plex Mono", monospace; font-size: .85em; background: var(--surface-2);
+    border: 1px solid var(--border); padding: .05rem .35rem; border-radius: 5px; }
+
+  /* SVG element styling (page-level, not inside the <svg>) */
+  .box { fill: var(--surface); stroke: var(--stroke); stroke-width: 1.2; }
+  .store { fill: var(--surface-2); stroke: var(--stroke); stroke-width: 1.2; }
+  .search { stroke: var(--accent); stroke-width: 2.2; }
+  .n-title { fill: currentColor; font: 600 13px "IBM Plex Sans", sans-serif; }
+  .n-sub { fill: var(--muted); font: 11px "IBM Plex Mono", monospace; }
+  .s-title { fill: currentColor; font: 600 13px "IBM Plex Mono", monospace; }
+  .flow-lbl { fill: var(--muted); font: 11px "IBM Plex Mono", monospace; }
+  .mist { fill: var(--mistral); font-weight: 600; }
+  .acc { fill: var(--accent); }
+  .flow { stroke: currentColor; stroke-width: 1.6; fill: none; }
+  .read { stroke: var(--muted); stroke-width: 1.3; fill: none; }
+  .bg   { stroke: var(--muted); stroke-width: 1.3; fill: none; stroke-dasharray: 5 4; }
+  .lgd { fill: var(--muted); font: 11px "IBM Plex Mono", monospace; }
+</style>
+
+<div class="wrap">
+  <p class="eyebrow">ProductChat · Retrieval pipeline</p>
+  <h1>One question, end to end</h1>
+  <p class="intro">How a shop customer's message becomes an answer — the live request path down the left, the stores it reads on the right, and the background jobs that keep those stores fresh.</p>
+
+  <figure>
+    <svg class="diagram" viewBox="0 0 940 660" role="img"
+         aria-label="Flow of a ProductChat request: customer question to POST /api/chat, then understand-query (mistral-small), embed search_text (mistral-embed), vector search in Qdrant with category and price filters, bestseller tie-break, compose answer (mistral-large), order and return product cards. Qdrant and SQLite are read on the right; a scraper sync and a nightly bestseller capture write into Qdrant; the run and thumbs up/down feedback are written to SQLite.">
+      <defs>
+        <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="context-stroke"/>
+        </marker>
+      </defs>
+
+      <!-- ===== request spine (left) ===== -->
+      <!-- N1 -->
+      <rect class="box" x="90" y="44" width="290" height="50" rx="7"/>
+      <text class="n-title" x="106" y="66">Customer question</text>
+      <text class="n-sub" x="106" y="82">chat widget → frontend</text>
+      <!-- N2 -->
+      <rect class="box" x="90" y="114" width="290" height="50" rx="7"/>
+      <text class="n-title" x="106" y="136">POST /api/chat</text>
+      <text class="n-sub" x="106" y="152">rate-limited 30/min · rag.py</text>
+      <!-- N3 -->
+      <rect class="box" x="90" y="184" width="290" height="50" rx="7"/>
+      <text class="n-title" x="106" y="206">Understand the question</text>
+      <text class="n-sub" x="106" y="222"><tspan class="mist">&#9670; mistral-small</tspan> → intent</text>
+      <!-- N4 -->
+      <rect class="box" x="90" y="254" width="290" height="50" rx="7"/>
+      <text class="n-title" x="106" y="276">Embed the search text</text>
+      <text class="n-sub" x="106" y="292"><tspan class="mist">&#9670; mistral-embed</tspan> · 1024-dim</text>
+      <!-- N5 (search, accent) -->
+      <rect class="box search" x="90" y="324" width="290" height="50" rx="7"/>
+      <text class="n-title acc" x="106" y="346">Vector search in Qdrant</text>
+      <text class="n-sub" x="106" y="362">category + price filters · top-N cosine</text>
+      <!-- N6 -->
+      <rect class="box" x="90" y="394" width="290" height="50" rx="7"/>
+      <text class="n-title" x="106" y="416">Bestseller tie-break</text>
+      <text class="n-sub" x="106" y="432">relevance-gated · banded</text>
+      <!-- N7 -->
+      <rect class="box" x="90" y="464" width="290" height="50" rx="7"/>
+      <text class="n-title" x="106" y="486">Compose the answer</text>
+      <text class="n-sub" x="106" y="502"><tspan class="mist">&#9670; mistral-large</tspan> → picks + reasons</text>
+      <!-- N8 -->
+      <rect class="box" x="90" y="534" width="290" height="50" rx="7"/>
+      <text class="n-title" x="106" y="556">Order &amp; return</text>
+      <text class="n-sub" x="106" y="572">re-rank picks · drop hallucinated ids</text>
+
+      <!-- spine arrows -->
+      <line class="flow" x1="235" y1="94"  x2="235" y2="113" marker-end="url(#ah)"/>
+      <line class="flow" x1="235" y1="164" x2="235" y2="183" marker-end="url(#ah)"/>
+      <line class="flow" x1="235" y1="234" x2="235" y2="253" marker-end="url(#ah)"/>
+      <line class="flow" x1="235" y1="304" x2="235" y2="323" marker-end="url(#ah)"/>
+      <line class="flow" x1="235" y1="374" x2="235" y2="393" marker-end="url(#ah)"/>
+      <line class="flow" x1="235" y1="444" x2="235" y2="463" marker-end="url(#ah)"/>
+      <line class="flow" x1="235" y1="514" x2="235" y2="533" marker-end="url(#ah)"/>
+      <line class="flow" x1="235" y1="584" x2="235" y2="606" marker-end="url(#ah)"/>
+      <text class="flow-lbl" x="393" y="108">message</text>
+      <text class="flow-lbl" x="393" y="248">search_text</text>
+      <text class="flow-lbl" x="393" y="318">query vector</text>
+      <text class="flow-lbl" x="393" y="388">top-N matches</text>
+      <text class="flow-lbl" x="393" y="458">reordered</text>
+      <text class="flow-lbl" x="393" y="528">answer + picks</text>
+      <text class="n-sub" x="250" y="624">product cards + answer → widget</text>
+
+      <!-- filters branch: intent splits, category+price go straight to the search -->
+      <path class="read" d="M90,214 L48,214 L48,344 L88,344" marker-end="url(#ah)"/>
+      <text class="flow-lbl" x="10" y="276">filters</text>
+      <text class="flow-lbl" x="10" y="290">cat+</text>
+      <text class="flow-lbl" x="10" y="304">price</text>
+
+      <!-- ===== data stores (right) ===== -->
+      <!-- SQLite -->
+      <path class="store" d="M560,150 a90,10 0 0 1 180,0 v44 a90,10 0 0 1 -180,0 z"/>
+      <path class="store" d="M560,150 a90,10 0 0 0 180,0" fill="none"/>
+      <text class="s-title" x="650" y="180" text-anchor="middle">SQLite</text>
+      <text class="n-sub" x="650" y="196" text-anchor="middle">products · ops journal</text>
+      <!-- SQLite read -> N3 -->
+      <path class="read" d="M560,178 L384,206" marker-end="url(#ah)"/>
+      <text class="flow-lbl" x="470" y="182">categories</text>
+
+      <!-- Qdrant -->
+      <path class="store" d="M520,312 a100,11 0 0 1 200,0 v52 a100,11 0 0 1 -200,0 z"/>
+      <path class="store" d="M520,312 a100,11 0 0 0 200,0" fill="none"/>
+      <text class="s-title" x="620" y="344" text-anchor="middle">Qdrant</text>
+      <text class="n-sub" x="620" y="360" text-anchor="middle">vectors + bestseller_rank</text>
+      <!-- Qdrant read -> N5 -->
+      <path class="read" d="M520,349 L384,349" marker-end="url(#ah)"/>
+      <text class="flow-lbl" x="398" y="341">read</text>
+
+      <!-- ===== background jobs (bottom-right) ===== -->
+      <rect class="box" x="520" y="452" width="180" height="92" rx="7"/>
+      <text class="n-title" x="536" y="474">Scraper sync</text>
+      <text class="n-sub" x="536" y="492">sitemap →</text>
+      <text class="n-sub" x="536" y="507">embed → upsert</text>
+      <text class="n-sub" x="536" y="527">every 6h</text>
+
+      <rect class="box" x="712" y="452" width="176" height="92" rx="7"/>
+      <text class="n-title" x="728" y="474">Bestseller capture</text>
+      <text class="n-sub" x="728" y="492">crawl ?Sortierung=11</text>
+      <text class="n-sub" x="728" y="507">→ set_payload rank</text>
+      <text class="n-sub" x="728" y="527">nightly 02:00 Berlin</text>
+
+      <!-- background writes -> Qdrant -->
+      <path class="bg" d="M600,452 L600,368" marker-end="url(#ah)"/>
+      <text class="flow-lbl" x="606" y="410">vectors</text>
+      <path class="bg" d="M790,452 L680,368" marker-end="url(#ah)"/>
+      <text class="flow-lbl" x="700" y="410">rank</text>
+
+      <!-- ===== write-back: the run + user feedback land in SQLite ===== -->
+      <path class="bg" d="M380,559 L912,559 L912,172 L744,172" marker-end="url(#ah)"/>
+      <text class="flow-lbl" x="392" y="553">run logged &#183; &#128077;/&#128078; feedback &#8594; SQLite</text>
+
+      <!-- ===== legend ===== -->
+      <line class="flow" x1="40" y1="642" x2="70" y2="642" marker-end="url(#ah)"/>
+      <text class="lgd" x="78" y="646">live request</text>
+      <line class="read" x1="176" y1="642" x2="206" y2="642" marker-end="url(#ah)"/>
+      <text class="lgd" x="214" y="646">store read</text>
+      <line class="bg" x1="300" y1="642" x2="330" y2="642" marker-end="url(#ah)"/>
+      <text class="lgd" x="338" y="646">store write (job &#183; feedback)</text>
+      <rect class="box search" x="536" y="636" width="16" height="11" rx="3"/>
+      <text class="lgd" x="558" y="646">the search</text>
+      <text class="mist lgd" x="644" y="646">&#9670;</text>
+      <text class="lgd" x="662" y="646">Mistral call</text>
+    </svg>
+    <figcaption><b>The literal "search" is step&nbsp;5</b> — a filtered vector-similarity lookup in Qdrant. Query understanding (step&nbsp;3) splits the message: <code>search_text</code> is embedded and matched by vector, while the parsed <b>category + price</b> filters are applied by Qdrant itself. Popularity enters only as a relevance-gated tie-break (steps&nbsp;5→6, re-applied at step&nbsp;8). If a filtered search returns fewer than 3 hits it retries unfiltered (not drawn). The catalog that step&nbsp;5 searches is kept current by two background jobs writing into Qdrant. After the response, the run is recorded in the operations journal and the customer's <b>&#128077;/&#128078; feedback</b> is written back to SQLite (the wire looping along the right edge).</figcaption>
+  </figure>
+</div>
