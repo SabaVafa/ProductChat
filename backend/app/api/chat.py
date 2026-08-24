@@ -39,7 +39,8 @@ def chat(
         # Process chat (with prior turns for context)
         history = [{"role": t.role, "content": t.content} for t in payload.history]
         response = rag_service.chat(
-            payload.message, history=history, is_refinement=payload.is_refinement
+            payload.message, history=history, is_refinement=payload.is_refinement,
+            product_id=payload.product_id, category=payload.category,
         )
 
         # Best-effort logging of the exchange; attach its id for feedback.

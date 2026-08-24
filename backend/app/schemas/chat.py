@@ -26,6 +26,12 @@ class ChatRequest(BaseModel):
     # A refinement MUST keep the current subject/context — the backend widens the
     # retrieval context and instructs the model not to switch product category.
     is_refinement: bool = False
+    # Launch context from the embedding page (e.g. the JTL widget on a product
+    # page passes the current product's id, read from the page's JSON-LD `sku`).
+    # When present, the assistant answers anchored to that product without the
+    # user having to restate what they're looking at.
+    product_id: Optional[str] = None
+    category: Optional[str] = None
 
 
 class ChatResponse(BaseModel):

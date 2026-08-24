@@ -33,8 +33,31 @@
     return null;
   }
 
+  // ---- product detection: read the PDP's JSON-LD `sku` (launch context) -----
+  // When embedded on a product page, this anchors the assistant to that product
+  // so questions like "welche Farben?" resolve without the user restating it.
+  function detectProductId() {
+    if (cfg.productId || (script && script.getAttribute("data-product-id")))
+      return String(cfg.productId || script.getAttribute("data-product-id"));
+    try {
+      var blocks = document.querySelectorAll('script[type="application/ld+json"]');
+      for (var i = 0; i < blocks.length; i++) {
+        var data; try { data = JSON.parse(blocks[i].textContent); } catch (e) { continue; }
+        var items = Array.isArray(data) ? data : (data["@graph"] || [data]);
+        for (var j = 0; j < items.length; j++) {
+          var it = items[j]; if (!it) continue;
+          var t = it["@type"];
+          var isProduct = t === "Product" || (Array.isArray(t) && t.indexOf("Product") !== -1);
+          if (isProduct) { var id = it.sku || it.productID || it.mpn; if (id) return String(id); }
+        }
+      }
+    } catch (e) {}
+    return null;
+  }
+
   // ---- state ---------------------------------------------------------------
-  var state = { open: false, loading: false, messages: [], suggestions: [], category: detectCategory() };
+  var state = { open: false, loading: false, messages: [], suggestions: [],
+                category: detectCategory(), productId: detectProductId() };
 
   function esc(s) {
     return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
@@ -101,18 +124,35 @@
     api("/api/suggestions" + q).then(function (d) { state.suggestions = (d && d.suggestions) || []; render(); }).catch(function () {});
   }
 
+  function chatBody(message, isRefinement) {
+    var b = { message: message, history: lastUserAssistant(), is_refinement: !!isRefinement };
+    if (state.productId) b.product_id = state.productId;   // launch context (PDP)
+    if (state.category) b.category = state.category;
+    return JSON.stringify(b);
+  }
+
+  function pushAssistant(res) {
+    state.messages.push({ role: "assistant", text: res.answer, products: res.products || [],
+      refine: res.refine_suggestions || [], followUp: res.follow_up_question || "", interactionId: res.interaction_id });
+  }
+
   function send(text, isRefinement) {
     var q = (text || "").trim();
     if (!q || state.loading) return;
-    var history = lastUserAssistant();
     state.messages.push({ role: "user", text: q });
     state.loading = true; render();
-    api("/api/chat", { method: "POST", body: JSON.stringify({ message: q, history: history, is_refinement: !!isRefinement }) })
-      .then(function (res) {
-        state.messages.push({ role: "assistant", text: res.answer, products: res.products || [],
-          refine: res.refine_suggestions || [], followUp: res.follow_up_question || "", interactionId: res.interaction_id });
-      })
+    api("/api/chat", { method: "POST", body: chatBody(q, isRefinement) })
+      .then(pushAssistant)
       .catch(function () { state.messages.push({ role: "assistant", text: "Sorry, something went wrong. Please try again." }); })
+      .then(function () { state.loading = false; render(); });
+  }
+
+  // When opened on a product page, fetch a grounded opening (no user bubble):
+  // the backend produces an overview of the viewed product + alternatives.
+  function introOnProduct() {
+    state.loading = true; render();
+    api("/api/chat", { method: "POST", body: chatBody("", false) })
+      .then(pushAssistant).catch(function () {})
       .then(function () { state.loading = false; render(); });
   }
 
@@ -126,7 +166,13 @@
   function render() {
     if (!state.open) {
       wrap.innerHTML = '<button class="launch" id="pc-open">💬 <span>Ask the assistant</span></button>';
-      root.getElementById("pc-open").onclick = function () { state.open = true; if (!state.suggestions.length) loadSuggestions(); render(); };
+      root.getElementById("pc-open").onclick = function () {
+        state.open = true;
+        if (!state.suggestions.length) loadSuggestions();
+        // On a product page, open already grounded on that product.
+        if (state.productId && !state.messages.length) introOnProduct();
+        render();
+      };
       return;
     }
     var msgs = state.messages.map(function (m, i) {

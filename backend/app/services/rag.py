@@ -18,6 +18,25 @@ def _catalog_categories(db: Session) -> List[str]:
     return [r[0] for r in rows if r[0]]
 
 
+def _product_to_dict(p, score: float = 1.0) -> Dict[str, Any]:
+    """Map a Product row to the same shape retrieval._format returns, so a
+    launch-context product can join the candidate set (grounding + citation)."""
+    return {
+        "product_id": p.product_id, "name": p.name, "description": p.description,
+        "category": p.category, "brand": p.brand, "price": p.price,
+        "image_url": p.image_url, "product_url": p.product_url,
+        "attributes": p.attributes, "bestseller_rank": getattr(p, "bestseller_rank", None),
+        "score": score,
+    }
+
+
+def _anchor_note(name: str, product_id: str) -> str:
+    """Prefix that tells the model which product 'this/that' refers to."""
+    return (f"[Kontext: Der Kunde betrachtet gerade das Produkt \"{name}\" "
+            f"(product_id {product_id}). Beziehe Formulierungen wie \"dieses Produkt\", "
+            f"\"das\", \"die Farben\" auf dieses Produkt. Seine Felder stehen in der Liste.] ")
+
+
 def _order_recommendations(
     recommendations: List[Dict[str, Any]],
     retrieved_products: List[Dict[str, Any]],
@@ -119,7 +138,7 @@ class RAGService:
 
         return suggestions[:4]
 
-    def chat(self, message: str, history: Optional[List[Dict[str, Any]]] = None, is_refinement: bool = False, include_debug: bool = True) -> Dict[str, Any]:
+    def chat(self, message: str, history: Optional[List[Dict[str, Any]]] = None, is_refinement: bool = False, include_debug: bool = True, product_id: Optional[str] = None, category: Optional[str] = None) -> Dict[str, Any]:
         """Process a chat message using RAG.
 
         When `include_debug` is True, the response carries a `debug` object
@@ -155,6 +174,20 @@ class RAGService:
                     result["debug"] = debug
                 return result
 
+            # Launch context: the embedding page (e.g. the JTL widget on a product
+            # page) may pass the product the user is currently viewing so answers
+            # are anchored to it without the user restating what they're looking at.
+            viewed = None
+            if product_id:
+                viewed = self.db.query(Product).filter(
+                    Product.product_id == str(product_id)).first()
+            effective_message = (message or "").strip()
+            if not effective_message and viewed:
+                effective_message = ("Bitte gib mir einen kurzen Überblick zu diesem "
+                                     "Produkt und passende Alternativen.")
+            add_step("0b_launch_context", product_id=product_id, category=category,
+                     viewed=(viewed.product_id if viewed else None))
+
             # Get settings
             settings_dict = self.settings_service.get_all_settings()
 
@@ -185,9 +218,9 @@ class RAGService:
             # a refinement chip carries recent context so "With LED" is parsed
             # against the current subject.
             if is_refinement and prior_user:
-                understand_text = " ".join(prior_user[-2:] + [message]).strip()
+                understand_text = " ".join(prior_user[-2:] + [effective_message]).strip()
             else:
-                understand_text = message.strip()
+                understand_text = effective_message
 
             # LLM query understanding -> structured query (primary categories,
             # clean search phrase, price bounds). This replaces the old keyword
@@ -208,13 +241,19 @@ class RAGService:
             # Filtered semantic retrieval — category + price enforced by the
             # vector DB (with an unfiltered fallback if the filter is too tight).
             retrieved_products = self.retrieval.retrieve(
-                query=parsed["search_text"],
+                query=parsed["search_text"] or effective_message,
                 limit=num_retrieved,
                 score_threshold=similarity_threshold,
-                categories=parsed["categories"] or None,
+                categories=parsed["categories"] or ([category] if category else None),
                 price_min=parsed["price_min"],
                 price_max=parsed["price_max"],
             )
+
+            # Ensure the currently-viewed product is in the candidate set, so the
+            # model can answer about it (grounded by rule 12) and cite it.
+            if viewed and not any(p.get("product_id") == viewed.product_id for p in retrieved_products):
+                top = max((p.get("score") or 0.0) for p in retrieved_products) if retrieved_products else 1.0
+                retrieved_products.append(_product_to_dict(viewed, score=top))
 
             add_step(
                 "2_vector_search",
@@ -259,8 +298,13 @@ class RAGService:
             # the subject). A typed question is answered statelessly — precise,
             # no drift to an earlier topic.
             llm_history = history_list if is_refinement else []
+            # Anchor the turn to the viewed product so "this", "das", "the colours"
+            # resolve without the user restating it.
+            llm_query = effective_message
+            if viewed:
+                llm_query = _anchor_note(viewed.name, viewed.product_id) + effective_message
             response = mistral.generate_recommendation(
-                query=message,
+                query=llm_query,
                 retrieved_products=retrieved_products,
                 config=output_settings,
                 debug=llm_debug,
