@@ -138,6 +138,23 @@ class RAGService:
             debug["steps"].append({"step": name, **info})
 
         try:
+            # Guardrail (runs BEFORE retrieval/LLM): a prompt-injection or
+            # system-prompt/model-disclosure attempt is refused here, so a
+            # jailbroken prompt never reaches generation.
+            from app.services.guardrails import blocked_reason, BLOCKED_REPLY
+            reason = blocked_reason(message)
+            if reason:
+                add_step("0_guardrail_blocked", reason=reason)
+                try:
+                    from app.services.ops import record_operation
+                    record_operation(self.db, "chat", "blocked", {"reason": reason})
+                except Exception:
+                    pass
+                result = {"answer": BLOCKED_REPLY, "products": [], "follow_up_question": ""}
+                if include_debug:
+                    result["debug"] = debug
+                return result
+
             # Get settings
             settings_dict = self.settings_service.get_all_settings()
 
