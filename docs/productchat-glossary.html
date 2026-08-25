@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ProductChat Glossary</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:ital,wght@0,400;1,400&display=swap">
+<style>
+  :root {
+    --bg: #eef1f5; --surface: #ffffff; --surface-2: #e9edf3;
+    --ink: #1a1e26; --muted: #5a6472; --faint: #8a93a1;
+    --border: #dde2e9; --accent: #2f6fb0; --accent-ink: #285f97;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #12151b; --surface: #1c212b; --surface-2: #262c38;
+      --ink: #e6e9ef; --muted: #9aa3b1; --faint: #6f7887;
+      --border: #2a303a; --accent: #6fa6e0; --accent-ink: #8ab6e6;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #12151b; --surface: #1c212b; --surface-2: #262c38;
+    --ink: #e6e9ef; --muted: #9aa3b1; --faint: #6f7887;
+    --border: #2a303a; --accent: #6fa6e0; --accent-ink: #8ab6e6;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+    font-family: "IBM Plex Sans", system-ui, sans-serif; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 52rem; margin: 0 auto; padding: clamp(1.25rem,4vw,3rem) clamp(1rem,4vw,2rem) 4rem; }
+  .eyebrow { font-family: "IBM Plex Mono", monospace; font-size: .72rem; letter-spacing: .18em;
+    text-transform: uppercase; color: var(--accent); font-weight: 500; margin: 0 0 .6rem; }
+  h1 { font-size: clamp(1.8rem,4.5vw,2.6rem); line-height: 1.05; letter-spacing: -.02em; font-weight: 700;
+    margin: 0 0 .7rem; text-wrap: balance; }
+  .intro { color: var(--muted); font-family: "IBM Plex Serif", Georgia, serif; max-width: 40rem; margin: 0 0 .4rem; }
+  .intro a { color: var(--accent-ink); }
+  section { margin-top: 2.2rem; }
+  h2 { font-size: 1.18rem; letter-spacing: -.01em; font-weight: 600; margin: 0 0 .9rem;
+    padding-bottom: .4rem; border-bottom: 1px solid var(--border); }
+  dl { margin: 0; display: flex; flex-direction: column; gap: .85rem; }
+  .term { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent);
+    border-radius: 9px; padding: .7rem .95rem; }
+  dt { font-family: "IBM Plex Mono", monospace; font-weight: 600; font-size: .92rem; color: var(--ink); margin-bottom: .2rem; }
+  dd { margin: 0; color: var(--muted); font-size: .95rem; }
+  dd code, dt code, .intro code { font-family: "IBM Plex Mono", monospace; font-size: .85em;
+    background: var(--surface-2); border: 1px solid var(--border); padding: .03rem .32rem; border-radius: 5px; color: var(--accent-ink); }
+  footer { margin-top: 3rem; padding-top: 1.2rem; border-top: 1px solid var(--border); color: var(--faint); font-size: .85rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">ProductChat · Reference</p>
+  <h1>Glossary</h1>
+  <p class="intro">Plain-language definitions for the terms in the request-flow diagram (<a href="productchat-flow.html">productchat-flow.html</a>). Each entry describes the term as it is used <em>in this system</em>, not just in the abstract.</p>
+
+  <section>
+    <h2>The models (all Mistral, three different jobs)</h2>
+    <dl>
+      <div class="term"><dt>mistral-small</dt><dd>A smaller, cheaper LLM used only to <em>parse</em> the question into structured fields. Fast; it doesn't need to be brilliant.</dd></div>
+      <div class="term"><dt>mistral-embed</dt><dd>An <em>embedding</em> model: it turns text into a vector (see below). Not a chat model.</dd></div>
+      <div class="term"><dt>mistral-large</dt><dd>The strong chat model that writes the final answer and chooses which products to recommend.</dd></div>
+    </dl>
+  </section>
+
+  <section>
+    <h2>Retrieval concepts (the "search")</h2>
+    <dl>
+      <div class="term"><dt>Embed / embedding</dt><dd>Converting text into a list of numbers (a <strong>vector</strong>) that captures its <em>meaning</em>, so similar meanings land near each other.</dd></div>
+      <div class="term"><dt>query vector · 1024-dim</dt><dd>The question's embedding: a list of <strong>1024</strong> numbers. "Dimensions" = how many numbers; more = more nuance.</dd></div>
+      <div class="term"><dt>Vector search</dt><dd>Instead of matching keywords, find the catalog vectors <em>closest</em> to the query vector. This is how "letterbox" can match a product titled "Briefkasten."</dd></div>
+      <div class="term"><dt>cosine / top-N cosine</dt><dd><strong>Cosine similarity</strong> measures the angle between two vectors (1.0 = identical direction, 0 = unrelated). "top-N" = return the N closest.</dd></div>
+      <div class="term"><dt>Qdrant</dt><dd>The <strong>vector database</strong>: stores all product vectors and finds the nearest ones fast.</dd></div>
+      <div class="term"><dt>category + price filters</dt><dd>Hard constraints applied <em>during</em> the search (only Briefkästen, only ≤ €150), so relevance can't override them.</dd></div>
+    </dl>
+  </section>
+
+  <section>
+    <h2>Ranking</h2>
+    <dl>
+      <div class="term"><dt>Bestseller tie-break</dt><dd>A small nudge that lets popular products lead <em>when results are otherwise similarly relevant</em>.</dd></div>
+      <div class="term"><dt>relevance-gated</dt><dd>The nudge only applies inside a relevance tier; it never promotes an off-topic product.</dd></div>
+      <div class="term"><dt>banded</dt><dd>Popularity is bucketed into coarse bands (top-5 / top-15 / …) rather than used as an exact number.</dd></div>
+    </dl>
+  </section>
+
+  <section>
+    <h2>LLM output</h2>
+    <dl>
+      <div class="term"><dt>intent</dt><dd>The structured result of understanding the question: <code>{categories, price_min/max, search_text}</code>.</dd></div>
+      <div class="term"><dt>picks + reasons</dt><dd>The products the LLM chose, each with a one-line justification.</dd></div>
+      <div class="term"><dt>hallucinated ids</dt><dd>Product IDs the LLM invents that aren't real; the system detects and drops them.</dd></div>
+    </dl>
+  </section>
+
+  <section>
+    <h2>The two stores (they do different things)</h2>
+    <dl>
+      <div class="term"><dt>Qdrant</dt><dd>Vector database; holds the embeddings <strong>plus <code>bestseller_rank</code></strong> in each product's <em>payload</em> (extra metadata attached to a vector).</dd></div>
+      <div class="term"><dt>SQLite</dt><dd>An ordinary file-based relational database; holds the product records and the <strong>ops journal</strong> (an audit log of every pipeline run).</dd></div>
+    </dl>
+  </section>
+
+  <section>
+    <h2>Background jobs</h2>
+    <dl>
+      <div class="term"><dt>Scraper sync</dt><dd>Periodically reads the shop's <strong>sitemap</strong> (a machine-readable list of all pages), fetches changed products, and <strong>upserts</strong> them ("update or insert") into Qdrant.</dd></div>
+      <div class="term"><dt><code>?Sortierung=11</code></dt><dd>The URL parameter that sorts a shop category by "Bestseller"; the capture job crawls those pages to learn each product's rank.</dd></div>
+      <div class="term"><dt><code>set_payload</code></dt><dd>A Qdrant operation that writes just the metadata (the rank) onto existing vectors <em>without</em> re-embedding them.</dd></div>
+    </dl>
+  </section>
+
+  <section>
+    <h2>Plumbing &amp; arrows</h2>
+    <dl>
+      <div class="term"><dt>POST /api/chat · rate-limited 30/min</dt><dd>The HTTP request the chat widget sends; at most 30 calls a minute per user (an abuse guard).</dd></div>
+      <div class="term"><dt>RAG</dt><dd><em>Retrieval-Augmented Generation</em>: retrieve real data first, then let the LLM generate an answer grounded in it — so it recommends actual products instead of made-up ones.</dd></div>
+      <div class="term"><dt>store read / store write</dt><dd>Solid muted arrow = the request <em>reading</em> from a database; dashed arrow = something <em>writing</em> to one (a background job, or the run/feedback write-back).</dd></div>
+      <div class="term"><dt>👍 / 👎 feedback</dt><dd>After the answer, the customer's thumbs-up/down is written back to SQLite, alongside the operations-journal record of the run.</dd></div>
+    </dl>
+  </section>
+
+  <footer>ProductChat reference · companion to productchat-flow.html</footer>
+</div>
+</body>
+</html>
