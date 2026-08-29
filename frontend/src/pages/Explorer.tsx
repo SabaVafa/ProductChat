@@ -1,6 +1,7 @@
 import { useState, useEffect, Fragment } from 'react';
 import { productsAPI, testAPI, ProductFilters } from '../services/api';
 import JsonView from '../components/JsonView';
+import { safeUrl, formatPrice } from '../utils/format';
 import {
   Database, Search, Play, Loader2, ExternalLink, CheckCircle2, XCircle,
   Table as TableIcon, Braces, Layers, ChevronRight, ChevronDown, Tag, X,
@@ -245,14 +246,14 @@ function DataTab() {
                       <td className="px-4 py-2.5 text-slate-600">{p.brand || '—'}</td>
                       <td className="px-4 py-2.5 text-slate-500 text-xs">{p.source || '—'}</td>
                       <td className="px-4 py-2.5 text-right font-medium">
-                        {p.price != null ? `€${Number(p.price).toFixed(2)}` : '—'}
+                        {p.price != null ? formatPrice(Number(p.price)) : '—'}
                       </td>
                       <td className="px-4 py-2.5 text-center">
                         {p.indexed ? <CheckCircle2 className="w-4 h-4 text-emerald-500 inline" /> : <XCircle className="w-4 h-4 text-slate-300 inline" />}
                       </td>
                       <td className="px-4 py-2.5 text-center" onClick={(e) => e.stopPropagation()}>
-                        {p.product_url ? (
-                          <a href={p.product_url} target="_blank" rel="noopener noreferrer" className="text-indigo-600 inline-flex">
+                        {safeUrl(p.product_url) ? (
+                          <a href={safeUrl(p.product_url)} target="_blank" rel="noopener noreferrer" className="text-indigo-600 inline-flex">
                             <ExternalLink className="w-4 h-4" />
                           </a>
                         ) : (
@@ -601,7 +602,7 @@ function PlaygroundTab() {
                   <div className="min-w-0 flex-1">
                     <p className="text-sm text-slate-900 line-clamp-1">{p.name}</p>
                     <p className="text-xs text-slate-400">
-                      {p.category} · {p.brand || '—'} · {p.price != null ? `€${Number(p.price).toFixed(2)}` : '—'}
+                      {p.category} · {p.brand || '—'} · {p.price != null ? formatPrice(Number(p.price)) : '—'}
                     </p>
                   </div>
                   <div className="text-right">

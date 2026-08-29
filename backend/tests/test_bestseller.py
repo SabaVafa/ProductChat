@@ -42,11 +42,36 @@ def test_more_relevant_pick_is_not_demoted_by_popularity():
     assert ids[0] == "RELEVANT", f"relevance must win across tiers, got {ids}"
 
 
-def test_api_shape_is_unchanged_and_internal_keys_do_not_leak():
+def test_api_shape_is_stable_and_internal_keys_do_not_leak():
     out = _order_recommendations(
         [{"product_id": "A", "reason": "r", "score": 0.5}], [_prod("A", 0.8, 2)]
     )
-    assert set(out[0]) == {"id", "name", "price", "image", "url", "reason", "score"}
+    assert set(out[0]) == {"id", "name", "price", "image", "url", "reason", "score",
+                           "popular", "has_variants"}
+
+
+def test_popular_flag_only_for_top_band_bestsellers():
+    def card(rank):
+        return _order_recommendations(
+            [{"product_id": "A", "reason": "r", "score": 0.5}], [_prod("A", 0.8, rank)]
+        )[0]
+    assert card(3)["popular"] is True        # top band
+    assert card(15)["popular"] is True       # band boundary
+    assert card(16)["popular"] is False      # below the honest "Beliebt" bar
+    assert card(None)["popular"] is False    # unranked
+
+
+def test_has_variants_flag_from_attribute_option_lists():
+    def card(attrs):
+        p = _prod("A", 0.8, None)
+        p["attributes"] = attrs
+        return _order_recommendations(
+            [{"product_id": "A", "reason": "r", "score": 0.5}], [p]
+        )[0]
+    assert card({"Farbe": ["Anthrazit", "Edelstahl"]})["has_variants"] is True
+    assert card({"Farbe": ["Anthrazit"]})["has_variants"] is False   # single option ≠ variant choice
+    assert card({})["has_variants"] is False
+    assert card(None)["has_variants"] is False
 
 
 def test_hallucinated_ids_are_dropped():
@@ -117,6 +142,23 @@ def test_discover_excludes_products_and_cms_pages():
     import types
     svc._get = types.MethodType(lambda self, url: html, svc)  # avoid network
     assert svc.discover_category_urls(catalog) == [f"{BASE_URL}/briefkasten"]
+
+
+def test_discover_handles_uppercase_relative_and_nested_slugs():
+    # Audit finding: the old regex silently missed /Paketboxen (uppercase),
+    # href="/topshop" (relative) and nested category paths — real JTL shapes.
+    svc = BestsellerService(db=None)
+    html = (f'<a href="{BASE_URL}/Paketboxen"></a>'                    # uppercase -> keep
+            '<a href="/topshop"></a>'                                  # relative -> keep
+            f'<a href="{BASE_URL}/garten/beleuchtung"></a>'            # nested -> keep
+            f'<a href="{BASE_URL}/paketboxen"></a>'                    # case-dup -> dedup
+            f'<a href="{BASE_URL}/media/image/product/1/x.jpg"></a>'   # asset -> drop
+            '<a href="//evil.example/x"></a>')                         # protocol-relative -> drop
+    import types
+    svc._get = types.MethodType(lambda self, url: html, svc)
+    assert svc.discover_category_urls(set()) == [
+        f"{BASE_URL}/Paketboxen", f"{BASE_URL}/topshop", f"{BASE_URL}/garten/beleuchtung",
+    ]
 
 
 # --- pure tie-break math (H-3) ---------------------------------------------

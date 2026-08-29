@@ -569,7 +569,7 @@ export default function Admin() {
                   <input
                     type="number"
                     value={settings.mistral.max_tokens}
-                    onChange={(e) => updateSetting('mistral', 'max_tokens', parseInt(e.target.value))}
+                    onChange={(e) => { const v = parseInt(e.target.value); updateSetting('mistral', 'max_tokens', Number.isFinite(v) ? v : 1000); }}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
@@ -615,7 +615,7 @@ export default function Admin() {
                   <input
                     type="number"
                     value={settings.retrieval.num_retrieved}
-                    onChange={(e) => updateSetting('retrieval', 'num_retrieved', parseInt(e.target.value))}
+                    onChange={(e) => { const v = parseInt(e.target.value); updateSetting('retrieval', 'num_retrieved', Number.isFinite(v) ? v : 10); }}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
@@ -681,7 +681,7 @@ export default function Admin() {
                   <input
                     type="number"
                     value={settings.output.num_recommendations}
-                    onChange={(e) => updateSetting('output', 'num_recommendations', parseInt(e.target.value))}
+                    onChange={(e) => { const v = parseInt(e.target.value); updateSetting('output', 'num_recommendations', Number.isFinite(v) ? v : 3); }}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>

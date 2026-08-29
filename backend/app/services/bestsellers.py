@@ -82,8 +82,17 @@ _NON_CATEGORY_SLUGS = {
     "versandinformationen", "batteriegesetz", "streitschlichtung",
 }
 
-# Anchor to any internal single-segment slug URL, in document order.
-_SLUG_RE = re.compile(r'href="' + re.escape(BASE_URL) + r'/([a-z0-9][a-z0-9\-]+)"')
+# Anchor to internal slug URLs, in document order. Deliberately broad (audit
+# finding: the old lowercase/single-segment/absolute-only pattern missed real
+# JTL categories like /Paketboxen, /Muelltonnenbox and nested ones, costing
+# bestseller-rank coverage): case-preserving, optional second path segment,
+# and root-relative hrefs are all accepted.
+_SLUG_RE = re.compile(
+    r'href="(?:' + re.escape(BASE_URL) + r')?/([A-Za-z0-9][A-Za-z0-9\-]*(?:/[A-Za-z0-9][A-Za-z0-9\-]*)?)"'
+)
+
+# First path segments that are assets/system paths, never categories.
+_ASSET_SEGMENTS = {"media", "includes", "templates", "gfx", "bilder", "export", "static"}
 
 
 def _stale_ranks_to_clear(
@@ -168,11 +177,15 @@ class BestsellerService:
         html = self._get(f"{BASE_URL}/") or ""
         seen, cats = set(), []
         for slug in _SLUG_RE.findall(html):
-            if slug in seen:
+            key = slug.lower()          # dedupe case variants (/Paketboxen vs /paketboxen)
+            if key in seen:
                 continue
-            seen.add(slug)
+            seen.add(key)
+            first_seg = key.split("/", 1)[0]
+            if first_seg in _NON_CATEGORY_SLUGS or first_seg in _ASSET_SEGMENTS:
+                continue
             full = f"{BASE_URL}/{slug}"
-            if full in catalog_urls or slug in _NON_CATEGORY_SLUGS:
+            if full in catalog_urls:
                 continue
             cats.append(full)
         return cats

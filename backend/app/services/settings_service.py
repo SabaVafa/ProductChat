@@ -180,7 +180,7 @@ class SettingsService:
                 env_key = ""
             mistral_defaults = {
                 "api_key": env_key,
-                "model": app_settings.MISTRAL_MODEL or "mistral-large-latest",
+                "model": app_settings.MISTRAL_MODEL or "mistral-medium-latest",
                 "temperature": 0.7,
                 "max_tokens": 1000
             }

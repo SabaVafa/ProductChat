@@ -111,6 +111,8 @@ class EmbeddingsService:
                     text_parts.append(str(attr))
 
         if product.get("price"):
-            text_parts.append(f"Price: ${product['price']}")
+            # EUR shop — "$" was wrong here too (harmless for similarity, but
+            # keep the composed text truthful). Only affects future embeddings.
+            text_parts.append(f"Price: {product['price']} EUR")
 
         return " | ".join(text_parts)

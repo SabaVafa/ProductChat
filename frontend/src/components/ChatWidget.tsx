@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { MessageSquare, X, Send, Loader2, Sparkles, ExternalLink, Bot, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { chatAPI, suggestionsAPI } from '../services/api';
 import { ChatResponse, ProductCard as ProductType } from '../types';
+import { safeUrl, formatPrice } from '../utils/format';
 
 interface Msg {
   role: 'user' | 'assistant';
@@ -156,14 +157,14 @@ export default function ChatWidget({ category }: Props) {
                       {m.products.map((p) => (
                         <a
                           key={p.id}
-                          href={p.url || '#'}
-                          target={p.url ? '_blank' : undefined}
+                          href={safeUrl(p.url) || '#'}
+                          target={safeUrl(p.url) ? '_blank' : undefined}
                           rel="noopener noreferrer"
                           className="flex gap-3 bg-white border border-slate-200 rounded-xl p-2.5 hover:border-indigo-300 hover:shadow-sm transition-all group"
                         >
-                          {p.image && (
+                          {safeUrl(p.image) && (
                             <img
-                              src={p.image}
+                              src={safeUrl(p.image)}
                               alt={p.name}
                               className="w-14 h-14 rounded-lg object-cover bg-slate-100 flex-shrink-0"
                               onError={(e) => (e.currentTarget.style.display = 'none')}
@@ -173,7 +174,9 @@ export default function ChatWidget({ category }: Props) {
                             <p className="text-xs font-medium text-slate-900 line-clamp-2">{p.name}</p>
                             <div className="flex items-center justify-between mt-1">
                               {p.price != null && (
-                                <span className="text-sm font-bold text-emerald-600">€{p.price.toFixed(2)}</span>
+                                <span className="text-sm font-bold text-emerald-600">
+                                  {p.has_variants ? 'ab ' : ''}{formatPrice(p.price)}
+                                </span>
                               )}
                               {p.url && (
                                 <span className="flex items-center gap-1 text-[11px] text-indigo-600 group-hover:underline">

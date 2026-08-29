@@ -19,15 +19,19 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// When a guarded endpoint rejects the token, ask for it once and retry.
+// When a guarded endpoint rejects the token, ask for it ONCE per page load.
+// (Several parallel 401s used to stack prompts, and a wrong token caused an
+// endless prompt→reload loop — audit finding M6.)
+let adminPromptShown = false;
 api.interceptors.response.use(
   (res) => res,
   (error) => {
-    if (error?.response?.status === 401) {
+    if (error?.response?.status === 401 && !adminPromptShown) {
+      adminPromptShown = true;
       const entered = window.prompt(
         'Admin token required for this action (set as ADMIN_TOKEN in backend/.env):'
       );
-      if (entered) {
+      if (entered && entered.trim()) {
         localStorage.setItem(ADMIN_TOKEN_KEY, entered.trim());
         window.location.reload();
       }

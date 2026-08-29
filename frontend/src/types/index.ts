@@ -6,6 +6,10 @@ export interface ProductCard {
   url?: string;
   reason: string;
   score?: number;
+  /** genuine shop bestseller (top rank band) → "Beliebt" pill */
+  popular?: boolean;
+  /** has selectable variant options → price shown as "ab …" */
+  has_variants?: boolean;
 }
 
 export interface RagDebugStep {

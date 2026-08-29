@@ -19,17 +19,29 @@ export default function Chat() {
       .catch((err) => console.error('Failed to load suggestions:', err));
   }, []);
 
-  const sendQuery = async (text: string) => {
+  const [lastQuery, setLastQuery] = useState('');
+
+  const sendQuery = async (text: string, isRefinement = false) => {
     const q = text.trim();
     if (!q) return;
 
     setLoading(true);
     setError(null);
-    setResponse(null);
+    // Keep the previous answer visible while loading — clearing it here meant
+    // an error wiped the old answer too (audit finding L4).
 
     try {
-      const result = await chatAPI.sendMessage(q);
+      // A refine chip must carry the conversation context, mirroring the
+      // storefront widget — otherwise "Mit LED" arrives as a cold query.
+      const history = isRefinement && response
+        ? [
+            { role: 'user', content: lastQuery },
+            { role: 'assistant', content: response.answer },
+          ]
+        : [];
+      const result = await chatAPI.sendMessage(q, history, isRefinement);
       setResponse(result);
+      setLastQuery(q);
       setMessage('');
     } catch (err) {
       setError('Failed to get response. Please try again.');
@@ -147,7 +159,7 @@ export default function Chat() {
                   {response.refine_suggestions.map((s) => (
                     <button
                       key={s}
-                      onClick={() => sendQuery(s)}
+                      onClick={() => sendQuery(s, true)}
                       className="px-3 py-1.5 text-sm bg-gray-100 border border-gray-200 rounded-full hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300 transition-colors"
                     >
                       {s}

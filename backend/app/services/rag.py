@@ -57,10 +57,12 @@ def _order_recommendations(
         details = by_id.get(rec.get("product_id"))
         if not details:
             continue  # skip hallucinated ids not in the retrieved set
+        attrs = details.get("attributes")
+        rank = details.get("bestseller_rank")
         picked.append({
             # tie-break inputs: the OBJECTIVE retrieval score + rank
             "score": details.get("score", 0.0) or 0.0,
-            "bestseller_rank": details.get("bestseller_rank"),
+            "bestseller_rank": rank,
             "_card": {
                 "id": details.get("product_id"),
                 "name": details.get("name"),
@@ -69,6 +71,12 @@ def _order_recommendations(
                 "url": details.get("product_url"),
                 "reason": rec.get("reason", ""),
                 "score": rec.get("score", details.get("score", 0.0)),
+                # honest "Beliebt" pill: only genuine shop bestsellers (top band)
+                "popular": rank is not None and rank <= 15,
+                # variant products (Farbe/Größe option lists) → price shown as "ab"
+                "has_variants": isinstance(attrs, dict) and any(
+                    isinstance(v, list) and len(v) > 1 for v in attrs.values()
+                ),
             },
         })
 
@@ -83,12 +91,18 @@ class RAGService:
         self.retrieval = RetrievalService(db)
         self.settings_service = SettingsService(db)
     
-    # Attribute values worth offering as one-tap refinements when they show up
+    # Attribute facets worth offering as one-tap refinements when they show up
     # in the retrieved set. Kept as a template (no LLM call) so it's free.
+    # (match_term, german_chip_label): match terms cover DE+EN product text,
+    # but the chip the customer sees is ALWAYS German (design-audit finding:
+    # English chips flipped the whole conversation into English).
     REFINE_KEYWORDS = [
-        "LED", "engraving", "Gravur", "facial recognition", "fingerprint",
-        "wireless", "Funkklingel", "anthracite", "Anthrazit", "stainless steel",
-        "exchangeable", "newspaper", "illuminated",
+        ("LED", "LED"), ("Gravur", "Gravur"), ("engraving", "Gravur"),
+        ("fingerprint", "Fingerprint"), ("Funkklingel", "Funk"), ("wireless", "Funk"),
+        ("Anthrazit", "Anthrazit"), ("anthracite", "Anthrazit"),
+        ("Edelstahl", "Edelstahl"), ("stainless steel", "Edelstahl"),
+        ("Zeitungsfach", "Zeitungsfach"), ("newspaper", "Zeitungsfach"),
+        ("beleuchtet", "beleuchtet"), ("illuminated", "beleuchtet"),
     ]
 
     def _build_refine_suggestions(self, retrieved_products: List[Dict[str, Any]]) -> List[str]:
@@ -109,16 +123,16 @@ class RAGService:
             f"{p.get('name','')} {p.get('description','')} {p.get('attributes','')}"
             for p in retrieved_products
         ).lower()
-        present = []
-        for kw in self.REFINE_KEYWORDS:
-            if kw.lower() in blob and kw.lower() not in [x.lower() for x in present]:
-                present.append(kw)
+        present: List[str] = []   # german chip labels, deduped
+        for term, label in self.REFINE_KEYWORDS:
+            if term.lower() in blob and label not in present:
+                present.append(label)
 
         suggestions: List[str] = []
         if len(categories) > 1:
-            suggestions.append(f"Only show {categories[0]}")
-        for kw in present[:2]:
-            suggestions.append(f"With {kw}")
+            suggestions.append(f"Nur {categories[0]}")
+        for label in present[:2]:
+            suggestions.append(f"Mit {label}")
         if len(prices) >= 3:
             srt = sorted(prices)
             mid = srt[len(srt) // 2]
@@ -134,7 +148,7 @@ class RAGService:
             # minimum and genuinely below the most expensive item (so it narrows
             # the set). This avoids degenerate chips like "Under €3".
             if threshold >= 10 and threshold < hi:
-                suggestions.append(f"Under €{threshold}")
+                suggestions.append(f"Unter {threshold} €")
 
         return suggestions[:4]
 
@@ -273,9 +287,21 @@ class RAGService:
             )
 
             if not retrieved_products:
+                # German dead-end WITH recovery chips (top categories), so the
+                # customer always has a way forward (design-audit finding).
+                from sqlalchemy import func
+                top_cats = [
+                    c for (c, _) in self.db.query(Product.category, func.count(Product.id))
+                    .filter(Product.category.isnot(None), Product.category != "")
+                    .group_by(Product.category)
+                    .order_by(func.count(Product.id).desc()).limit(3).all()
+                ]
                 result = {
-                    "answer": "I couldn't find any products matching your request. Please try different keywords or browse our catalog.",
+                    "answer": ("Dazu habe ich leider nichts Passendes gefunden. "
+                               "Magst du es mit anderen Begriffen versuchen – z. B. "
+                               "„Briefkasten mit Klingel“ oder „Video-Sprechanlage“?"),
                     "products": [],
+                    "refine_suggestions": [f"Nur {c}" for c in top_cats],
                 }
                 if include_debug:
                     result["debug"] = debug
@@ -284,7 +310,7 @@ class RAGService:
             # Get Mistral settings
             mistral_settings = settings_dict.get("mistral", {})
             api_key = mistral_settings.get("api_key")
-            model = mistral_settings.get("model", "mistral-large-latest")
+            model = mistral_settings.get("model", "mistral-medium-latest")
             temperature = mistral_settings.get("temperature", 0.7)
             max_tokens = mistral_settings.get("max_tokens", 1000)
 
@@ -353,7 +379,7 @@ class RAGService:
             logger.error(f"RAG chat error: {e}")
             add_step("error", message=str(e))
             result = {
-                "answer": "I apologize, but I encountered an error processing your request. Please try again.",
+                "answer": "Entschuldigung, da ist etwas schiefgelaufen. Bitte versuche es gleich noch einmal.",
                 "products": []
             }
             if include_debug:

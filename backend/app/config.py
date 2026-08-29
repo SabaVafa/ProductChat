@@ -20,7 +20,9 @@ class Settings(BaseSettings):
     
     # Mistral AI defaults (can be overridden via UI)
     MISTRAL_API_KEY: str = ""
-    MISTRAL_MODEL: str = "mistral-large-latest"
+    # medium, not large: mistral-large is tier-gated (403 tier_not_allowed on
+    # standard tiers as of 2026-08) — a large default breaks fresh installs.
+    MISTRAL_MODEL: str = "mistral-medium-latest"
     MISTRAL_TEMPERATURE: float = 0.7
     MISTRAL_MAX_TOKENS: int = 1000
     
@@ -33,7 +35,13 @@ class Settings(BaseSettings):
     
     # Application
     API_PREFIX: str = "/api"
-    CORS_ORIGINS: str = "http://localhost:3000,http://localhost:5173"
+    # Must include every origin the widget is embedded on — without the shop
+    # origin here, every /api/chat preflight from the live shop fails and the
+    # widget is dead (frontend-audit H1). Override via env in deployment.
+    CORS_ORIGINS: str = (
+        "http://localhost:3000,http://localhost:5173,"
+        "https://edelstahl-tuerklingel.de,https://www.edelstahl-tuerklingel.de"
+    )
     ENVIRONMENT: str = "development"
     
     # Redis

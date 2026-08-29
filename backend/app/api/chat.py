@@ -1,5 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, Request
-from typing import Dict, Any
+from fastapi import APIRouter, Depends, HTTPException, Request, Header
+from typing import Dict, Any, Optional
+from app.config import settings as app_settings
+import hmac
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.schemas.chat import ChatRequest, ChatResponse, FeedbackRequest
@@ -15,18 +17,30 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/chat", tags=["chat"])
 
 
+def _is_admin_caller(token: Optional[str]) -> bool:
+    """Soft admin check (never raises): valid X-Admin-Token, or open dev mode."""
+    expected = (app_settings.ADMIN_TOKEN or "").strip()
+    if not expected:
+        return app_settings.ENVIRONMENT == "development"
+    return bool(token) and hmac.compare_digest(token, expected)
+
+
 @router.post("", response_model=ChatResponse)
 @limiter.limit("30/minute")
 def chat(
     request: Request,           # required by the rate limiter (per-IP key)
     payload: ChatRequest,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    x_admin_token: Optional[str] = Header(default=None),
 ):
     """
     Process a chat message using RAG architecture.
 
     Returns AI-generated answer with product recommendations.
     Rate-limited per IP because each call costs an LLM request.
+    The full RAG debug trace (system prompt, raw LLM output, retrieval
+    internals) is only included for admin callers — it must never reach
+    anonymous shop visitors (audit finding M1).
     """
     try:
         # Initialize settings
@@ -41,6 +55,7 @@ def chat(
         response = rag_service.chat(
             payload.message, history=history, is_refinement=payload.is_refinement,
             product_id=payload.product_id, category=payload.category,
+            include_debug=_is_admin_caller(x_admin_token),
         )
 
         # Best-effort logging of the exchange; attach its id for feedback.

@@ -15,12 +15,13 @@ import re
 # Canned reply for a blocked message — stays on-task and reveals nothing.
 BLOCKED_REPLY = (
     "Ich kann dir gern bei der Produktsuche helfen, gebe aber keine internen "
-    "System- oder Modellinformationen preis. Wonach für ein Produkt suchst du?"
+    "System- oder Modellinformationen preis. Wonach suchst du?"
 )
 
 _PATTERNS = [
-    # override / ignore instructions
+    # override / ignore instructions (EN + DE)
     r"\b(ignore|disregard|forget|override|bypass)\b.{0,30}\b(previous|above|prior|all|your|the)?\s*(instructions?|rules?|prompt|guidelines?)\b",
+    r"\b(ignoriere|ignorier|vergiss|missachte|umgehe)\b.{0,40}\b(anweisungen|regeln|prompt|instruktionen|vorgaben)\b",
     # extract the system prompt / rules
     r"\bsystem\s*prompt\b",
     r"\b(reveal|show|print|repeat|display|expose|leak|tell me|give me)\b.{0,30}\b(system\s*prompt|prompt|instructions?|rules?|guidelines?)\b",

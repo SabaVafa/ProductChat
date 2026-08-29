@@ -10,6 +10,10 @@ class ProductCard(BaseModel):
     url: Optional[str] = None
     reason: str = ""
     score: Optional[float] = None
+    # True only for genuine shop bestsellers (top rank band) → "Beliebt" pill.
+    popular: bool = False
+    # True when the product has selectable variant options → price shown as "ab".
+    has_variants: bool = False
 
 
 class ChatTurn(BaseModel):

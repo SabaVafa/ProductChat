@@ -99,18 +99,20 @@ class SuggestionsService:
     def build_template_suggestions(self, category: Optional[str] = None) -> List[str]:
         facets = self._catalog_facets()
         out: List[str] = []
+        # German templates; categories are German nouns — keep their casing
+        # (lower-casing "Türklingeln" would be wrong German).
         if category:
-            out.append(f"Show me all {category.lower()}")
+            out.append(f"Zeig mir alle {category}")
             if facets["keywords"]:
-                out.append(f"{category} with {facets['keywords'][0]}")
-            out.append(f"Cheapest {category.lower()}")
+                out.append(f"{category} mit {facets['keywords'][0]}")
+            out.append(f"Günstigste {category}")
             return out
         for cat in facets["categories"][:3]:
-            out.append(f"Show me {cat.lower()}")
+            out.append(f"Zeig mir {cat}")
         if facets["keywords"]:
             kw = facets["keywords"][0]
-            cat = facets["categories"][0].lower() if facets["categories"] else "products"
-            out.append(f"{cat.capitalize()} with {kw}")
+            cat = facets["categories"][0] if facets["categories"] else "Produkte"
+            out.append(f"{cat} mit {kw}")
         return out
 
     # ---- LLM generation (cached; called after a sync) ------------------
@@ -129,7 +131,7 @@ class SuggestionsService:
         if not api_key:
             logger.info("Skipping LLM suggestions: no Mistral API key configured")
             return {"global": [], "by_category": {}}
-        model = mistral_settings.get("model", "mistral-large-latest")
+        model = mistral_settings.get("model", "mistral-medium-latest")
 
         price_hint = ""
         if facets["prices"]:
@@ -151,7 +153,10 @@ class SuggestionsService:
         user_prompt = (
             f"Categories: {', '.join(cats)}. "
             f"Common features: {', '.join(facets['keywords']) or 'n/a'}. {price_hint} "
-            "Write all questions in English."
+            # German shop, German customers — the earlier English instruction
+            # made every starter chip English (design-audit finding).
+            "Write all questions in German (de-DE), natural informal du-Form. "
+            "Prices in the format 1.234,56 €."
         )
 
         try:
