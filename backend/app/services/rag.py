@@ -36,10 +36,14 @@ def _apply_negation_filter(products: List[Dict[str, Any]], message: str) -> List
         return not any(t in name for t in terms)
 
     filtered = [p for p in products if keep(p)]
-    if len(filtered) >= 2:
+    if len(filtered) != len(products):
         logger.info("Negation filter %s: %d -> %d products", terms, len(products), len(filtered))
-        return filtered
-    return products
+    # Return the filtered set even if it's small/empty: showing a product the
+    # user explicitly excluded ("ohne Gravur" → a "mit Lasergravur" item) is worse
+    # than showing fewer. An empty result then routes to the German
+    # no-results + offer-to-broaden path rather than to wrong recommendations —
+    # this is what stops the drift-to-nameplates screenshot from recurring.
+    return filtered
 
 
 def _catalog_categories(db: Session) -> List[str]:

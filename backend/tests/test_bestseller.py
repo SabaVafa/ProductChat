@@ -92,12 +92,19 @@ def test_negation_filter_drops_headlined_feature_keeps_optional():
         assert any("Modell-G" in n for n in names) and any("optional" in n.lower() for n in names)
 
 
-def test_negation_filter_noop_without_negation_and_never_empties():
+def test_negation_filter_noop_without_negation():
     prods = [{"name": "Briefkasten mit Gravur A"}, {"name": "Briefkasten mit Gravur B"}]
     # no negation in the message -> unchanged
     assert _apply_negation_filter(prods, "Briefkasten mit Gravur") == prods
-    # negation that would drop everything -> keep original (never strand the user)
-    assert _apply_negation_filter(prods, "ohne Gravur") == prods
+
+
+def test_negation_filter_drops_all_excluded_rather_than_showing_them():
+    # If EVERY retrieved product headlines the excluded feature (e.g. query
+    # understanding drifted to nameplates, which all carry "Gravur"), returning
+    # an empty set routes to the German no-results/offer-to-broaden path.
+    # Showing the excluded products instead is the drift-to-nameplates bug.
+    prods = [{"name": "Namensschild mit Lasergravur"}, {"name": "Hausnummernschild mit Gravur"}]
+    assert _apply_negation_filter(prods, "ohne Gravur") == []
 
 
 def test_hallucinated_ids_are_dropped():
