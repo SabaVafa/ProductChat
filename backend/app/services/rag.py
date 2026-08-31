@@ -6,8 +6,40 @@ from app.models.product import Product
 from sqlalchemy.orm import Session
 from typing import Dict, Any, List, Optional
 import logging
+import re
 
 logger = logging.getLogger(__name__)
+
+# Words after "ohne/without/kein" that are not product features.
+_NEG_STOP = {"die", "der", "das", "eine", "einen", "einem", "the", "a", "an", "und", "and"}
+_NEG_RE = re.compile(r"\b(?:ohne|without|kein|keine|no)\s+([a-zA-ZäöüÄÖÜß]{3,})", re.IGNORECASE)
+
+
+def _apply_negation_filter(products: List[Dict[str, Any]], message: str) -> List[Dict[str, Any]]:
+    """Drop products that HEADLINE a feature the user asked to exclude.
+
+    Vector search can't do negation — "Briefkasten ohne Gravur" retrieves lots of
+    "mit Lasergravur" products because the token overlap is huge. When the message
+    says "ohne X" / "without X", drop products whose NAME contains X unless the
+    name marks it optional ("Gravur optional" stays — it can be ordered without).
+    Keeps the filter only if a usable set survives, so it never empties results.
+    """
+    terms = [m.group(1).lower() for m in _NEG_RE.finditer(message or "")]
+    terms = [t for t in terms if t not in _NEG_STOP]
+    if not terms:
+        return products
+
+    def keep(p: Dict[str, Any]) -> bool:
+        name = (p.get("name") or "").lower()
+        if "optional" in name:          # e.g. "Gravur optional" — can be without
+            return True
+        return not any(t in name for t in terms)
+
+    filtered = [p for p in products if keep(p)]
+    if len(filtered) >= 2:
+        logger.info("Negation filter %s: %d -> %d products", terms, len(products), len(filtered))
+        return filtered
+    return products
 
 
 def _catalog_categories(db: Session) -> List[str]:
@@ -262,6 +294,10 @@ class RAGService:
                 price_min=parsed["price_min"],
                 price_max=parsed["price_max"],
             )
+
+            # Negation guard: for "ohne X" / "without X", drop products that
+            # headline X in their name (vector search can't negate).
+            retrieved_products = _apply_negation_filter(retrieved_products, effective_message)
 
             # Ensure the currently-viewed product is in the candidate set, so the
             # model can answer about it (grounded by rule 12) and cite it.

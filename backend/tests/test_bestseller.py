@@ -74,6 +74,32 @@ def test_has_variants_flag_from_attribute_option_lists():
     assert card(None)["has_variants"] is False
 
 
+from app.services.rag import _apply_negation_filter
+
+
+def test_negation_filter_drops_headlined_feature_keeps_optional():
+    prods = [
+        {"name": "Metzler Briefkasten Design | Modell-G"},              # plain -> keep
+        {"name": "Metzler Briefkasten mit Lasergravur | Stencil"},     # gravur -> drop
+        {"name": "Metzler Briefkasten Edelstahl Gravur optional | Moris"},  # optional -> keep
+        {"name": "Metzler Briefkasten Unterputz | personalisiert mit Gravur"},  # gravur -> drop
+        {"name": "Metzler Briefkasten aus Edelstahl | personalisiert"},  # plain -> keep
+    ]
+    for msg in ["Briefkasten ohne Gravur", "without gravur", "ohne Gravur bitte"]:
+        names = [p["name"] for p in _apply_negation_filter(prods, msg)]
+        assert not any("lasergravur" in n.lower() for n in names), (msg, names)
+        assert not any("personalisiert mit gravur" in n.lower() for n in names), (msg, names)
+        assert any("Modell-G" in n for n in names) and any("optional" in n.lower() for n in names)
+
+
+def test_negation_filter_noop_without_negation_and_never_empties():
+    prods = [{"name": "Briefkasten mit Gravur A"}, {"name": "Briefkasten mit Gravur B"}]
+    # no negation in the message -> unchanged
+    assert _apply_negation_filter(prods, "Briefkasten mit Gravur") == prods
+    # negation that would drop everything -> keep original (never strand the user)
+    assert _apply_negation_filter(prods, "ohne Gravur") == prods
+
+
 def test_hallucinated_ids_are_dropped():
     out = _order_recommendations(
         [{"product_id": "GHOST", "reason": "r", "score": 0.5}], [_prod("A", 0.8, 2)]
