@@ -20,20 +20,30 @@ def _apply_negation_filter(products: List[Dict[str, Any]], message: str) -> List
 
     Vector search can't do negation — "Briefkasten ohne Gravur" retrieves lots of
     "mit Lasergravur" products because the token overlap is huge. When the message
-    says "ohne X" / "without X", drop products whose NAME contains X unless the
-    name marks it optional ("Gravur optional" stays — it can be ordered without).
-    Keeps the filter only if a usable set survives, so it never empties results.
+    says "ohne X" / "without X", drop products whose NAME contains X — unless the
+    name marks *that feature* optional ("Gravur optional" stays — it can be ordered
+    without). The "optional" must qualify the negated term itself: a product named
+    "... mit Gravur | Zeitungsfach optional ..." has Gravur INCLUDED (only the
+    newspaper slot is optional), so it must still be dropped.
     """
     terms = [m.group(1).lower() for m in _NEG_RE.finditer(message or "")]
     terms = [t for t in terms if t not in _NEG_STOP]
     if not terms:
         return products
 
+    def _term_is_optional(name: str, t: str) -> bool:
+        # True only when "optional"/"ohne" qualifies THIS term with no other
+        # word between them (e.g. "gravur optional", "optional gravur", "ohne
+        # gravur") — not a stray "optional" elsewhere in the name.
+        et = re.escape(t)
+        return re.search(rf"{et}\W{{1,4}}optional|optional\W{{1,4}}{et}|ohne\W{{1,4}}{et}", name) is not None
+
     def keep(p: Dict[str, Any]) -> bool:
         name = (p.get("name") or "").lower()
-        if "optional" in name:          # e.g. "Gravur optional" — can be without
-            return True
-        return not any(t in name for t in terms)
+        for t in terms:
+            if t in name and not _term_is_optional(name, t):
+                return False
+        return True
 
     filtered = [p for p in products if keep(p)]
     if len(filtered) != len(products):

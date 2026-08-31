@@ -92,6 +92,19 @@ def test_negation_filter_drops_headlined_feature_keeps_optional():
         assert any("Modell-G" in n for n in names) and any("optional" in n.lower() for n in names)
 
 
+def test_negation_optional_must_qualify_the_negated_term_not_another_feature():
+    # Real bug: "... mit Gravur | Zeitungsfach optional ..." has the Gravur
+    # INCLUDED; the "optional" belongs to the newspaper slot, not the gravur.
+    # A stray "optional" elsewhere must not rescue a "mit Gravur" product.
+    prods = [
+        {"name": "Metzler Briefkasten aus Edelstahl | personalisiert mit Gravur | Zeitungsfach optional | Moris"},
+        {"name": "Metzler Briefkasten Edelstahl Gravur optional | Modell02"},  # gravur itself optional -> keep
+    ]
+    names = [p["name"] for p in _apply_negation_filter(prods, "without gravur")]
+    assert not any("mit Gravur" in n for n in names), names   # dropped
+    assert any("Modell02" in n for n in names)                # gravur-optional kept
+
+
 def test_negation_filter_noop_without_negation():
     prods = [{"name": "Briefkasten mit Gravur A"}, {"name": "Briefkasten mit Gravur B"}]
     # no negation in the message -> unchanged
