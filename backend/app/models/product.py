@@ -21,6 +21,12 @@ class Product(Base):
     # "Bestseller" listing (?Sortierung=11); NULL = not a ranked bestseller.
     # Used only as a relevance-gated tie-break in retrieval, never a hard sort.
     bestseller_rank = Column(Integer, nullable=True, index=True)
+    # Comma-joined membership in the shop's gravur variant categories (currently
+    # only "ohne" from /briefkasten-ohne-gravur). Captured from the category page,
+    # NOT scraped per-product, so it survives the URL-alias gap. Deliberately its
+    # own column (not `attributes`) so it is NEVER part of the embedding text;
+    # pushed to the Qdrant payload as `gravur` and used as a hard retrieval filter.
+    gravur_tags = Column(String(32), nullable=True, index=True)
     # Scraper change-detection fields: sitemap <lastmod> and a content hash.
     source = Column(String(50), nullable=True)  # e.g. "scraper", "manual"
     lastmod = Column(String(64), nullable=True)

@@ -32,7 +32,8 @@ def understand_query(
     has no product type of its own, so the product type is inherited from the
     conversation; a message that names a new product type switches to it.
     """
-    fallback = {"categories": [], "search_text": text, "price_min": None, "price_max": None}
+    fallback = {"categories": [], "search_text": text, "price_min": None, "price_max": None,
+                "gravur": None}
     if not text or not text.strip():
         return fallback
 
@@ -42,8 +43,13 @@ def understand_query(
         "sells doorbells, mailboxes, intercoms, package boxes, house numbers, cameras, lights "
         "and accessories.\n\n"
         "Respond with ONLY a JSON object of this exact shape:\n"
-        '{"categories": [string], "search_text": string, "price_min": number|null, "price_max": number|null}\n\n'
+        '{"categories": [string], "search_text": string, "price_min": number|null, "price_max": number|null, "gravur": "ohne"|null}\n\n'
         "Rules:\n"
+        "0. \"gravur\": set to \"ohne\" ONLY when the shopper wants a MAILBOX/Briefkasten "
+        "explicitly WITHOUT engraving — 'ohne Gravur', 'without engraving/gravur', 'no "
+        "engraving', 'nicht graviert', 'mit austauschbarem Namensschild statt Gravur'. "
+        "Otherwise null. (Do NOT set it for 'mit Gravur', for a plain 'Briefkasten', or "
+        "for any non-mailbox product.)\n"
         "1. \"categories\": pick the entries from the AVAILABLE CATEGORIES below that match the "
         "shopper's PRIMARY product type. Choose the category that NAMES the product itself, the "
         "most specific one. If the request combines a product with a feature (e.g. 'mailbox with "
@@ -104,9 +110,13 @@ def understand_query(
         except (TypeError, ValueError):
             return None
 
+    gravur = data.get("gravur")
+    gravur = "ohne" if (isinstance(gravur, str) and gravur.lower() == "ohne") else None
+
     return {
         "categories": cats,
         "search_text": (data.get("search_text") or text).strip() or text,
         "price_min": _num(data.get("price_min")),
         "price_max": _num(data.get("price_max")),
+        "gravur": gravur,
     }

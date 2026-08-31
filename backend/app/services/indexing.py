@@ -177,6 +177,8 @@ class IndexingService:
                     "product_url": product.product_url,
                     "attributes": product.attributes,
                     "bestseller_rank": product.bestseller_rank,
+                    # List payload so a MatchValue("ohne") filter hits; None when untagged.
+                    "gravur": (product.gravur_tags.split(",") if product.gravur_tags else None),
                 }
             ))
 

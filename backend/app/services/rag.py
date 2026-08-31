@@ -292,6 +292,16 @@ class RAGService:
                 context=understand_context,
             )
 
+            # "ohne Gravur" is answered from the shop's curated category
+            # membership (a Qdrant payload tag), NOT by guessing from names.
+            # That tag is the only ohne-gravur category and it means mailboxes,
+            # so it replaces the category filter and constrains the whole result.
+            gravur = parsed.get("gravur")
+            gravur_filter = {"gravur": "ohne"} if gravur == "ohne" else None
+            categories_filter = (parsed["categories"] or ([category] if category else None))
+            if gravur_filter:
+                categories_filter = None
+
             add_step(
                 "1b_query_understanding",
                 understand_text=understand_text,
@@ -299,22 +309,28 @@ class RAGService:
                 search_text=parsed["search_text"],
                 price_min=parsed["price_min"],
                 price_max=parsed["price_max"],
+                gravur=gravur,
             )
 
-            # Filtered semantic retrieval — category + price enforced by the
-            # vector DB (with an unfiltered fallback if the filter is too tight).
+            # Filtered semantic retrieval — category/price/gravur enforced by the
+            # vector DB (with an unfiltered fallback if category/price is too tight;
+            # the gravur filter is always kept, so "mit Gravur" can't leak back).
             retrieved_products = self.retrieval.retrieve(
                 query=parsed["search_text"] or effective_message,
                 limit=num_retrieved,
                 score_threshold=similarity_threshold,
-                categories=parsed["categories"] or ([category] if category else None),
+                filters=gravur_filter,
+                categories=categories_filter,
                 price_min=parsed["price_min"],
                 price_max=parsed["price_max"],
             )
 
-            # Negation guard: for "ohne X" / "without X", drop products that
-            # headline X in their name (vector search can't negate).
-            retrieved_products = _apply_negation_filter(retrieved_products, effective_message)
+            # Negation guard for OTHER "ohne X" / "without X" features (vector
+            # search can't negate). Gravur is handled authoritatively above by the
+            # curated category tag, so skip the name heuristic there — a tagged
+            # "ohne Gravur" box may still say "Gravur optional" in its name.
+            if not gravur_filter:
+                retrieved_products = _apply_negation_filter(retrieved_products, effective_message)
 
             # Ensure the currently-viewed product is in the candidate set, so the
             # model can answer about it (grounded by rule 12) and cite it.

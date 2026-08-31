@@ -180,6 +180,46 @@ async def bestseller_status(_: None = Depends(require_admin)):
     return get_capture_status()
 
 
+def _run_gravur_capture():
+    """Capture the shop's 'ohne Gravur' category membership in a background thread."""
+    from app.services.gravur import GravurService
+    db = SessionLocal()
+    try:
+        GravurService(db).capture()
+    except Exception as e:
+        logger.error(f"Background gravur capture failed: {e}")
+    finally:
+        db.close()
+
+
+@router.post("/import/gravur", response_model=Dict[str, Any])
+@limiter.limit("6/hour")
+async def capture_gravur(
+    request: Request,               # required by the rate limiter (per-IP key)
+    _: None = Depends(require_admin),
+):
+    """Capture the shop's curated 'Briefkasten ohne Gravur' membership (background).
+
+    Crawls /briefkasten-ohne-gravur, resolves each listed product to a catalog
+    product_id (bridging the URL-alias gap via the product page's data-product-id),
+    and patches a `gravur` tag onto the Qdrant payload WITHOUT re-embedding.
+    Retrieval then answers "ohne Gravur" from this set instead of guessing from
+    product names. Returns immediately; poll GET /index/gravur/status.
+    """
+    from app.services.gravur import get_capture_status
+    if get_capture_status()["status"] == "running":
+        return {"success": False, "message": "Gravur capture already in progress"}
+    thread = threading.Thread(target=_run_gravur_capture, daemon=True)
+    thread.start()
+    return {"success": True, "message": "Gravur capture started", "status": "running"}
+
+
+@router.get("/gravur/status", response_model=Dict[str, Any])
+async def gravur_status(_: None = Depends(require_admin)):
+    from app.services.gravur import get_capture_status
+    return get_capture_status()
+
+
 @router.post("/dedupe", response_model=Dict[str, Any])
 async def dedupe_products(
     db: Session = Depends(get_db),

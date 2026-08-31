@@ -65,6 +65,22 @@ def _bestseller_job():
         db.close()
 
 
+def _gravur_job():
+    """Refresh the 'ohne Gravur' category membership (curated on the shop)."""
+    from app.services.gravur import GravurService
+    if SYNC_STATE.get("status") == "running":
+        logger.info("Scheduler: catalog sync running, skipping gravur capture this tick")
+        return
+    db = SessionLocal()
+    try:
+        logger.info("Scheduler: starting gravur capture")
+        GravurService(db).capture()
+    except Exception as e:
+        logger.error(f"Scheduler gravur job failed: {e}")
+    finally:
+        db.close()
+
+
 def start_scheduler():
     global _scheduler
     if _scheduler is not None:
@@ -88,6 +104,14 @@ def start_scheduler():
             run_date=datetime.now() + timedelta(seconds=30),
             id="catalog_sync_startup",
         )
+        # Catch-up gravur refresh after the startup sync (the backend rarely
+        # stays up for the daily cron in this stop/start usage pattern).
+        _scheduler.add_job(
+            _gravur_job,
+            "date",
+            run_date=datetime.now() + timedelta(seconds=120),
+            id="gravur_capture_startup",
+        )
 
     # Daily bestseller-rank refresh, a bit after the shop's ~01:00 recompute.
     if settings.BESTSELLER_CAPTURE_ENABLED:
@@ -97,6 +121,16 @@ def start_scheduler():
             "cron",
             hour=hour,
             id="bestseller_capture",
+            max_instances=1,
+            coalesce=True,
+        )
+        # Daily gravur membership refresh, alongside the bestseller capture.
+        _scheduler.add_job(
+            _gravur_job,
+            "cron",
+            hour=hour,
+            minute=20,
+            id="gravur_capture",
             max_instances=1,
             coalesce=True,
         )
