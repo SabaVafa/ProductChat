@@ -186,18 +186,21 @@ class SuggestionsService:
         out: List[str] = []
         # German templates; categories are German nouns — keep their casing
         # (lower-casing "Türklingeln" would be wrong German).
+        # Natural, complete German questions (categories are plural/mass nouns,
+        # so "Zeig mir alle …" / "Habt ihr …?" stay grammatical without needing
+        # per-gender articles).
         if category:
             out.append(f"Zeig mir alle {category}")
             if facets["keywords"]:
-                out.append(f"{category} mit {facets['keywords'][0]}")
-            out.append(f"Günstigste {category}")
+                out.append(f"Habt ihr {category} mit {facets['keywords'][0]}?")
+            out.append(f"Was sind die günstigsten {category}?")
             return out
         for cat in facets["categories"][:3]:
-            out.append(f"Zeig mir {cat}")
+            out.append(f"Zeig mir alle {cat}")
         if facets["keywords"]:
             kw = facets["keywords"][0]
             cat = facets["categories"][0] if facets["categories"] else "Produkte"
-            out.append(f"{cat} mit {kw}")
+            out.append(f"Habt ihr {cat} mit {kw}?")
         return out
 
     # ---- LLM generation (cached; called after a sync) ------------------
@@ -220,7 +223,8 @@ class SuggestionsService:
 
         price_hint = ""
         if facets["prices"]:
-            price_hint = f"Prices range roughly €{int(min(facets['prices']))}-€{int(max(facets['prices']))}."
+            price_hint = (f"Preise liegen etwa zwischen {int(min(facets['prices']))} € "
+                          f"und {int(max(facets['prices']))} €.")
 
         # Feed the LLM the MAIN product families first (not the arbitrary first-8
         # DB categories, which were all doorbell/accessory categories and left
@@ -232,24 +236,35 @@ class SuggestionsService:
         cats = (main + others)[:8]
 
         system_prompt = (
-            "You generate short starter questions a shopper might click in a product "
-            "recommendation chat for a stainless-steel doorbell / mailbox / intercom store. "
-            "Return ONLY a JSON object of exactly this shape: "
-            '{"global": ["..."], "by_category": {"<Category>": ["..."]}}. '
-            f'"global" MUST have {count} questions, EACH about a DIFFERENT product '
-            "category from the list (e.g. one doorbell, one mailbox, one intercom, one "
-            "parcel box, one house number). Never make them all about the same category. "
-            f'"by_category" has one key per provided category (use the category name '
-            f"VERBATIM as the key), each with {per_category} questions specific to THAT "
-            "category. Each question under 9 words, natural, specific, no numbering."
+            "Du bist deutschsprachiger E-Commerce-Texter für einen Shop mit Türklingeln, "
+            "Briefkästen, Sprechanlagen, Paketboxen, Hausnummern und Außenleuchten aus "
+            "Edelstahl. Du schreibst Start-Fragen, die ein Kunde im Produktberater-Chat "
+            "anklickt.\n\n"
+            "Antworte NUR mit einem JSON-Objekt exakt dieser Form: "
+            '{"global": ["..."], "by_category": {"<Kategorie>": ["..."]}}.\n'
+            f'"global": genau {count} Fragen, JEDE zu einer ANDEREN Produktkategorie aus '
+            "der Liste (z. B. eine zu Türklingeln, eine zu Briefkästen, eine zu "
+            "Sprechanlagen, eine zu Paketboxen, eine zu Hausnummern). Niemals alle zur "
+            "gleichen Kategorie.\n"
+            f'"by_category": ein Schlüssel pro genannter Kategorie (Kategoriename WORTWÖRTLICH '
+            f"als Schlüssel), je {per_category} Fragen speziell zu DIESER Kategorie.\n\n"
+            "WICHTIG – Sprache und Stil:\n"
+            "- Muttersprachliches, natürliches, idiomatisches Deutsch. Jede Frage muss klingen, "
+            "wie ein echter deutscher Kunde sie stellen würde.\n"
+            "- Vollständige, flüssige Fragen — KEINE telegramm-artigen Fragmente, keine "
+            "wörtlichen Übersetzungen, keine falsche Wortstellung.\n"
+            "- Informelles Du. Korrekte Grammatik, Artikel und Groß-/Kleinschreibung.\n"
+            "- Gut: 'Habt ihr eine Sprechanlage mit integrierter Kamera?', 'Welcher Briefkasten "
+            "hat ein Zeitungsfach?', 'Gibt es Paketboxen für große Pakete?'.\n"
+            "- Schlecht (NICHT so): 'Mit Kamera integriert?', 'Für Gewerbe oder Privat?', "
+            "'Für mehrere Lieferungen?', 'Welche Größe passt?'.\n"
+            "- Höchstens ~12 Wörter, aber lieber natürlich und vollständig als knapp und holprig. "
+            "Keine Nummerierung."
         )
         user_prompt = (
-            f"Categories: {', '.join(cats)}. "
-            f"Common features: {', '.join(facets['keywords']) or 'n/a'}. {price_hint} "
-            # German shop, German customers — the earlier English instruction
-            # made every starter chip English (design-audit finding).
-            "Write all questions in German (de-DE), natural informal du-Form. "
-            "Prices in the format 1.234,56 €."
+            f"Kategorien: {', '.join(cats)}. "
+            f"Häufige Merkmale: {', '.join(facets['keywords']) or 'n/a'}. {price_hint} "
+            "Schreibe alle Fragen auf Deutsch (de-DE). Preise im Format 1.234,56 €."
         )
 
         try:
