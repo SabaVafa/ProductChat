@@ -18,10 +18,28 @@ from datetime import datetime, timezone
 from typing import List, Dict, Any, Optional
 import logging
 import json
+import re
 
 logger = logging.getLogger(__name__)
 
 SUGGESTIONS_CATEGORY = "suggestions"
+
+# German colour/material words that must be capitalized when they appear as a
+# standalone noun (e.g. "zu Anthrazit", "Edelstahl oder Anthrazit"). The LLM
+# often lower-cases them. Word boundaries mean an inflected ADJECTIVE ("weiße
+# Klingel", "anthrazitgrau") is left untouched — only the bare noun form is hit.
+_COLOR_MATERIAL_NOUNS = [
+    "anthrazit", "edelstahl", "eisenglimmer", "aluminium", "messing", "kupfer",
+    "weiß", "schwarz", "grau", "braun", "silber", "gold", "warmweiß", "kaltweiß",
+]
+_COLOR_RE = re.compile(r"\b(" + "|".join(_COLOR_MATERIAL_NOUNS) + r")\b", re.IGNORECASE)
+
+
+def _normalize_de(text: str) -> str:
+    """Capitalize standalone colour/material nouns the LLM lower-cased."""
+    if not text:
+        return text
+    return _COLOR_RE.sub(lambda m: m.group(1)[0].upper() + m.group(1)[1:], text)
 
 # Attribute keywords to look for when building template questions.
 TEMPLATE_KEYWORDS = ["LED", "Gravur", "Funkklingel", "Anthrazit", "Fingerprint", "Edelstahl"]
@@ -40,7 +58,9 @@ MAIN_CATEGORIES = [
 # default chips can be kept to one-per-family (structural diversity) even if the
 # LLM skews its global list toward one category.
 FAMILY_KEYWORDS = {
-    "Türklingeln": ["türklingel", "klingel", "funkklingel", "gong", "klingeltaster", "fingerprint"],
+    # NB: no "fingerprint" — it spans doorbells/intercoms/security, so it would
+    # misclassify a Sprechanlage/Sicherheit question as a doorbell.
+    "Türklingeln": ["türklingel", "klingel", "funkklingel", "gong", "klingeltaster"],
     "Briefkästen": ["briefkast", "briefkästen", "postkasten"],
     "Sprechanlagen": ["sprechanlage", "gegensprech", "intercom", "innenstation"],
     "Paketboxen": ["paketbox", "paket", "päckchen", "lieferung"],
@@ -72,7 +92,7 @@ class SuggestionsService:
 
         merged: List[str] = []
         for q in candidates:
-            q = (q or "").strip()
+            q = _normalize_de((q or "").strip())
             if q and q not in merged:
                 merged.append(q)
         return merged[:limit]
@@ -246,10 +266,11 @@ class SuggestionsService:
                 model=model,
             )
             data = json.loads(content)
-            global_qs = [q.strip() for q in data.get("global", []) if isinstance(q, str) and q.strip()]
+            global_qs = [_normalize_de(q.strip()) for q in data.get("global", [])
+                         if isinstance(q, str) and q.strip()]
             by_cat_raw = data.get("by_category", {}) or {}
             by_cat = {
-                str(k): [q.strip() for q in v if isinstance(q, str) and q.strip()]
+                str(k): [_normalize_de(q.strip()) for q in v if isinstance(q, str) and q.strip()]
                 for k, v in by_cat_raw.items() if isinstance(v, list)
             }
 

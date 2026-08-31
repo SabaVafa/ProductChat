@@ -69,3 +69,28 @@ def test_family_classifier_maps_known_terms():
     assert svc._family_of("Zeig mir alle Briefkästen") == "Briefkästen"
     assert svc._family_of("Sprechanlage mit Video?") == "Sprechanlagen"
     assert svc._family_of("Etwas ganz anderes") is None
+
+
+from app.services.suggestions import _normalize_de
+
+
+def test_normalize_capitalizes_standalone_colour_nouns():
+    assert _normalize_de("Welche Außenleuchte passt zu anthrazit?") == \
+        "Welche Außenleuchte passt zu Anthrazit?"
+    assert _normalize_de("Edelstahl oder anthrazit?") == "Edelstahl oder Anthrazit?"
+    assert _normalize_de("Briefkasten in weiß") == "Briefkasten in Weiß"
+    assert _normalize_de("Warmweiß oder kaltweiß?") == "Warmweiß oder Kaltweiß?"
+
+
+def test_normalize_leaves_inflected_adjectives_and_compounds_alone():
+    # Inflected colour adjectives and colour-compounds are NOT nouns -> untouched.
+    assert _normalize_de("eine weiße Klingel") == "eine weiße Klingel"
+    assert _normalize_de("die schwarze Türklingel") == "die schwarze Türklingel"
+    assert _normalize_de("Briefkasten in anthrazitgrau") == "Briefkasten in anthrazitgrau"
+
+
+def test_default_chips_are_normalized(monkeypatch):
+    svc = _svc(["Welche Leuchte passt zu anthrazit?", "Briefkasten in weiß?"])
+    chips = svc.get_suggestions(limit=6)
+    assert any("Anthrazit" in c for c in chips)
+    assert not any("anthrazit?" in c for c in chips)   # no lower-case colour noun left
