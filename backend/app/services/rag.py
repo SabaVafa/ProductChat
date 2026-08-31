@@ -264,20 +264,23 @@ class RAGService:
                 if h.get("role") == "user" and (h.get("content") or "").strip()
             ]
 
-            # Text to understand: a typed question stands alone (precise, stateless);
-            # a refinement chip carries recent context so "With LED" is parsed
-            # against the current subject.
-            if is_refinement and prior_user:
-                understand_text = " ".join(prior_user[-2:] + [effective_message]).strip()
-            else:
-                understand_text = effective_message
+            # Text to understand is always the CURRENT message; recent prior
+            # user turns go in as context so a follow-up that only modifies an
+            # earlier request ("without gravur", "cheaper", "the second one")
+            # inherits its product type — whether it was typed or a refine chip.
+            # A message that names a new product type still switches topic.
+            understand_text = effective_message
+            understand_context = prior_user
 
             # LLM query understanding -> structured query (primary categories,
             # clean search phrase, price bounds). This replaces the old keyword
             # heuristics; the categories/price are applied as Qdrant filters.
             mistral_settings = settings_dict.get("mistral", {})
             uq_service = MistralService(api_key=mistral_settings.get("api_key"))
-            parsed = understand_query(uq_service, _catalog_categories(self.db), understand_text)
+            parsed = understand_query(
+                uq_service, _catalog_categories(self.db), understand_text,
+                context=understand_context,
+            )
 
             add_step(
                 "1b_query_understanding",

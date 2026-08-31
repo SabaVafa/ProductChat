@@ -22,8 +22,16 @@ def understand_query(
     mistral: MistralService,
     categories: List[str],
     text: str,
+    context: Optional[List[str]] = None,
 ) -> Dict[str, Any]:
-    """Return {categories, search_text, price_min, price_max}."""
+    """Return {categories, search_text, price_min, price_max}.
+
+    `context` is the recent prior USER turns (oldest first), used to resolve a
+    follow-up that only modifies an earlier request — e.g. after "I need a
+    mailbox" the shopper types "without gravur" or "cheaper". Such a fragment
+    has no product type of its own, so the product type is inherited from the
+    conversation; a message that names a new product type switches to it.
+    """
     fallback = {"categories": [], "search_text": text, "price_min": None, "price_max": None}
     if not text or not text.strip():
         return fallback
@@ -51,12 +59,32 @@ def understand_query(
         "- 'mailbox' / 'Briefkasten' -> Briefkasten categories (NOT 'Paketboxen').\n"
         "- 'doorbell' -> Türklingeln / Funkklingeln (NOT 'Klingeltaster & Lichtschalter', which are "
         "spare buttons).\n"
-        "- 'intercom' -> Sprechanlagen categories; 'camera' -> 'IP Kameras' / 'Sicherheitstechnik'.\n\n"
-        f"AVAILABLE CATEGORIES: [{cat_list}]"
+        "- 'intercom' -> Sprechanlagen categories; 'camera' -> 'IP Kameras' / 'Sicherheitstechnik'.\n"
     )
+    prior = [c.strip() for c in (context or []) if c and c.strip()]
+    if prior:
+        system += (
+            "\nFOLLOW-UP HANDLING: The CURRENT MESSAGE may refine the recent conversation. "
+            "If it only adds or removes a feature, colour, material, or price — or says "
+            "'without/ohne X', 'cheaper', 'the second one' — with NO product type of its own, "
+            "KEEP the product type from the recent conversation and fold the modifier into "
+            "search_text (e.g. after 'mailbox', 'without gravur' -> categories stay the mailbox "
+            "category, search_text 'Briefkasten ohne Gravur'). If the CURRENT MESSAGE names a "
+            "NEW product type, switch to it and ignore the earlier topic.\n"
+        )
+    system += f"\nAVAILABLE CATEGORIES: [{cat_list}]"
+
+    if prior:
+        user_content = (
+            "RECENT CONVERSATION (oldest to newest):\n"
+            + "\n".join(f"- {c}" for c in prior[-3:])
+            + f"\n\nCURRENT MESSAGE: {text}"
+        )
+    else:
+        user_content = text
     try:
         content = mistral.chat_content(
-            messages=[ChatMessage("system", system), ChatMessage("user", text)],
+            messages=[ChatMessage("system", system), ChatMessage("user", user_content)],
             temperature=0,
             max_tokens=300,
             response_format={"type": "json_object"},

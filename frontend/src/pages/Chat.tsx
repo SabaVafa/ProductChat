@@ -31,9 +31,10 @@ export default function Chat() {
     // an error wiped the old answer too (audit finding L4).
 
     try {
-      // A refine chip must carry the conversation context, mirroring the
-      // storefront widget — otherwise "Mit LED" arrives as a cold query.
-      const history = isRefinement && response
+      // Carry the previous exchange as context for BOTH refine chips and typed
+      // follow-ups, mirroring the storefront widget — otherwise a modifier like
+      // "ohne Gravur" or "Mit LED" arrives as a cold query with no subject.
+      const history = response
         ? [
             { role: 'user', content: lastQuery },
             { role: 'assistant', content: response.answer },
