@@ -26,6 +26,30 @@ SUGGESTIONS_CATEGORY = "suggestions"
 # Attribute keywords to look for when building template questions.
 TEMPLATE_KEYWORDS = ["LED", "Gravur", "Funkklingel", "Anthrazit", "Fingerprint", "Edelstahl"]
 
+# The shop's main PRODUCT families, in the order we want starter chips to appear.
+# Used to (a) feed the LLM a representative set of categories — not the arbitrary
+# first-8 — and (b) build the default chips one-per-family so they span the
+# catalog instead of collapsing onto a single category (e.g. all Türklingeln).
+# Only those actually present in the catalog are used.
+MAIN_CATEGORIES = [
+    "Türklingeln", "Briefkästen", "Sprechanlagen", "Paketboxen",
+    "Hausnummern", "Außenleuchten", "Mülltonnenboxen", "Sicherheitstechnik",
+]
+
+# Keywords that map a free-text starter question to a main family, so the
+# default chips can be kept to one-per-family (structural diversity) even if the
+# LLM skews its global list toward one category.
+FAMILY_KEYWORDS = {
+    "Türklingeln": ["türklingel", "klingel", "funkklingel", "gong", "klingeltaster", "fingerprint"],
+    "Briefkästen": ["briefkast", "briefkästen", "postkasten"],
+    "Sprechanlagen": ["sprechanlage", "gegensprech", "intercom", "innenstation"],
+    "Paketboxen": ["paketbox", "paket", "päckchen", "lieferung"],
+    "Hausnummern": ["hausnummer"],
+    "Außenleuchten": ["außenleuchte", "leuchte", "lampe", "beleucht", "strahler"],
+    "Sicherheitstechnik": ["kamera", "alarm", "sensor", "sicherheit"],
+    "Mülltonnenboxen": ["mülltonne", "müll"],
+}
+
 
 class SuggestionsService:
     def __init__(self, db: Session):
@@ -42,16 +66,57 @@ class SuggestionsService:
         if category:
             llm = self._get_cached_by_category().get(category, [])
             templates = self.build_template_suggestions(category)
+            candidates = llm + templates
         else:
-            llm = self._get_cached_llm_questions()
-            templates = self.build_template_suggestions()
+            candidates = self._diverse_default_suggestions(limit)
 
         merged: List[str] = []
-        for q in llm + templates:
+        for q in candidates:
             q = (q or "").strip()
             if q and q not in merged:
                 merged.append(q)
         return merged[:limit]
+
+    @staticmethod
+    def _family_of(question: str) -> Optional[str]:
+        q = (question or "").lower()
+        for family, kws in FAMILY_KEYWORDS.items():
+            if any(kw in q for kw in kws):
+                return family
+        return None
+
+    def _diverse_default_suggestions(self, limit: int) -> List[str]:
+        """Default chips that always span categories.
+
+        Take the (self-contained, natural) global LLM questions but keep at most
+        ONE per product family, so the set can never collapse onto a single
+        category. Any main family still unrepresented is filled with a template
+        question, so the chips stay diverse even if the LLM skewed its output.
+        """
+        present = {
+            row[0] for row in
+            self.db.query(Product.category).distinct().filter(Product.category.isnot(None)).all()
+        }
+        chosen: List[str] = []
+        overflow: List[str] = []          # extra same-family questions, used last
+        seen_families = set()
+        for q in self._get_cached_llm_questions():
+            fam = self._family_of(q)
+            if fam and fam not in seen_families:
+                seen_families.add(fam)
+                chosen.append(q)
+            else:
+                overflow.append(q)
+        # Backfill missing families with a self-contained template question.
+        for cat in MAIN_CATEGORIES:
+            if len(chosen) >= limit:
+                break
+            if cat in present and cat not in seen_families:
+                templ = self.build_template_suggestions(cat)
+                if templ:
+                    seen_families.add(cat)
+                    chosen.append(templ[0])
+        return chosen + overflow + self.build_template_suggestions()
 
     @staticmethod
     def _as_list(raw: Any) -> List[str]:
@@ -137,18 +202,26 @@ class SuggestionsService:
         if facets["prices"]:
             price_hint = f"Prices range roughly €{int(min(facets['prices']))}-€{int(max(facets['prices']))}."
 
-        # Cap categories in the prompt to keep it small.
-        cats = facets["categories"][:8]
+        # Feed the LLM the MAIN product families first (not the arbitrary first-8
+        # DB categories, which were all doorbell/accessory categories and left
+        # the chips doorbell-only), then any others up to the cap.
+        present = facets["categories"]
+        present_set = set(present)
+        main = [c for c in MAIN_CATEGORIES if c in present_set]
+        others = [c for c in present if c not in main]
+        cats = (main + others)[:8]
 
         system_prompt = (
             "You generate short starter questions a shopper might click in a product "
             "recommendation chat for a stainless-steel doorbell / mailbox / intercom store. "
             "Return ONLY a JSON object of exactly this shape: "
             '{"global": ["..."], "by_category": {"<Category>": ["..."]}}. '
-            f'"global" has {count} questions covering different categories. '
-            f'"by_category" has one key per provided category, each with {per_category} '
-            "questions specific to THAT category. Each question under 9 words, natural, "
-            "specific, no numbering."
+            f'"global" MUST have {count} questions, EACH about a DIFFERENT product '
+            "category from the list (e.g. one doorbell, one mailbox, one intercom, one "
+            "parcel box, one house number). Never make them all about the same category. "
+            f'"by_category" has one key per provided category (use the category name '
+            f"VERBATIM as the key), each with {per_category} questions specific to THAT "
+            "category. Each question under 9 words, natural, specific, no numbering."
         )
         user_prompt = (
             f"Categories: {', '.join(cats)}. "
