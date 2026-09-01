@@ -80,6 +80,45 @@ async def get_indexing_status(db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@router.get("/health", response_model=Dict[str, Any])
+async def index_health(db: Session = Depends(get_db), _: None = Depends(require_admin)):
+    """DB↔Qdrant consistency: counts + how many products are missing from Qdrant.
+
+    Read-only and free (no Mistral calls). `ok: false` with missing_count > 0
+    means a silent index gap — run POST /index/reconcile to self-heal.
+    """
+    return IndexingService(db).health()
+
+
+def _run_reconcile():
+    from app.services.indexing import IndexingService
+    db = SessionLocal()
+    try:
+        IndexingService(db).reconcile(trigger_repair=True)
+    except Exception as e:
+        logger.error(f"Background reconcile failed: {e}")
+    finally:
+        db.close()
+
+
+@router.post("/reconcile", response_model=Dict[str, Any])
+@limiter.limit("6/hour")
+async def reconcile_index(
+    request: Request,               # required by the rate limiter (per-IP key)
+    _: None = Depends(require_admin),
+):
+    """Detect DB↔Qdrant gaps, re-flag missing products, and repair (background).
+
+    Turns silent index-loss into a visible, self-closing gap: missing products
+    are re-flagged indexed=0 and an incremental re-index is kicked off. Returns
+    immediately; watch GET /index/health and the "reconcile" entry in /ops.
+    """
+    if IndexingService(SessionLocal()).get_status()["status"] == "running":
+        return {"success": False, "message": "Indexing already in progress; try again shortly"}
+    threading.Thread(target=_run_reconcile, daemon=True).start()
+    return {"success": True, "message": "Reconciliation started", "status": "running"}
+
+
 @router.post("/import", response_model=Dict[str, Any])
 async def import_products(
     request: ImportRequest,

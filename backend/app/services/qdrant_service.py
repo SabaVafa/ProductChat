@@ -198,3 +198,34 @@ class QdrantService:
         except Exception as e:
             logger.error(f"Error counting points: {e}")
             return 0
+
+    def all_indexed_product_ids(self) -> Optional[set]:
+        """Every product_id actually stored in the collection (from payloads).
+
+        Used by the reconciliation safeguard to diff against the DB and detect
+        products that are flagged indexed but silently missing from Qdrant.
+        Returns None on error so callers can tell "no gap" apart from "couldn't
+        read Qdrant" and avoid re-flagging the whole catalog on a transient fault.
+        """
+        ids: set = set()
+        try:
+            with _client_lock:
+                offset = None
+                while True:
+                    points, offset = self.client.scroll(
+                        collection_name=self.collection_name,
+                        limit=1000,
+                        offset=offset,
+                        with_payload=["product_id"],
+                        with_vectors=False,
+                    )
+                    for p in points:
+                        pid = (p.payload or {}).get("product_id")
+                        if pid is not None:
+                            ids.add(str(pid))
+                    if offset is None:
+                        break
+            return ids
+        except Exception as e:
+            logger.error(f"Error scrolling points for reconciliation: {e}")
+            return None

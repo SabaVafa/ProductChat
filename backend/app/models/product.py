@@ -31,6 +31,10 @@ class Product(Base):
     source = Column(String(50), nullable=True)  # e.g. "scraper", "manual"
     lastmod = Column(String(64), nullable=True)
     content_hash = Column(String(64), nullable=True)
-    indexed = Column(Integer, default=0)  # 0 = not indexed, 1 = indexed
+    # 0 = needs indexing, 1 = indexed (vector in Qdrant), -1 = gave up after
+    # MAX_INDEX_ATTEMPTS failed embeds (kept out of the retry pool so a
+    # persistently-failing product can't burn the rate-limited quota forever).
+    indexed = Column(Integer, default=0)
+    index_attempts = Column(Integer, default=0)  # consecutive failed embed attempts
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())

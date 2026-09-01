@@ -21,6 +21,11 @@ def product_id_to_point_id(product_id: str) -> str:
 
 logger = logging.getLogger(__name__)
 
+# After this many consecutive failed embed attempts a product is parked
+# (indexed = -1) so it stops consuming the rate-limited free-tier quota every
+# run. Reconciliation reports parked products so a genuine problem is visible.
+MAX_INDEX_ATTEMPTS = 5
+
 
 class IndexingService:
     def __init__(self, db: Session):
@@ -56,6 +61,84 @@ class IndexingService:
             "completed_at": status.completed_at.isoformat() if status.completed_at else None
         }
     
+    def health(self) -> Dict[str, Any]:
+        """Compare the DB against Qdrant to surface silent index gaps.
+
+        `missing` = products in the DB but absent from Qdrant (the silent-loss
+        that makes a whole category return nothing). `orphans` = points in
+        Qdrant with no matching product (e.g. a deleted product). Read-only and
+        free — no Mistral calls — so it's safe to poll.
+        """
+        products = self.db.query(Product).all()
+        db_ids = {p.product_id for p in products}
+        parked = {p.product_id for p in products if p.indexed == -1}
+        qdrant_ids = self.qdrant.all_indexed_product_ids()
+        if qdrant_ids is None:
+            return {"ok": False, "error": "could not read Qdrant", "db_count": len(db_ids)}
+        missing = db_ids - qdrant_ids
+        return {
+            "ok": len(missing) == 0,
+            "db_count": len(db_ids),
+            "qdrant_count": len(qdrant_ids),
+            "missing_count": len(missing),
+            "missing_sample": sorted(missing)[:20],
+            "parked_count": len(parked),          # given up after repeated failures
+            "orphan_count": len(qdrant_ids - db_ids),
+        }
+
+    def reconcile(self, trigger_repair: bool = True) -> Dict[str, Any]:
+        """Detect DB↔Qdrant gaps and queue the missing products for re-indexing.
+
+        A product flagged indexed but absent from Qdrant is re-flagged indexed=0
+        so the next incremental run re-embeds it — turning a silent, permanent
+        hole into a visible, self-closing one. Products already parked at -1
+        (persistently failing) are reported but NOT resurrected, so reconcile
+        can't loop on a broken product. On free-tier Mistral the repair is
+        eventually-consistent: each run re-embeds what the rate limit allows.
+        """
+        h = self.health()
+        if not h.get("ok") and "error" in h:
+            logger.warning("Reconcile skipped: %s", h["error"])
+            return {"success": False, **h}
+
+        products = self.db.query(Product).all()
+        qdrant_ids = self.qdrant.all_indexed_product_ids()
+        if qdrant_ids is None:
+            return {"success": False, "error": "could not read Qdrant"}
+
+        reflagged, parked = 0, 0
+        for p in products:
+            if p.product_id in qdrant_ids:
+                continue
+            if p.indexed == -1:          # given up — don't resurrect, just report
+                parked += 1
+                continue
+            p.indexed = 0                # missing from Qdrant -> make it retryable
+            reflagged += 1
+        self.db.commit()
+
+        result = {
+            "success": True,
+            "db_count": h["db_count"],
+            "qdrant_count": h["qdrant_count"],
+            "missing_count": h["missing_count"],
+            "reflagged_for_reindex": reflagged,
+            "parked_persistent_failures": parked,
+            "orphan_count": h["orphan_count"],
+        }
+        if reflagged:
+            logger.warning("Reconcile: %d products missing from Qdrant re-flagged "
+                           "for re-index (%d parked)", reflagged, parked)
+        else:
+            logger.info("Reconcile: DB and Qdrant consistent (%d products, %d parked)",
+                        h["db_count"], parked)
+        from app.services.ops import record_operation
+        record_operation(self.db, "reconcile", "completed", result)
+
+        if trigger_repair and reflagged:
+            self.start_indexing(incremental=True)
+        return result
+
     def start_indexing(self, incremental: bool = False) -> Dict[str, Any]:
         """Start the indexing process."""
         # Check if already running
@@ -68,6 +151,8 @@ class IndexingService:
         
         # Get products to index
         if incremental:
+            # Skip products parked after too many failures (indexed == -1), so a
+            # persistently-broken product doesn't drain the quota every run.
             products = self.db.query(Product).filter(Product.indexed == 0).all()
         else:
             # For full reindex, delete collection first
@@ -100,12 +185,19 @@ class IndexingService:
                 status.processed = min(i + batch_size, total)
                 self.db.commit()
 
-            # Mark ONLY the products whose vectors actually landed in Qdrant.
-            # Marking everything would leave silently-failed products flagged
-            # as indexed while being invisible to search.
+            # Mark ONLY the products whose vectors actually landed in Qdrant as
+            # indexed. A product whose embed failed is set back to 0 (retryable)
+            # — NOT left at its old flag, which is how "indexed but missing from
+            # Qdrant" gaps were created. After MAX_INDEX_ATTEMPTS it is parked at
+            # -1 so it stops consuming quota; reconciliation still surfaces it.
             for product in products:
                 if product.product_id in succeeded_ids:
                     product.indexed = 1
+                    product.index_attempts = 0
+                else:
+                    attempts = (product.index_attempts or 0) + 1
+                    product.index_attempts = attempts
+                    product.indexed = -1 if attempts >= MAX_INDEX_ATTEMPTS else 0
 
             failed = total - len(succeeded_ids)
             status.status = "completed"

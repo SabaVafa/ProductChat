@@ -79,7 +79,8 @@ def _ensure_columns():
     'ADD COLUMN IF NOT EXISTS', so we introspect the live columns and ALTER
     only the missing ones. Idempotent and safe to run on every startup.
     """
-    wanted = {"bestseller_rank": "INTEGER", "gravur_tags": "VARCHAR(32)"}
+    wanted = {"bestseller_rank": "INTEGER", "gravur_tags": "VARCHAR(32)",
+              "index_attempts": "INTEGER"}
     try:
         with engine.begin() as conn:
             existing = {c["name"] for c in inspect(conn).get_columns("products")}

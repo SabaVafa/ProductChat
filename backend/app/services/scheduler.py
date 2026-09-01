@@ -65,6 +65,22 @@ def _bestseller_job():
         db.close()
 
 
+def _reconcile_job():
+    """Detect silent DB↔Qdrant index gaps and self-heal (re-flag + re-index)."""
+    from app.services.indexing import IndexingService
+    if SYNC_STATE.get("status") == "running":
+        logger.info("Scheduler: catalog sync running, skipping reconcile this tick")
+        return
+    db = SessionLocal()
+    try:
+        logger.info("Scheduler: starting index reconciliation")
+        IndexingService(db).reconcile(trigger_repair=True)
+    except Exception as e:
+        logger.error(f"Scheduler reconcile job failed: {e}")
+    finally:
+        db.close()
+
+
 def _gravur_job():
     """Refresh the 'ohne Gravur' category membership (curated on the shop)."""
     from app.services.gravur import GravurService
@@ -112,6 +128,15 @@ def start_scheduler():
             run_date=datetime.now() + timedelta(seconds=120),
             id="gravur_capture_startup",
         )
+        # Reconcile after the startup sync+index settle, so any silent index
+        # gap is caught and repaired on every boot (free check; heals gradually
+        # on the rate-limited free tier).
+        _scheduler.add_job(
+            _reconcile_job,
+            "date",
+            run_date=datetime.now() + timedelta(seconds=240),
+            id="reconcile_startup",
+        )
 
     # Daily bestseller-rank refresh, a bit after the shop's ~01:00 recompute.
     if settings.BESTSELLER_CAPTURE_ENABLED:
@@ -131,6 +156,16 @@ def start_scheduler():
             hour=hour,
             minute=20,
             id="gravur_capture",
+            max_instances=1,
+            coalesce=True,
+        )
+        # Daily index reconciliation (self-heal any silent DB↔Qdrant gap).
+        _scheduler.add_job(
+            _reconcile_job,
+            "cron",
+            hour=hour,
+            minute=40,
+            id="index_reconcile",
             max_instances=1,
             coalesce=True,
         )
