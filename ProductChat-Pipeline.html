@@ -1,0 +1,424 @@
+<title>ProductChat RAG Pipeline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+
+<style>
+  :root {
+    --bg: #f5f6f9;
+    --surface: #ffffff;
+    --surface-2: #eef1f6;
+    --ink: #191d28;
+    --muted: #5a6376;
+    --faint: #8a93a6;
+    --border: #e2e6ee;
+    --border-strong: #cfd6e2;
+
+    /* WHERE work happens — semantic, not decorative */
+    --app: #4b52c4;        /* local app logic — free */
+    --app-soft: #ecedf9;
+    --mistral: #a9630f;    /* paid external API call */
+    --mistral-soft: #f8efe2;
+    --qdrant: #0c857a;     /* local vector DB — free */
+    --qdrant-soft: #e2f2ef;
+
+    --shadow: 0 1px 2px rgba(25,29,40,.04), 0 6px 20px rgba(25,29,40,.06);
+    --radius: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0e1118;
+      --surface: #161b24;
+      --surface-2: #1d2430;
+      --ink: #e8ebf3;
+      --muted: #9aa4b7;
+      --faint: #6c7688;
+      --border: #262d3a;
+      --border-strong: #333c4b;
+      --app: #8f96f2;
+      --app-soft: #1e2340;
+      --mistral: #e2a55c;
+      --mistral-soft: #35281a;
+      --qdrant: #2cccbb;
+      --qdrant-soft: #10322e;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0e1118;
+    --surface: #161b24;
+    --surface-2: #1d2430;
+    --ink: #e8ebf3;
+    --muted: #9aa4b7;
+    --faint: #6c7688;
+    --border: #262d3a;
+    --border-strong: #333c4b;
+    --app: #8f96f2;
+    --app-soft: #1e2340;
+    --mistral: #e2a55c;
+    --mistral-soft: #35281a;
+    --qdrant: #2cccbb;
+    --qdrant-soft: #10322e;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Hanken Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 940px; margin: 0 auto; padding: clamp(1.5rem, 4vw, 4rem) clamp(1rem, 4vw, 2rem) 5rem; }
+
+  /* ---- header ---- */
+  .eyebrow {
+    font-family: "JetBrains Mono", monospace;
+    font-size: .72rem; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--app); font-weight: 500; margin: 0 0 .9rem;
+  }
+  h1 {
+    font-family: "Archivo", sans-serif; font-weight: 800;
+    font-size: clamp(2rem, 6vw, 3.1rem); line-height: 1.02; letter-spacing: -.02em;
+    margin: 0 0 .7rem; text-wrap: balance;
+  }
+  .lede { font-size: clamp(1rem, 2.4vw, 1.15rem); color: var(--muted); max-width: 62ch; margin: 0; }
+  .lede b { color: var(--ink); font-weight: 600; }
+
+  /* ---- legend ---- */
+  .legend {
+    display: flex; flex-wrap: wrap; gap: .55rem .5rem;
+    margin: 1.8rem 0 .3rem; padding: 0; list-style: none;
+  }
+  .legend li {
+    display: inline-flex; align-items: center; gap: .5rem;
+    font-size: .82rem; color: var(--muted);
+    background: var(--surface); border: 1px solid var(--border);
+    padding: .4rem .7rem; border-radius: 999px;
+  }
+  .legend .swatch { width: .7rem; height: .7rem; border-radius: 3px; flex: none; }
+  .legend b { color: var(--ink); font-weight: 600; }
+  .swatch.app { background: var(--app); }
+  .swatch.mistral { background: var(--mistral); }
+  .swatch.qdrant { background: var(--qdrant); }
+
+  /* ---- phase ---- */
+  .phase { margin-top: 2.6rem; }
+  .phase-head { display: flex; align-items: baseline; gap: .75rem; flex-wrap: wrap; margin-bottom: .3rem; }
+  .phase-head h2 {
+    font-family: "Archivo", sans-serif; font-weight: 700;
+    font-size: clamp(1.3rem, 3.4vw, 1.7rem); letter-spacing: -.01em; margin: 0;
+  }
+  .phase-tag {
+    font-family: "JetBrains Mono", monospace; font-size: .72rem;
+    letter-spacing: .04em; color: var(--faint);
+    border: 1px solid var(--border); border-radius: 999px; padding: .16rem .6rem;
+  }
+  .phase-sub { color: var(--muted); font-size: .95rem; margin: .1rem 0 1.4rem; max-width: 60ch; }
+
+  /* ---- flow spine ---- */
+  .flow { list-style: none; margin: 0; padding: 0; position: relative; }
+  .flow::before {
+    content: ""; position: absolute; left: 15px; top: 8px; bottom: 8px;
+    width: 2px; background: linear-gradient(var(--border-strong), var(--border));
+  }
+  .node { position: relative; padding: 0 0 .85rem 3rem; }
+  .node:last-child { padding-bottom: 0; }
+  .node .dot {
+    position: absolute; left: 6px; top: 4px; width: 20px; height: 20px; border-radius: 50%;
+    background: var(--surface); border: 2px solid var(--where, var(--app));
+    display: grid; place-items: center; z-index: 1;
+  }
+  .node .dot::after {
+    content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--where, var(--app));
+  }
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow);
+    padding: .85rem 1rem .9rem;
+    border-left: 3px solid var(--where, var(--app));
+  }
+  .card .meta { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; margin-bottom: .3rem; }
+  .num {
+    font-family: "JetBrains Mono", monospace; font-size: .74rem; color: var(--faint);
+    font-weight: 500;
+  }
+  .where {
+    font-family: "JetBrains Mono", monospace; font-size: .64rem; font-weight: 500;
+    letter-spacing: .06em; text-transform: uppercase;
+    padding: .16rem .45rem; border-radius: 5px;
+    color: var(--where); background: var(--where-soft);
+  }
+  .comp {
+    font-family: "JetBrains Mono", monospace; font-size: .74rem; color: var(--muted);
+    margin-left: auto; word-break: break-word;
+  }
+  .card h3 {
+    font-family: "Archivo", sans-serif; font-weight: 600; font-size: 1.02rem;
+    margin: 0 0 .2rem; letter-spacing: -.005em;
+  }
+  .card p { margin: 0; color: var(--muted); font-size: .9rem; }
+  .card p code {
+    font-family: "JetBrains Mono", monospace; font-size: .82em;
+    background: var(--surface-2); padding: .05rem .3rem; border-radius: 4px; color: var(--ink);
+  }
+
+  [data-where="app"] { --where: var(--app); --where-soft: var(--app-soft); }
+  [data-where="mistral"] { --where: var(--mistral); --where-soft: var(--mistral-soft); }
+  [data-where="qdrant"] { --where: var(--qdrant); --where-soft: var(--qdrant-soft); }
+
+  /* ---- bridge ---- */
+  .bridge {
+    margin: 1.6rem 0 .4rem; position: relative;
+    display: flex; align-items: center; gap: .9rem;
+    background: var(--qdrant-soft); border: 1px solid var(--qdrant);
+    border-radius: var(--radius); padding: .9rem 1.1rem;
+  }
+  .bridge .ic { flex: none; color: var(--qdrant); }
+  .bridge h3 { font-family: "Archivo", sans-serif; font-size: 1rem; font-weight: 700; margin: 0 0 .15rem; }
+  .bridge p { margin: 0; color: var(--muted); font-size: .88rem; }
+  .bridge .count { font-family: "JetBrains Mono", monospace; color: var(--qdrant); font-weight: 500; }
+
+  /* ---- figure (cross-phase claim) ---- */
+  figure.diagram { margin: 2.4rem 0 0; }
+  figure.diagram svg { display: block; width: 100%; max-width: 100%; height: auto; color: var(--muted); }
+  figcaption { font-size: .82rem; color: var(--faint); margin-top: .6rem; text-align: center; }
+
+  /* ---- footer ---- */
+  .mental {
+    margin-top: 3rem; background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1.3rem 1.4rem; box-shadow: var(--shadow);
+  }
+  .mental .k {
+    font-family: "JetBrains Mono", monospace; font-size: .7rem; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--app); margin: 0 0 .5rem;
+  }
+  .mental p { margin: .2rem 0; font-size: 1.02rem; }
+  .mental .b { color: var(--faint); font-family: "Archivo"; font-weight: 700; }
+
+  @media (max-width: 560px) {
+    .comp { margin-left: 0; width: 100%; }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .node, .bridge, .phase-head { animation: rise .5s cubic-bezier(.22,.61,.36,1) both; }
+    .flow .node:nth-child(2) { animation-delay: .03s; }
+    .flow .node:nth-child(3) { animation-delay: .06s; }
+    .flow .node:nth-child(4) { animation-delay: .09s; }
+    .flow .node:nth-child(5) { animation-delay: .12s; }
+    .flow .node:nth-child(6) { animation-delay: .15s; }
+    @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  }
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">ProductChat · Retrieval-Augmented Generation</p>
+    <h1>How ProductChat answers a question</h1>
+    <p class="lede">The heavy work of turning <b>1,474 products into searchable vectors</b> happens once, ahead of time. Each live question then needs only a cheap embed, a filtered vector search, and one grounded answer — so replies are fast and can only talk about real catalog products.</p>
+
+    <ul class="legend">
+      <li><span class="swatch app"></span><b>App</b> — local logic, free</li>
+      <li><span class="swatch mistral"></span><b>Mistral</b> — paid API call</li>
+      <li><span class="swatch qdrant"></span><b>Qdrant</b> — local vector DB, free</li>
+    </ul>
+  </header>
+
+  <!-- PHASE 1 -->
+  <section class="phase">
+    <div class="phase-head">
+      <h2>Preparation</h2>
+      <span class="phase-tag">offline · periodic</span>
+    </div>
+    <p class="phase-sub">Runs on indexing / sync — not when a shopper asks. Builds and maintains the vector index everything else reads from.</p>
+
+    <ol class="flow">
+      <li class="node" data-where="app">
+        <span class="dot"></span>
+        <div class="card">
+          <div class="meta"><span class="num">01</span><span class="where">App</span><span class="comp">scraper.py → SQLite</span></div>
+          <h3>Scrape the catalog</h3>
+          <p>Read the sitemap, fetch each product page, pull structured data (name, price, image, category) into the database. Change-detection means only new or changed products get re-processed.</p>
+        </div>
+      </li>
+      <li class="node" data-where="app">
+        <span class="dot"></span>
+        <div class="card">
+          <div class="meta"><span class="num">02</span><span class="where">App</span><span class="comp">import/jtl · dedupe</span></div>
+          <h3>Enrich &amp; dedupe</h3>
+          <p>Fold in JTL variant attributes (Farbe, Montageart, Material) and merge records that share a product URL, so one SKU is one row.</p>
+        </div>
+      </li>
+      <li class="node" data-where="mistral">
+        <span class="dot"></span>
+        <div class="card">
+          <div class="meta"><span class="num">03</span><span class="where">Mistral → Qdrant</span><span class="comp">indexing.py · mistral-embed</span></div>
+          <h3>Embed &amp; store — the batch job</h3>
+          <p>Turn each product's text into a <b>1024-number vector</b> (batches of 5), and upsert it into Qdrant with a payload (name, price, category). The expensive step — hundreds of calls, minutes, rate-limit prone.</p>
+        </div>
+      </li>
+      <li class="node" data-where="qdrant">
+        <span class="dot"></span>
+        <div class="card">
+          <div class="meta"><span class="num">04</span><span class="where">Qdrant</span><span class="comp">bestsellers.py · gravur.py</span></div>
+          <h3>Attach signals — no re-embed</h3>
+          <p>Patch <code>bestseller_rank</code> and the <code>gravur</code> tag straight onto the stored points. Meaning didn't change, so no Mistral call — just cheap payload updates.</p>
+        </div>
+      </li>
+      <li class="node" data-where="mistral">
+        <span class="dot"></span>
+        <div class="card">
+          <div class="meta"><span class="num">05</span><span class="where">Mistral</span><span class="comp">suggestions.py</span></div>
+          <h3>Generate starter chips</h3>
+          <p>Pre-write the native-German starter questions — one per product family — and cache them, so no LLM call is needed per chat.</p>
+        </div>
+      </li>
+      <li class="node" data-where="app">
+        <span class="dot"></span>
+        <div class="card">
+          <div class="meta"><span class="num">06</span><span class="where">App</span><span class="comp">indexing.reconcile</span></div>
+          <h3>Reconcile</h3>
+          <p>Diff the database against Qdrant and re-flag any product that's silently missing from the index — turning silent index-loss into a visible, self-closing gap.</p>
+        </div>
+      </li>
+    </ol>
+
+    <div class="bridge">
+      <svg class="ic" width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <ellipse cx="12" cy="5.5" rx="7.5" ry="3" stroke="currentColor" stroke-width="1.6"/>
+        <path d="M4.5 5.5v13c0 1.66 3.36 3 7.5 3s7.5-1.34 7.5-3v-13" stroke="currentColor" stroke-width="1.6"/>
+        <path d="M4.5 12c0 1.66 3.36 3 7.5 3s7.5-1.34 7.5-3" stroke="currentColor" stroke-width="1.6"/>
+      </svg>
+      <div>
+        <h3>Qdrant now holds the index</h3>
+        <p><span class="count">1,474 product vectors</span> + payloads, sitting on disk — ready to be searched. Phase 2 reads from here and never rebuilds it.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PHASE 2 -->
+  <section class="phase">
+    <div class="phase-head">
+      <h2>Answering</h2>
+      <span class="phase-tag">live · per question</span>
+    </div>
+    <p class="phase-sub">Runs on every message — about three Mistral calls total: understand, embed, generate.</p>
+
+    <ol class="flow">
+      <li class="node" data-where="app">
+        <span class="dot"></span>
+        <div class="card">
+          <div class="meta"><span class="num">01</span><span class="where">App</span><span class="comp">guardrails.py · limiter.py</span></div>
+          <h3>Guardrail &amp; rate limit</h3>
+          <p>Reject prompt-injection and abuse; cap at 30 requests/min before any model is touched.</p>
+        </div>
+      </li>
+      <li class="node" data-where="mistral">
+        <span class="dot"></span>
+        <div class="card">
+          <div class="meta"><span class="num">02</span><span class="where">Mistral</span><span class="comp">query_understanding.py · small</span></div>
+          <h3>Understand the query</h3>
+          <p>Turn the message + recent context into a structured query: <code>categories</code> (family-expanded), <code>search_text</code>, price bounds, <code>gravur</code>. Where "ohne Gravur", "cheaper", and topic-switches get resolved.</p>
+        </div>
+      </li>
+      <li class="node" data-where="mistral">
+        <span class="dot"></span>
+        <div class="card">
+          <div class="meta"><span class="num">03</span><span class="where">Mistral</span><span class="comp">embeddings.py · mistral-embed</span></div>
+          <h3>Embed the search text</h3>
+          <p>Convert the cleaned search phrase into a query vector — the one small, cheap embed per question.</p>
+        </div>
+      </li>
+      <li class="node" data-where="qdrant">
+        <span class="dot"></span>
+        <div class="card">
+          <div class="meta"><span class="num">04</span><span class="where">Qdrant</span><span class="comp">qdrant_service.search</span></div>
+          <h3>Filtered vector search</h3>
+          <p>Find the product vectors nearest the query — with category, price, and gravur filters applied inside Qdrant. Reads the index built in Phase 1.</p>
+        </div>
+      </li>
+      <li class="node" data-where="app">
+        <span class="dot"></span>
+        <div class="card">
+          <div class="meta"><span class="num">05</span><span class="where">App</span><span class="comp">_apply_negation_filter · tie-break</span></div>
+          <h3>Refine the candidate set</h3>
+          <p>Drop products that headline an excluded feature ("ohne X"), then nudge genuine bestsellers up among comparably-relevant picks — never over a clearly better match.</p>
+        </div>
+      </li>
+      <li class="node" data-where="app">
+        <span class="dot"></span>
+        <div class="card">
+          <div class="meta"><span class="num">06</span><span class="where">App</span><span class="comp">mistral.py · prompt</span></div>
+          <h3>Build the grounded prompt</h3>
+          <p>Assemble system rules (German du-Form, EUR, never invent products), shop facts, and the retrieved products as the only context the model may use.</p>
+        </div>
+      </li>
+      <li class="node" data-where="mistral">
+        <span class="dot"></span>
+        <div class="card">
+          <div class="meta"><span class="num">07</span><span class="where">Mistral</span><span class="comp">generate · medium</span></div>
+          <h3>Generate the answer</h3>
+          <p>The LLM writes the recommendation using <b>only</b> the retrieved products — the "augmented generation". Grounding is why it can't invent products that don't exist.</p>
+        </div>
+      </li>
+      <li class="node" data-where="app">
+        <span class="dot"></span>
+        <div class="card">
+          <div class="meta"><span class="num">08</span><span class="where">App</span><span class="comp">_order_recommendations</span></div>
+          <h3>Post-process into cards</h3>
+          <p>Map the picks back to real records, add flags (<code>popular</code>, <code>has_variants</code>), drop any hallucinated IDs, and build the refine chips.</p>
+        </div>
+      </li>
+      <li class="node" data-where="app">
+        <span class="dot"></span>
+        <div class="card">
+          <div class="meta"><span class="num">09</span><span class="where">App</span><span class="comp">widget</span></div>
+          <h3>Return to the widget</h3>
+          <p>Answer text + product cards + refine chips render in the chat — grounded, in German, priced in €.</p>
+        </div>
+      </li>
+    </ol>
+  </section>
+
+  <!-- cross-phase claim -->
+  <figure class="diagram">
+    <svg viewBox="0 0 720 150" role="img" aria-label="Preparation builds the Qdrant index once; each live question reads from it at the search step.">
+      <defs>
+        <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="currentColor"/>
+        </marker>
+      </defs>
+      <!-- Prep row -->
+      <text x="12" y="34" font-family="JetBrains Mono, monospace" font-size="11" fill="currentColor" letter-spacing="1">OFFLINE</text>
+      <rect x="12" y="44" width="118" height="34" rx="8" fill="none" stroke="currentColor" stroke-width="1.4"/>
+      <text x="71" y="65" text-anchor="middle" font-family="Hanken Grotesk, sans-serif" font-size="12.5" fill="currentColor">scrape → embed</text>
+      <line x1="130" y1="61" x2="250" y2="61" stroke="currentColor" stroke-width="1.4" marker-end="url(#ah)"/>
+      <!-- Qdrant -->
+      <rect x="252" y="40" width="150" height="42" rx="9" fill="none" stroke="#0c857a" stroke-width="2"/>
+      <text x="327" y="58" text-anchor="middle" font-family="Archivo, sans-serif" font-weight="700" font-size="13" fill="#0c857a">Qdrant index</text>
+      <text x="327" y="73" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10.5" fill="#0c857a">1,474 vectors</text>
+      <!-- Live row -->
+      <text x="708" y="34" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="11" fill="currentColor" letter-spacing="1">LIVE · PER QUESTION</text>
+      <rect x="590" y="44" width="118" height="34" rx="8" fill="none" stroke="currentColor" stroke-width="1.4"/>
+      <text x="649" y="65" text-anchor="middle" font-family="Hanken Grotesk, sans-serif" font-size="12.5" fill="currentColor">question</text>
+      <line x1="590" y1="61" x2="486" y2="61" stroke="currentColor" stroke-width="1.4" marker-end="url(#ah)"/>
+      <rect x="404" y="44" width="80" height="34" rx="8" fill="none" stroke="currentColor" stroke-width="1.4"/>
+      <text x="444" y="65" text-anchor="middle" font-family="Hanken Grotesk, sans-serif" font-size="12" fill="currentColor">search</text>
+      <!-- read arrow from Qdrant up/into search -->
+      <path d="M402 61 L404 61" stroke="currentColor" stroke-width="1.4"/>
+      <line x1="444" y1="100" x2="444" y2="80" stroke="#0c857a" stroke-width="1.6" marker-end="url(#ah)"/>
+      <path d="M327 82 L327 100 L444 100" fill="none" stroke="#0c857a" stroke-width="1.6"/>
+      <text x="360" y="118" font-family="JetBrains Mono, monospace" font-size="10.5" fill="#0c857a">reads, never rebuilds</text>
+    </svg>
+    <figcaption>Preparation builds the Qdrant index once; every live question reads from it at the search step and never rebuilds it.</figcaption>
+  </figure>
+
+  <div class="mental">
+    <p class="k">The one-line model</p>
+    <p><span class="b">Offline —</span> turn every product into a searchable vector, once.</p>
+    <p><span class="b">Live —</span> turn the question into a vector, let Qdrant fetch the closest <em>real</em> products, then let Mistral write an answer allowed to talk only about those.</p>
+  </div>
+</div>

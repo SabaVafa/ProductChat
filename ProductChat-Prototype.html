@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ProductChat Prototype</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root { --bg:#eef1f5; --card:#fff; --ink:#1a1e26; --muted:#5a6472; --accent:#38507e;
+          --ok:#2c7a4d; --ok-soft:#e5f1ea; --warn:#b45a1e; --warn-soft:#f8ece0; --border:#dde2e9; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#12151b; --card:#1a1e26; --ink:#e6e9ef; --muted:#9aa3b1; --accent:#8ba6d4;
+            --ok:#6bbd8b; --ok-soft:#1a2820; --warn:#d9925a; --warn-soft:#2c2319; --border:#2a303a; }
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; min-height:100vh; display:grid; place-items:center; background:var(--bg);
+         color:var(--ink); font-family:system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:14px;
+          padding:2rem 2.2rem; max-width:34rem; margin:1rem; box-shadow:0 10px 30px rgba(0,0,0,.08); }
+  h1 { margin:0 0 .3rem; font-size:1.5rem; letter-spacing:-.01em; }
+  p  { color:var(--muted); line-height:1.55; }
+  .status { display:inline-flex; align-items:center; gap:.5rem; font-weight:600; padding:.4rem .8rem;
+            border-radius:999px; font-size:.9rem; margin:.6rem 0 1rem; }
+  .status.checking { background:var(--warn-soft); color:var(--warn); }
+  .status.online   { background:var(--ok-soft);  color:var(--ok); }
+  .status.offline  { background:var(--warn-soft); color:var(--warn); }
+  .dot { width:.55rem; height:.55rem; border-radius:50%; background:currentColor; }
+  a.btn { display:inline-block; background:var(--accent); color:#fff; text-decoration:none;
+          padding:.7rem 1.3rem; border-radius:10px; font-weight:600; }
+  a.btn.disabled { opacity:.45; pointer-events:none; }
+  ol { color:var(--muted); line-height:1.7; padding-left:1.2rem; }
+  code { background:var(--bg); border:1px solid var(--border); border-radius:5px; padding:.05rem .4rem;
+         font-family:Consolas,monospace; font-size:.9em; color:var(--accent); }
+  .links { margin-top:1.2rem; padding-top:1rem; border-top:1px solid var(--border); font-size:.88rem; color:var(--muted); }
+  .links a { color:var(--accent); }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>ProductChat Prototype</h1>
+    <p>Launcher for the local prototype. It checks whether the app is running and takes you there.</p>
+
+    <div id="status" class="status checking"><span class="dot"></span><span id="status-text">Checking whether the prototype is running …</span></div>
+    <div>
+      <a id="open" class="btn disabled" href="http://localhost:3000">Open the prototype</a>
+    </div>
+
+    <div id="help" style="display:none">
+      <p><b>The prototype isn't running.</b> Start it, then this page opens it automatically:</p>
+      <ol>
+        <li>Double-click <code>run.bat</code> in this folder (starts backend + frontend), <b>or</b></li>
+        <li>ask Claude to "run the prototype".</li>
+      </ol>
+      <p>This page re-checks every few seconds — leave it open.</p>
+    </div>
+
+    <div class="links">
+      Direct links (when running):
+      <a href="http://localhost:3000">Store view</a> ·
+      <a href="http://localhost:3000/assistant">Chat</a> ·
+      <a href="http://localhost:3000/admin">Admin</a> ·
+      <a href="http://localhost:8000/widget-demo">Widget demo</a>
+      <br>Note: use <code>localhost</code>, not <code>127.0.0.1</code> — and never open <code>frontend/index.html</code> directly (it is Vite source, not the app).
+    </div>
+  </div>
+
+<script>
+  var statusEl = document.getElementById('status');
+  var textEl = document.getElementById('status-text');
+  var openBtn = document.getElementById('open');
+  var helpEl = document.getElementById('help');
+  var redirected = false;
+
+  function check() {
+    // no-cors: resolves if the dev server answered at all, rejects if unreachable.
+    fetch('http://localhost:3000/', { mode: 'no-cors', cache: 'no-store' })
+      .then(function () {
+        statusEl.className = 'status online';
+        textEl.textContent = 'Prototype is running — opening it …';
+        openBtn.classList.remove('disabled');
+        helpEl.style.display = 'none';
+        if (!redirected) { redirected = true; setTimeout(function(){ location.href = 'http://localhost:3000'; }, 600); }
+      })
+      .catch(function () {
+        statusEl.className = 'status offline';
+        textEl.textContent = 'Prototype is NOT running';
+        openBtn.classList.add('disabled');
+        helpEl.style.display = 'block';
+        redirected = false;
+      });
+  }
+  check();
+  setInterval(check, 3000);
+</script>
+</body>
+</html>
