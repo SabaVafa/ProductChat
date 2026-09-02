@@ -169,7 +169,7 @@
   .inp button:hover{ filter:brightness(1.12); box-shadow:0 6px 16px -4px rgba(1,82,83,.55); } .inp button:active{ transform:scale(.94); }\
   .inp button:disabled{ background:#c3d3d1; box-shadow:none; cursor:default; } .muted{ color:#9aa5a3; font-size:12px; padding:2px; }\
   .empty{ text-align:center; color:#5b6c6a; font-size:13px; line-height:1.5; padding:8px 14px; }\
-  .empty .hero{ display:flex; align-items:center; justify-content:center; width:58px; height:58px; border-radius:19px; color:#015253; background:radial-gradient(circle at 50% 38%, #d7eae8, #eef6f5); box-shadow:0 5px 14px -8px rgba(1,82,83,.28); margin:0 auto 14px; animation:pchero 3.6s ease-in-out infinite; }\
+  .empty .hero{ display:flex; align-items:center; justify-content:center; width:58px; height:58px; border-radius:19px; color:#fff; background:linear-gradient(150deg,#02726e,#015253); box-shadow:0 8px 18px -6px rgba(1,82,83,.42); margin:0 auto 14px; animation:pchero 3.6s ease-in-out infinite; }\
   .empty .hero svg{ width:31px; height:31px; }\
   @keyframes pchero{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-3px); } }\
   @media (max-width:480px){ .panel{ width:calc(100vw - 20px); height:calc(100dvh - 20px); bottom:10px; right:10px; border-radius:16px; } .launch{ bottom:14px; right:14px; } }\
