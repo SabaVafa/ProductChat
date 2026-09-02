@@ -119,20 +119,24 @@
     display:flex; align-items:center; justify-content:center; border:0; border-radius:50%; cursor:pointer; color:#fff;\
     background:rgba(1,82,83,.82); backdrop-filter:blur(14px) saturate(1.5); -webkit-backdrop-filter:blur(14px) saturate(1.5);\
     box-shadow:0 4px 12px -3px rgba(1,82,83,.32), 0 1px 3px rgba(0,0,0,.1);\
-    transition:transform .22s cubic-bezier(.34,1.56,.64,1), box-shadow .22s, background .22s; }\
+    transition:transform .22s cubic-bezier(.34,1.56,.64,1), box-shadow .22s, background .22s; animation:pcLaunchIn .34s cubic-bezier(.34,1.56,.64,1) both; }\
   .launch:hover{ transform:translateY(-2px) scale(1.05); background:rgba(2,105,106,.88); box-shadow:0 8px 20px -6px rgba(1,82,83,.4), 0 2px 5px rgba(0,0,0,.12); }\
   .launch:active{ transform:scale(.96); }\
   .launch svg{ width:34px; height:34px; display:block; }\
+  @keyframes pcLaunchIn{ 0%{ opacity:0; transform:scale(.4); } 60%{ opacity:1; } 100%{ opacity:1; transform:scale(1); } }\
   .panel{ position:fixed; bottom:20px; right:20px; z-index:2147483000; width:358px; max-width:calc(100vw - 28px);\
     height:min(552px, calc(100dvh - 36px)); background:#fff; border:1px solid rgba(1,82,83,.1); border-radius:20px;\
     box-shadow:0 32px 64px -24px rgba(1,44,45,.5), 0 8px 20px -12px rgba(0,0,0,.16); display:flex; flex-direction:column; overflow:hidden;\
-    transform-origin:bottom right; animation:pcpop .22s cubic-bezier(.22,.68,.4,1.02); }\
-  @keyframes pcpop{ from{ opacity:0; transform:translateY(10px) scale(.97); } to{ opacity:1; transform:none; } }\
-  @media (prefers-reduced-motion: reduce){ .panel{ animation:none; } .launch{ transition:none; } .empty .hero{ animation:none; } .typing i{ animation:none; } }\
+    transform-origin:bottom right; }\
+  .panel.opening{ animation:pcOpen .32s cubic-bezier(.16,1,.3,1) both; }\
+  .panel.closing{ animation:pcClose .2s cubic-bezier(.4,0,1,1) both; }\
+  @keyframes pcOpen{ from{ opacity:0; transform:translateY(16px) scale(.82); } to{ opacity:1; transform:translateY(0) scale(1); } }\
+  @keyframes pcClose{ from{ opacity:1; transform:translateY(0) scale(1); } to{ opacity:0; transform:translateY(16px) scale(.82); } }\
+  @media (prefers-reduced-motion: reduce){ .panel.opening, .panel.closing{ animation:none; } .launch{ transition:none; animation:none; } .typing i{ animation:none; } }\
   .hd{ display:flex; align-items:center; gap:11px; padding:13px 14px; color:#fff; background:radial-gradient(95% 130% at 22% -20%, rgba(255,255,255,.14), rgba(255,255,255,0) 55%), radial-gradient(120% 150% at 20% 0%, #05867f 0%, #015b58 42%, #013d3e 100%); box-shadow:inset 0 -1px 0 rgba(255,255,255,.1); }\
-  .hd .av{ position:relative; width:36px; height:36px; border-radius:4px; background:rgba(255,255,255,.16); box-shadow:inset 0 0 0 1px rgba(255,255,255,.12); display:flex; align-items:center; justify-content:center; flex:none; }\
+  .hd .av{ position:relative; width:36px; height:36px; border-radius:50%; background:rgba(255,255,255,.16); box-shadow:inset 0 0 0 1px rgba(255,255,255,.12); display:flex; align-items:center; justify-content:center; flex:none; }\
   .hd .av svg{ width:21px; height:21px; display:block; }\
-  .hd .av::after{ content:''; position:absolute; right:-2px; bottom:-2px; width:10px; height:10px; border-radius:50%; background:#2fd08a; box-shadow:0 0 0 2px #024e4c, 0 0 6px rgba(47,208,138,.7); }\
+  .hd .av::after{ content:''; position:absolute; right:1px; bottom:1px; width:10px; height:10px; border-radius:50%; background:#2fd08a; box-shadow:0 0 0 2px #024e4c, 0 0 6px rgba(47,208,138,.7); }\
   .hd .tt{ flex:1; min-width:0; } .hd b{ font-size:14px; font-weight:600; letter-spacing:.01em; display:block; }\
   .hd small{ display:block; font-size:11px; opacity:.72; margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }\
   .hd button{ background:rgba(255,255,255,.12); border:0; color:#fff; width:28px; height:28px; border-radius:9px; cursor:pointer; font-size:14px; line-height:1; flex:none; transition:background .15s; }\
@@ -201,7 +205,7 @@
     wrap = document.createElement("div"); root.appendChild(wrap);
     // Escape closes the open panel (basic keyboard support).
     document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape" && state.open) { state.open = false; render(); }
+      if (e.key === "Escape" && state.open) { closePanel(); }
     });
     render();
   }
@@ -280,6 +284,19 @@
       : '<div class="card">' + inner + "</div>";
   }
 
+  // Collapse with an exit animation that mirrors the open (panel shrinks back
+  // toward the launcher corner), then swap to the launcher.
+  function closePanel() {
+    var panel = root && root.querySelector && root.querySelector(".panel");
+    if (!panel) { state.open = false; render(); return; }
+    panel.classList.remove("opening");
+    panel.classList.add("closing");
+    var done = false;
+    var finish = function () { if (done) return; done = true; state.open = false; render(); };
+    panel.addEventListener("animationend", finish, { once: true });
+    setTimeout(finish, 260);   // fallback if animationend doesn't fire
+  }
+
   function render() {
     // Preserve the user's draft + focus across full re-renders (async updates
     // like arriving suggestions must not eat what they're typing).
@@ -290,11 +307,16 @@
     if (!state.open) {
       wrap.innerHTML = '<button class="launch" id="pc-open" aria-label="' + T.open + '" title="' + T.launcher + '">' + AVATAR_SVG + "</button>";
       root.getElementById("pc-open").onclick = function () {
-        state.open = true; focusInputNext = true;
-        if (!state.suggestions.length) loadSuggestions();
-        // On a product page, open already grounded on that product.
-        if (state.productId && !state.messages.length) introOnProduct();
+        state.open = true; state.justOpened = true; focusInputNext = true;
         render();
+        // Defer the async loads so their re-render doesn't rebuild the panel
+        // mid-entrance and cut the open animation short.
+        setTimeout(function () {
+          if (!state.open) return;
+          if (!state.suggestions.length) loadSuggestions();
+          // On a product page, open already grounded on that product.
+          if (state.productId && !state.messages.length) introOnProduct();
+        }, 360);
       };
       return;
     }
@@ -319,8 +341,10 @@
     var chipList = state.messages.length ? (state.loading ? [] : (lastA && lastA.refine) || []) : state.suggestions;
     var chips = chipList.slice(0, 5).map(function (s) { return '<button class="chip" data-c="' + esc(s) + '">' + esc(s) + "</button>"; }).join("");
 
+    var openCls = state.justOpened ? " opening" : "";
+    state.justOpened = false;
     wrap.innerHTML =
-      '<div class="panel"><div class="hd">' +
+      '<div class="panel' + openCls + '"><div class="hd">' +
       '<span class="av">' + AVATAR_SVG + "</span>" +
       '<div class="tt"><b>' + T.title + "</b><small>" +
       (state.category ? T.browsing + esc(state.category) : T.subtitle) + "</small></div>" +
@@ -330,7 +354,7 @@
       '<form class="inp" id="pc-form"><input id="pc-in" type="search" placeholder="' + T.placeholder + '" ' + (state.loading ? "disabled" : "") + ">" +
       '<button type="submit" aria-label="' + T.send + '" ' + (state.loading ? "disabled" : "") + ">➤</button></form></div>";
 
-    root.getElementById("pc-close").onclick = function () { state.open = false; render(); };
+    root.getElementById("pc-close").onclick = function () { closePanel(); };
     root.getElementById("pc-form").onsubmit = function (e) { e.preventDefault(); var inp = root.getElementById("pc-in"); send(inp.value); };
     Array.prototype.forEach.call(root.querySelectorAll(".chip"), function (b) {
       b.onclick = function () { send(b.getAttribute("data-c"), state.messages.length > 0); };

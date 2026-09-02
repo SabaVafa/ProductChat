@@ -37,6 +37,14 @@ interface Props {
 
 export default function ChatWidget({ category }: Props) {
   const [open, setOpen] = useState(false);
+  const [closing, setClosing] = useState(false);
+  const closePanel = () => {
+    setClosing(true);
+    window.setTimeout(() => {
+      setOpen(false);
+      setClosing(false);
+    }, 220);
+  };
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([]);
@@ -111,22 +119,29 @@ export default function ChatWidget({ category }: Props) {
       <style>{`
         .pc-input::-webkit-search-cancel-button{ -webkit-appearance:none; appearance:none; width:16px; height:16px; margin-left:8px; cursor:pointer; opacity:.85; transition:opacity .15s; background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23A1A1A1' stroke-width='2.2' stroke-linecap='round'><line x1='6' y1='6' x2='18' y2='18'/><line x1='6' y1='18' x2='18' y2='6'/></svg>") center / contain no-repeat; }
         .pc-input::-webkit-search-cancel-button:hover{ opacity:1; }
+        .pc-opening{ animation: pcOpen .32s cubic-bezier(.16,1,.3,1) both; }
+        .pc-closing{ animation: pcClose .2s cubic-bezier(.4,0,1,1) both; }
+        .pc-launch{ animation: pcLaunchIn .34s cubic-bezier(.34,1.56,.64,1) both; }
+        @keyframes pcOpen{ from{ opacity:0; transform:translateY(16px) scale(.82); } to{ opacity:1; transform:translateY(0) scale(1); } }
+        @keyframes pcClose{ from{ opacity:1; transform:translateY(0) scale(1); } to{ opacity:0; transform:translateY(16px) scale(.82); } }
+        @keyframes pcLaunchIn{ 0%{ opacity:0; transform:scale(.4); } 60%{ opacity:1; } 100%{ opacity:1; transform:scale(1); } }
+        @media (prefers-reduced-motion: reduce){ .pc-opening,.pc-closing,.pc-launch{ animation:none; } }
       `}</style>
       {/* Floating launcher */}
-      {!open && (
+      {!open && !closing && (
         <button
           onClick={() => setOpen(true)}
           aria-label="Ask the assistant"
           title="Ask the assistant"
-          className="fixed bottom-5 right-5 z-50 flex items-center justify-center w-14 h-14 rounded-full bg-[#015253]/80 backdrop-blur-md hover:bg-[#02696a]/[0.88] text-white shadow-[0_4px_12px_-3px_rgba(1,82,83,0.32)] hover:shadow-[0_8px_20px_-6px_rgba(1,82,83,0.4)] hover:-translate-y-0.5 hover:scale-105 active:scale-95 transition-all"
+          className="pc-launch fixed bottom-5 right-5 z-50 flex items-center justify-center w-14 h-14 rounded-full bg-[#015253]/80 backdrop-blur-md hover:bg-[#02696a]/[0.88] text-white shadow-[0_4px_12px_-3px_rgba(1,82,83,0.32)] hover:shadow-[0_8px_20px_-6px_rgba(1,82,83,0.4)] hover:-translate-y-0.5 hover:scale-105 active:scale-95 transition-all"
         >
           <AssistantAvatar className="w-[34px] h-[34px]" />
         </button>
       )}
 
       {/* Panel */}
-      {open && (
-        <div className="fixed bottom-5 right-5 z-50 w-[calc(100vw-2.5rem)] sm:w-[358px] h-[540px] max-h-[calc(100dvh-2.5rem)] bg-white rounded-[20px] shadow-2xl border border-[#015253]/10 flex flex-col overflow-hidden">
+      {(open || closing) && (
+        <div className={`${closing ? 'pc-closing' : 'pc-opening'} origin-bottom-right fixed bottom-5 right-5 z-50 w-[calc(100vw-2.5rem)] sm:w-[358px] h-[540px] max-h-[calc(100dvh-2.5rem)] bg-white rounded-[20px] shadow-2xl border border-[#015253]/10 flex flex-col overflow-hidden`}>
           {/* Header */}
           <div
             className="flex items-center justify-between px-3.5 py-3 text-white shadow-[inset_0_-1px_0_rgba(255,255,255,0.1)]"
@@ -136,9 +151,9 @@ export default function ChatWidget({ category }: Props) {
             }}
           >
             <div className="flex items-center gap-2.5">
-              <div className="relative w-9 h-9 rounded-[4px] bg-white/[0.16] ring-1 ring-white/10 flex items-center justify-center">
+              <div className="relative w-9 h-9 rounded-full bg-white/[0.16] ring-1 ring-white/10 flex items-center justify-center">
                 <AssistantAvatar className="w-[21px] h-[21px]" />
-                <span className="absolute -right-0.5 -bottom-0.5 w-2.5 h-2.5 rounded-full bg-[#2fd08a] ring-2 ring-[#024e4c]" />
+                <span className="absolute right-0.5 bottom-0.5 w-2.5 h-2.5 rounded-full bg-[#2fd08a] ring-2 ring-[#024e4c]" />
               </div>
               <div className="leading-tight">
                 <p className="font-semibold text-sm">Product Assistant</p>
@@ -147,7 +162,7 @@ export default function ChatWidget({ category }: Props) {
                 </p>
               </div>
             </div>
-            <button onClick={() => setOpen(false)} className="p-1.5 rounded-lg hover:bg-white/20 transition-colors">
+            <button onClick={closePanel} className="p-1.5 rounded-lg hover:bg-white/20 transition-colors">
               <X className="w-4 h-4" />
             </button>
           </div>
