@@ -110,7 +110,7 @@ export default function ChatWidget({ category }: Props) {
           onClick={() => setOpen(true)}
           aria-label="Ask the assistant"
           title="Ask the assistant"
-          className="fixed bottom-5 right-5 z-50 flex items-center justify-center w-14 h-14 rounded-full bg-[#015253] hover:bg-[#02696a] text-white shadow-[0_4px_12px_-3px_rgba(1,82,83,0.32)] hover:shadow-[0_8px_20px_-6px_rgba(1,82,83,0.4)] hover:-translate-y-0.5 hover:scale-105 active:scale-95 transition-all"
+          className="fixed bottom-5 right-5 z-50 flex items-center justify-center w-14 h-14 rounded-full bg-[#015253]/80 backdrop-blur-md hover:bg-[#02696a]/[0.88] text-white shadow-[0_4px_12px_-3px_rgba(1,82,83,0.32)] hover:shadow-[0_8px_20px_-6px_rgba(1,82,83,0.4)] hover:-translate-y-0.5 hover:scale-105 active:scale-95 transition-all"
         >
           <AssistantAvatar className="w-[34px] h-[34px]" />
         </button>

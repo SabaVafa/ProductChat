@@ -116,10 +116,11 @@
   :host{ all: initial; }\
   *{ box-sizing:border-box; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; }\
   .launch{ position:fixed; bottom:20px; right:20px; z-index:2147483000; width:58px; height:58px; padding:0;\
-    display:flex; align-items:center; justify-content:center; border:0; border-radius:50%; cursor:pointer; color:#fff; background:#015253;\
+    display:flex; align-items:center; justify-content:center; border:0; border-radius:50%; cursor:pointer; color:#fff;\
+    background:rgba(1,82,83,.82); backdrop-filter:blur(14px) saturate(1.5); -webkit-backdrop-filter:blur(14px) saturate(1.5);\
     box-shadow:0 4px 12px -3px rgba(1,82,83,.32), 0 1px 3px rgba(0,0,0,.1);\
     transition:transform .22s cubic-bezier(.34,1.56,.64,1), box-shadow .22s, background .22s; }\
-  .launch:hover{ transform:translateY(-2px) scale(1.05); background:#02696a; box-shadow:0 8px 20px -6px rgba(1,82,83,.4), 0 2px 5px rgba(0,0,0,.12); }\
+  .launch:hover{ transform:translateY(-2px) scale(1.05); background:rgba(2,105,106,.88); box-shadow:0 8px 20px -6px rgba(1,82,83,.4), 0 2px 5px rgba(0,0,0,.12); }\
   .launch:active{ transform:scale(.96); }\
   .launch svg{ width:34px; height:34px; display:block; }\
   .panel{ position:fixed; bottom:20px; right:20px; z-index:2147483000; width:358px; max-width:calc(100vw - 28px);\
