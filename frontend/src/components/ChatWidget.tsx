@@ -118,9 +118,15 @@ export default function ChatWidget({ category }: Props) {
 
       {/* Panel */}
       {open && (
-        <div className="fixed bottom-5 right-5 z-50 w-[calc(100vw-2.5rem)] sm:w-[358px] h-[540px] max-h-[calc(100dvh-2.5rem)] bg-white/70 backdrop-blur-xl rounded-[20px] shadow-2xl border border-white/50 flex flex-col overflow-hidden">
+        <div className="fixed bottom-5 right-5 z-50 w-[calc(100vw-2.5rem)] sm:w-[358px] h-[540px] max-h-[calc(100dvh-2.5rem)] bg-white rounded-[20px] shadow-2xl border border-[#015253]/10 flex flex-col overflow-hidden">
           {/* Header */}
-          <div className="flex items-center justify-between px-3.5 py-3 text-white bg-[linear-gradient(145deg,#02726e,#015253_55%,#013f40)] shadow-[inset_0_-1px_0_rgba(255,255,255,0.1)]">
+          <div
+            className="flex items-center justify-between px-3.5 py-3 text-white shadow-[inset_0_-1px_0_rgba(255,255,255,0.1)]"
+            style={{
+              background:
+                'radial-gradient(95% 130% at 22% -20%, rgba(255,255,255,0.14), rgba(255,255,255,0) 55%), radial-gradient(120% 150% at 20% 0%, #05867f, #015b58 42%, #013d3e)',
+            }}
+          >
             <div className="flex items-center gap-2.5">
               <div className="relative w-9 h-9 rounded-xl bg-white/[0.16] ring-1 ring-white/10 flex items-center justify-center">
                 <AssistantAvatar className="w-[21px] h-[21px]" />
@@ -141,7 +147,7 @@ export default function ChatWidget({ category }: Props) {
           {/* Body */}
           <div
             ref={scrollRef}
-            className={`flex-1 overflow-y-auto p-3.5 space-y-3 bg-transparent [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${
+            className={`flex-1 overflow-y-auto p-3.5 space-y-3 bg-[#f5f8f7] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${
               messages.length === 0 ? 'flex flex-col justify-center' : ''
             }`}
           >
@@ -262,7 +268,7 @@ export default function ChatWidget({ category }: Props) {
 
           {/* Suggestion / refine chips */}
           {(messages.length === 0 ? suggestions : activeRefine).length > 0 && (
-            <div className="px-3.5 py-3 bg-transparent border-t border-white/40 flex flex-wrap gap-2">
+            <div className="px-3.5 py-3 bg-white border-t border-slate-100 flex flex-wrap gap-2">
               {(messages.length === 0 ? suggestions : activeRefine).slice(0, 5).map((s) => (
                 <button
                   key={s}
@@ -281,7 +287,7 @@ export default function ChatWidget({ category }: Props) {
               e.preventDefault();
               send(input);
             }}
-            className="px-3.5 py-3 bg-transparent border-t border-white/40 flex gap-2"
+            className="px-3.5 py-3 bg-white border-t border-slate-200 flex gap-2"
           >
             <input
               value={input}
