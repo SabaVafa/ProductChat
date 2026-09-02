@@ -163,10 +163,12 @@
   .chip{ font-size:12px; padding:6px 11px; background:#f2f7f6; border:1px solid transparent; border-radius:999px; cursor:pointer; color:#3d5250; font-weight:500; text-align:left; transition:all .14s; }\
   .chip:hover{ background:#e3f0ef; border-color:#bcdedb; color:#015253; }\
   .inp{ display:flex; gap:8px; padding:11px 12px; background:#fff; border-top:1px solid rgba(1,44,45,.07); }\
-  .inp input{ flex:1; padding:10px 13px; font-size:15px; background:#f5f6fa; border:1px solid transparent; border-radius:12px; outline:none; color:#14201f; transition:background .15s, border-color .15s, box-shadow .15s; }\
-  .inp input::placeholder{ color:#9aa5a3; }\
-  .inp input:focus{ background:#fff; border-color:#7fb3b3; box-shadow:0 0 0 3px rgba(1,82,83,.14); }\
-  .inp button{ width:40px; height:40px; border:0; border-radius:12px; background:linear-gradient(150deg,#02726e,#015253); color:#fff; cursor:pointer; font-size:15px; flex:none; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 12px -4px rgba(1,82,83,.5); transition:filter .15s, transform .12s, box-shadow .15s; }\
+  .inp input{ flex:1; height:44px; padding:0 14px; font-size:16px; background:#f5f6fa; border:1px solid #dadada; border-radius:8px; outline:none; color:#000; transition:border-color .15s, box-shadow .15s; }\
+  .inp input::placeholder{ color:#a1a1a1; }\
+  .inp input:focus{ border-color:#015253; box-shadow:0 0 0 3px rgba(1,82,83,.10); }\
+  .inp input::-webkit-search-cancel-button{ -webkit-appearance:none; appearance:none; width:16px; height:16px; margin-left:8px; cursor:pointer; opacity:.85; transition:opacity .15s; background:url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23A1A1A1' stroke-width='2.2' stroke-linecap='round'><line x1='6' y1='6' x2='18' y2='18'/><line x1='6' y1='18' x2='18' y2='6'/></svg>\") center / contain no-repeat; }\
+  .inp input::-webkit-search-cancel-button:hover{ opacity:1; }\
+  .inp button{ width:44px; height:44px; border:0; border-radius:8px; background:linear-gradient(150deg,#02726e,#015253); color:#fff; cursor:pointer; font-size:15px; flex:none; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 12px -4px rgba(1,82,83,.5); transition:filter .15s, transform .12s, box-shadow .15s; }\
   .inp button:hover{ filter:brightness(1.12); box-shadow:0 6px 16px -4px rgba(1,82,83,.55); } .inp button:active{ transform:scale(.94); }\
   .inp button:disabled{ background:#c3d3d1; box-shadow:none; cursor:default; } .muted{ color:#9aa5a3; font-size:12px; padding:2px; }\
   .empty{ text-align:center; color:#5b6c6a; font-size:13px; line-height:1.5; padding:8px 14px; }\
@@ -323,7 +325,7 @@
       '<button id="pc-close" aria-label="' + T.close + '">✕</button></div>' +
       '<div class="body' + (state.messages.length ? "" : " pc-empty") + '" id="pc-body">' + empty + msgs + loading + "</div>" +
       (chips ? '<div class="chips">' + chips + "</div>" : "") +
-      '<form class="inp" id="pc-form"><input id="pc-in" placeholder="' + T.placeholder + '" ' + (state.loading ? "disabled" : "") + ">" +
+      '<form class="inp" id="pc-form"><input id="pc-in" type="search" placeholder="' + T.placeholder + '" ' + (state.loading ? "disabled" : "") + ">" +
       '<button type="submit" aria-label="' + T.send + '" ' + (state.loading ? "disabled" : "") + ">➤</button></form></div>";
 
     root.getElementById("pc-close").onclick = function () { state.open = false; render(); };

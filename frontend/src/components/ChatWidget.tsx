@@ -290,16 +290,17 @@ export default function ChatWidget({ category }: Props) {
             className="px-3.5 py-3 bg-white border-t border-slate-200 flex gap-2"
           >
             <input
+              type="search"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Type your question…"
               disabled={loading}
-              className="flex-1 px-3.5 py-2.5 text-sm bg-[#f5f6fa] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#015253] focus:bg-white transition-all"
+              className="flex-1 h-11 px-3.5 text-base text-black bg-[#f5f6fa] border border-[#dadada] rounded-lg outline-none placeholder:text-[#a1a1a1] focus:border-[#015253] focus:ring-[3px] focus:ring-[rgba(1,82,83,0.1)] transition-[border-color,box-shadow]"
             />
             <button
               type="submit"
               disabled={loading || !input.trim()}
-              className="w-10 h-10 flex items-center justify-center text-white rounded-xl bg-[linear-gradient(150deg,#02726e,#015253)] shadow-[0_4px_12px_-4px_rgba(1,82,83,0.5)] hover:brightness-110 active:scale-95 disabled:bg-slate-300 disabled:bg-none disabled:shadow-none transition-all"
+              className="w-11 h-11 flex items-center justify-center text-white rounded-lg bg-[linear-gradient(150deg,#02726e,#015253)] shadow-[0_4px_12px_-4px_rgba(1,82,83,0.5)] hover:brightness-110 active:scale-95 disabled:bg-slate-300 disabled:bg-none disabled:shadow-none transition-all"
             >
               <Send className="w-4 h-4" />
             </button>
