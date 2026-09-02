@@ -1,5 +1,17 @@
 import { useState, useEffect, useRef } from 'react';
-import { X, Send, Loader2, Sparkles, ExternalLink, Bot, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { X, Send, ExternalLink, ThumbsUp, ThumbsDown } from 'lucide-react';
+
+// Support-agent avatar (head + shoulders with a headset) — inherits currentColor.
+const AssistantAvatar = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 28 28" className={className} fill="none" aria-hidden="true">
+    <path d="M8.2 12.6a5.8 5.8 0 0 1 11.6 0" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+    <rect x="6.6" y="11.3" width="2.6" height="3.4" rx="1.3" fill="currentColor" />
+    <rect x="18.8" y="11.3" width="2.6" height="3.4" rx="1.3" fill="currentColor" />
+    <path d="M19.9 14.7v.8a1.6 1.6 0 0 1-1.6 1.6h-2.3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+    <circle cx="14" cy="12.4" r="3.7" fill="currentColor" />
+    <path d="M20.6 24c0-3.5-3-5.7-6.6-5.7S7.4 20.5 7.4 24z" fill="currentColor" />
+  </svg>
+);
 import { chatAPI, suggestionsAPI } from '../services/api';
 import { ChatResponse, ProductCard as ProductType } from '../types';
 import { safeUrl, formatPrice } from '../utils/format';
@@ -100,10 +112,7 @@ export default function ChatWidget({ category }: Props) {
           title="Ask the assistant"
           className="fixed bottom-5 right-5 z-50 flex items-center justify-center w-14 h-14 rounded-full bg-[#015253] hover:bg-[#02696a] text-white shadow-lg hover:shadow-xl hover:-translate-y-0.5 hover:scale-105 active:scale-95 transition-all"
         >
-          <svg viewBox="0 0 28 28" className="w-7 h-7" fill="none">
-            <path d="M6 5h16a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3h-8l-5 4v-4H6a3 3 0 0 1-3-3V8a3 3 0 0 1 3-3z" fill="#fff" />
-            <path d="M14 8.1l1.05 2.75L17.8 11.9l-2.75 1.05L14 15.7l-1.05-2.75L10.2 11.9l2.75-1.05L14 8.1z" fill="#015253" />
-          </svg>
+          <AssistantAvatar className="w-7 h-7" />
         </button>
       )}
 
@@ -111,10 +120,11 @@ export default function ChatWidget({ category }: Props) {
       {open && (
         <div className="fixed bottom-5 right-5 z-50 w-[calc(100vw-2.5rem)] sm:w-[358px] h-[540px] max-h-[calc(100dvh-2.5rem)] bg-white rounded-[20px] shadow-2xl border border-[#015253]/10 flex flex-col overflow-hidden">
           {/* Header */}
-          <div className="flex items-center justify-between px-3.5 py-3 bg-[#015253] text-white shadow-[inset_0_-1px_0_rgba(255,255,255,0.08)]">
+          <div className="flex items-center justify-between px-3.5 py-3 text-white bg-[linear-gradient(145deg,#02726e,#015253_55%,#013f40)] shadow-[inset_0_-1px_0_rgba(255,255,255,0.1)]">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
-                <Bot className="w-5 h-5" />
+              <div className="relative w-9 h-9 rounded-xl bg-white/[0.16] ring-1 ring-white/10 flex items-center justify-center">
+                <AssistantAvatar className="w-[21px] h-[21px]" />
+                <span className="absolute -right-0.5 -bottom-0.5 w-2.5 h-2.5 rounded-full bg-[#2fd08a] ring-2 ring-[#024e4c]" />
               </div>
               <div className="leading-tight">
                 <p className="font-semibold text-sm">Product Assistant</p>
@@ -129,11 +139,16 @@ export default function ChatWidget({ category }: Props) {
           </div>
 
           {/* Body */}
-          <div ref={scrollRef} className="flex-1 overflow-y-auto p-3.5 space-y-3 bg-[#f5f8f7]">
+          <div
+            ref={scrollRef}
+            className={`flex-1 overflow-y-auto p-3.5 space-y-3 bg-[#f5f8f7] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${
+              messages.length === 0 ? 'flex flex-col justify-center' : ''
+            }`}
+          >
             {messages.length === 0 && (
-              <div className="text-center pt-6">
-                <div className="w-12 h-12 mx-auto rounded-2xl bg-[#d3e6e5] flex items-center justify-center mb-3">
-                  <Sparkles className="w-6 h-6 text-[#015253]" />
+              <div className="text-center">
+                <div className="w-14 h-14 mx-auto rounded-[19px] flex items-center justify-center mb-3.5 text-[#015253] bg-[radial-gradient(circle_at_50%_38%,#d7eae8,#eef6f5)] shadow-[0_10px_26px_-10px_rgba(1,82,83,0.4),0_0_0_7px_rgba(1,82,83,0.04)]">
+                  <AssistantAvatar className="w-7 h-7" />
                 </div>
                 <p className="text-sm text-slate-600 mb-1 font-medium">
                   {category ? `Questions about ${category.toLowerCase()}` : 'Not sure where to start?'}
@@ -148,7 +163,7 @@ export default function ChatWidget({ category }: Props) {
                   <div
                     className={
                       m.role === 'user'
-                        ? 'bg-[#015253] text-white rounded-2xl rounded-br-sm px-3.5 py-2.5 text-sm'
+                        ? 'bg-[linear-gradient(155deg,#02696a,#014a4b)] text-white rounded-2xl rounded-br-sm px-3.5 py-2.5 text-sm shadow-[0_2px_8px_-3px_rgba(1,82,83,0.4)]'
                         : 'bg-white border border-slate-200 rounded-2xl rounded-bl-sm px-3.5 py-2.5 text-sm text-slate-700 shadow-sm'
                     }
                   >
@@ -233,21 +248,26 @@ export default function ChatWidget({ category }: Props) {
             ))}
 
             {loading && (
-              <div className="flex items-center gap-2 text-slate-400 text-sm">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Thinking…
+              <div className="flex items-center gap-1.5 w-fit px-3.5 py-3 bg-white border border-slate-200 rounded-2xl rounded-bl-sm shadow-sm">
+                {[0, 150, 300].map((d) => (
+                  <span
+                    key={d}
+                    className="w-1.5 h-1.5 rounded-full bg-[#8fbcb8] animate-bounce"
+                    style={{ animationDelay: `${d}ms` }}
+                  />
+                ))}
               </div>
             )}
           </div>
 
           {/* Suggestion / refine chips */}
           {(messages.length === 0 ? suggestions : activeRefine).length > 0 && (
-            <div className="px-3 pt-2.5 pb-1 bg-slate-50 border-t border-slate-100 flex flex-wrap gap-1.5">
+            <div className="px-3.5 py-3 bg-white border-t border-slate-100 flex flex-wrap gap-2">
               {(messages.length === 0 ? suggestions : activeRefine).slice(0, 5).map((s) => (
                 <button
                   key={s}
                   onClick={() => (messages.length === 0 ? send(s) : send(s, true))}
-                  className="text-left px-2.5 py-1.5 text-xs bg-white border border-slate-200 rounded-full hover:border-[#4d8a8a] hover:text-[#015253] text-slate-600 transition-colors"
+                  className="text-left px-3 py-2 text-xs bg-[#f2f7f6] border border-transparent rounded-full hover:bg-[#e3f0ef] hover:border-[#bcdedb] hover:text-[#015253] text-[#3d5250] transition-colors"
                 >
                   {s}
                 </button>
@@ -261,7 +281,7 @@ export default function ChatWidget({ category }: Props) {
               e.preventDefault();
               send(input);
             }}
-            className="p-3 bg-white border-t border-slate-200 flex gap-2"
+            className="px-3.5 py-3 bg-white border-t border-slate-200 flex gap-2"
           >
             <input
               value={input}
@@ -273,7 +293,7 @@ export default function ChatWidget({ category }: Props) {
             <button
               type="submit"
               disabled={loading || !input.trim()}
-              className="w-10 h-10 flex items-center justify-center bg-[#015253] text-white rounded-xl hover:bg-[#013b3c] disabled:bg-slate-300 transition-colors"
+              className="w-10 h-10 flex items-center justify-center text-white rounded-xl bg-[linear-gradient(150deg,#02726e,#015253)] shadow-[0_4px_12px_-4px_rgba(1,82,83,0.5)] hover:brightness-110 active:scale-95 disabled:bg-slate-300 disabled:bg-none disabled:shadow-none transition-all"
             >
               <Send className="w-4 h-4" />
             </button>

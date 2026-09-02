@@ -127,20 +127,26 @@
     box-shadow:0 32px 64px -24px rgba(1,44,45,.5), 0 8px 20px -12px rgba(0,0,0,.16); display:flex; flex-direction:column; overflow:hidden;\
     transform-origin:bottom right; animation:pcpop .22s cubic-bezier(.22,.68,.4,1.02); }\
   @keyframes pcpop{ from{ opacity:0; transform:translateY(10px) scale(.97); } to{ opacity:1; transform:none; } }\
-  @media (prefers-reduced-motion: reduce){ .panel{ animation:none; } .launch{ transition:none; } }\
-  .hd{ display:flex; align-items:center; gap:11px; padding:12px 14px; color:#fff; background:#015253; box-shadow:inset 0 -1px 0 rgba(255,255,255,.08); }\
-  .hd .av{ width:34px; height:34px; border-radius:11px; background:rgba(255,255,255,.14); display:flex; align-items:center; justify-content:center; flex:none; }\
-  .hd .av svg{ width:19px; height:19px; display:block; }\
+  @media (prefers-reduced-motion: reduce){ .panel{ animation:none; } .launch{ transition:none; } .empty .hero{ animation:none; } .typing i{ animation:none; } }\
+  .hd{ display:flex; align-items:center; gap:11px; padding:13px 14px; color:#fff; background:linear-gradient(145deg,#02726e 0%,#015253 55%,#013f40 100%); box-shadow:inset 0 -1px 0 rgba(255,255,255,.1); }\
+  .hd .av{ position:relative; width:36px; height:36px; border-radius:12px; background:rgba(255,255,255,.16); box-shadow:inset 0 0 0 1px rgba(255,255,255,.12); display:flex; align-items:center; justify-content:center; flex:none; }\
+  .hd .av svg{ width:21px; height:21px; display:block; }\
+  .hd .av::after{ content:''; position:absolute; right:-2px; bottom:-2px; width:10px; height:10px; border-radius:50%; background:#2fd08a; box-shadow:0 0 0 2px #024e4c, 0 0 6px rgba(47,208,138,.7); }\
   .hd .tt{ flex:1; min-width:0; } .hd b{ font-size:14px; font-weight:600; letter-spacing:.01em; display:block; }\
   .hd small{ display:block; font-size:11px; opacity:.72; margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }\
   .hd button{ background:rgba(255,255,255,.12); border:0; color:#fff; width:28px; height:28px; border-radius:9px; cursor:pointer; font-size:14px; line-height:1; flex:none; transition:background .15s; }\
   .hd button:hover{ background:rgba(255,255,255,.24); }\
-  .body{ flex:1; overflow-y:auto; padding:14px; background:#f5f8f7; display:flex; flex-direction:column; gap:9px; }\
-  .body::-webkit-scrollbar{ width:7px; } .body::-webkit-scrollbar-thumb{ background:rgba(1,82,83,.16); border-radius:99px; }\
+  .body{ flex:1; overflow-y:auto; padding:14px; background:#f5f8f7; display:flex; flex-direction:column; gap:9px; scrollbar-width:none; }\
+  .body.pc-empty{ justify-content:center; }\
+  .body::-webkit-scrollbar{ display:none; }\
   .row{ display:flex; } .row.u{ justify-content:flex-end; } .row.a{ justify-content:flex-start; }\
   .bub{ max-width:86%; padding:9px 12px; border-radius:15px; font-size:13.5px; line-height:1.45; }\
-  .u .bub{ background:#015253; color:#fff; border-bottom-right-radius:5px; }\
-  .a .bub{ background:#fff; color:#2b3a3a; border:1px solid rgba(1,44,45,.08); border-bottom-left-radius:5px; box-shadow:0 1px 2px rgba(1,44,45,.05); }\
+  .u .bub{ background:linear-gradient(155deg,#02696a,#014a4b); color:#fff; border-bottom-right-radius:5px; box-shadow:0 2px 8px -3px rgba(1,82,83,.4); }\
+  .a .bub{ background:#fff; color:#26302f; border:1px solid rgba(1,44,45,.07); border-bottom-left-radius:5px; box-shadow:0 2px 6px -3px rgba(1,44,45,.09); }\
+  .typing{ align-self:flex-start; display:inline-flex; align-items:center; gap:5px; padding:12px 14px; background:#fff; border:1px solid rgba(1,44,45,.07); border-radius:15px; border-bottom-left-radius:5px; box-shadow:0 2px 6px -3px rgba(1,44,45,.09); }\
+  .typing i{ width:7px; height:7px; border-radius:50%; background:#8fbcb8; display:block; animation:pctype 1.3s infinite ease-in-out; }\
+  .typing i:nth-child(2){ animation-delay:.16s; } .typing i:nth-child(3){ animation-delay:.32s; }\
+  @keyframes pctype{ 0%,60%,100%{ transform:translateY(0); opacity:.45; } 30%{ transform:translateY(-5px); opacity:1; } }\
   .card{ display:flex; gap:11px; margin-top:7px; padding:9px; background:#fff; border:1px solid rgba(1,44,45,.09); border-radius:13px; text-decoration:none; transition:border-color .15s, box-shadow .15s, transform .15s; }\
   a.card:hover{ border-color:#4d8a8a; box-shadow:0 6px 16px -10px rgba(1,82,83,.4); transform:translateY(-1px); }\
   .card img{ width:50px; height:50px; border-radius:9px; object-fit:cover; background:#eef2f1; flex:none; }\
@@ -159,12 +165,25 @@
   .inp input{ flex:1; padding:10px 13px; font-size:15px; background:#f2f6f5; border:1px solid transparent; border-radius:12px; outline:none; color:#14201f; transition:background .15s, border-color .15s, box-shadow .15s; }\
   .inp input::placeholder{ color:#9aa5a3; }\
   .inp input:focus{ background:#fff; border-color:#7fb3b3; box-shadow:0 0 0 3px rgba(1,82,83,.14); }\
-  .inp button{ width:40px; height:40px; border:0; border-radius:12px; background:#015253; color:#fff; cursor:pointer; font-size:15px; flex:none; display:flex; align-items:center; justify-content:center; transition:background .15s, transform .12s; }\
-  .inp button:hover{ background:#02696a; } .inp button:active{ transform:scale(.94); }\
-  .inp button:disabled{ background:#c3d3d1; cursor:default; } .muted{ color:#9aa5a3; font-size:12px; padding:2px; }\
-  .empty{ text-align:center; color:#5b6c6a; font-size:13px; line-height:1.5; padding:18px 10px 8px; }\
+  .inp button{ width:40px; height:40px; border:0; border-radius:12px; background:linear-gradient(150deg,#02726e,#015253); color:#fff; cursor:pointer; font-size:15px; flex:none; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 12px -4px rgba(1,82,83,.5); transition:filter .15s, transform .12s, box-shadow .15s; }\
+  .inp button:hover{ filter:brightness(1.12); box-shadow:0 6px 16px -4px rgba(1,82,83,.55); } .inp button:active{ transform:scale(.94); }\
+  .inp button:disabled{ background:#c3d3d1; box-shadow:none; cursor:default; } .muted{ color:#9aa5a3; font-size:12px; padding:2px; }\
+  .empty{ text-align:center; color:#5b6c6a; font-size:13px; line-height:1.5; padding:8px 14px; }\
+  .empty .hero{ display:flex; align-items:center; justify-content:center; width:58px; height:58px; border-radius:19px; color:#015253; background:radial-gradient(circle at 50% 38%, #d7eae8, #eef6f5); box-shadow:0 10px 26px -10px rgba(1,82,83,.4), 0 0 0 7px rgba(1,82,83,.04); margin:0 auto 14px; animation:pchero 3.6s ease-in-out infinite; }\
+  .empty .hero svg{ width:31px; height:31px; }\
+  @keyframes pchero{ 0%,100%{ transform:translateY(0); box-shadow:0 10px 26px -10px rgba(1,82,83,.4), 0 0 0 7px rgba(1,82,83,.04); } 50%{ transform:translateY(-3px); box-shadow:0 14px 30px -10px rgba(1,82,83,.5), 0 0 0 11px rgba(1,82,83,.03); } }\
   @media (max-width:480px){ .panel{ width:calc(100vw - 20px); height:calc(100dvh - 20px); bottom:10px; right:10px; border-radius:16px; } .launch{ bottom:14px; right:14px; } }\
   ";
+
+  // Support-agent avatar (head + shoulders with a headset), white on teal.
+  var AVATAR_SVG =
+    '<svg viewBox="0 0 28 28" fill="none">' +
+    '<path d="M8.2 12.6a5.8 5.8 0 0 1 11.6 0" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>' +
+    '<rect x="6.6" y="11.3" width="2.6" height="3.4" rx="1.3" fill="currentColor"/>' +
+    '<rect x="18.8" y="11.3" width="2.6" height="3.4" rx="1.3" fill="currentColor"/>' +
+    '<path d="M19.9 14.7v.8a1.6 1.6 0 0 1-1.6 1.6h-2.3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>' +
+    '<circle cx="14" cy="12.4" r="3.7" fill="currentColor"/>' +
+    '<path d="M20.6 24c0-3.5-3-5.7-6.6-5.7S7.4 20.5 7.4 24z" fill="currentColor"/></svg>';
 
   // ---- mount (GTM-safe: document.body may not exist yet) --------------------
   var root, wrap, focusInputNext = false;
@@ -264,9 +283,7 @@
     var hadFocus = prevInput && root.activeElement === prevInput;
 
     if (!state.open) {
-      wrap.innerHTML = '<button class="launch" id="pc-open" aria-label="' + T.open + '" title="' + T.launcher + '">' +
-        '<svg viewBox="0 0 28 28" fill="none"><path d="M6 5h16a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3h-8l-5 4v-4H6a3 3 0 0 1-3-3V8a3 3 0 0 1 3-3z" fill="#fff"/>' +
-        '<path d="M14 8.1l1.05 2.75L17.8 11.9l-2.75 1.05L14 15.7l-1.05-2.75L10.2 11.9l2.75-1.05L14 8.1z" fill="#015253"/></svg></button>';
+      wrap.innerHTML = '<button class="launch" id="pc-open" aria-label="' + T.open + '" title="' + T.launcher + '">' + AVATAR_SVG + "</button>";
       root.getElementById("pc-open").onclick = function () {
         state.open = true; focusInputNext = true;
         if (!state.suggestions.length) loadSuggestions();
@@ -288,8 +305,9 @@
     }).join("");
 
     var empty = state.messages.length ? "" :
-      '<div class="empty">' + (state.category ? T.emptyCat + esc(state.category) + T.emptyCatTail : T.empty) + "</div>";
-    var loading = state.loading ? '<div class="muted">' + T.thinking + "</div>" : "";
+      '<div class="empty"><span class="hero">' + AVATAR_SVG + "</span>" +
+      (state.category ? T.emptyCat + esc(state.category) + T.emptyCatTail : T.empty) + "</div>";
+    var loading = state.loading ? '<div class="typing"><i></i><i></i><i></i></div>' : "";
 
     var lastA = null;
     for (var k = state.messages.length - 1; k >= 0; k--) if (state.messages[k].role === "assistant") { lastA = state.messages[k]; break; }
@@ -298,11 +316,11 @@
 
     wrap.innerHTML =
       '<div class="panel"><div class="hd">' +
-      '<span class="av"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5l1.55 4.2 4.2 1.55-4.2 1.55L12 14l-1.55-4.2L6.25 8.25l4.2-1.55L12 2.5z"/><path d="M18.6 14.2l.72 1.95 1.95.72-1.95.72-.72 1.95-.72-1.95-1.95-.72 1.95-.72.72-1.95z"/></svg></span>' +
+      '<span class="av">' + AVATAR_SVG + "</span>" +
       '<div class="tt"><b>' + T.title + "</b><small>" +
       (state.category ? T.browsing + esc(state.category) : T.subtitle) + "</small></div>" +
       '<button id="pc-close" aria-label="' + T.close + '">✕</button></div>' +
-      '<div class="body" id="pc-body">' + empty + msgs + loading + "</div>" +
+      '<div class="body' + (state.messages.length ? "" : " pc-empty") + '" id="pc-body">' + empty + msgs + loading + "</div>" +
       (chips ? '<div class="chips">' + chips + "</div>" : "") +
       '<form class="inp" id="pc-form"><input id="pc-in" placeholder="' + T.placeholder + '" ' + (state.loading ? "disabled" : "") + ">" +
       '<button type="submit" aria-label="' + T.send + '" ' + (state.loading ? "disabled" : "") + ">➤</button></form></div>";

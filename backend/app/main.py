@@ -176,7 +176,13 @@ def widget_js():
 def widget_demo():
     """A minimal page that embeds the widget exactly as a shop page would —
     for local testing without touching the real storefront."""
-    return """<!doctype html><html lang="en"><head><meta charset="utf-8">
+    # Version the script by file mtime so the demo always loads the latest build
+    # (the widget itself is cached max-age=300 for real shops).
+    try:
+        v = int(os.path.getmtime(os.path.join(_STATIC_DIR, "productchat-widget.js")))
+    except OSError:
+        v = 0
+    return f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ProductChat widget demo</title></head>
 <body style="font-family:system-ui,sans-serif;max-width:720px;margin:60px auto;padding:0 20px;color:#334155">
@@ -185,7 +191,7 @@ def widget_demo():
 the same way it would sit on a live JTL-Shop (NOVA) page. Look for the
 <b>"Ask the assistant"</b> button in the bottom-right corner.</p>
 <pre style="background:#f1f5f9;padding:14px;border-radius:10px;overflow:auto">&lt;script src="/productchat-widget.js" defer&gt;&lt;/script&gt;</pre>
-<script src="/productchat-widget.js" defer></script>
+<script src="/productchat-widget.js?v={v}" defer></script>
 </body></html>"""
 
 
