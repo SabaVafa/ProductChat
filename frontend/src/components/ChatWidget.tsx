@@ -110,7 +110,7 @@ export default function ChatWidget({ category }: Props) {
           onClick={() => setOpen(true)}
           aria-label="Ask the assistant"
           title="Ask the assistant"
-          className="fixed bottom-5 right-5 z-50 flex items-center justify-center w-14 h-14 rounded-full bg-[#015253] hover:bg-[#02696a] text-white shadow-lg hover:shadow-xl hover:-translate-y-0.5 hover:scale-105 active:scale-95 transition-all"
+          className="fixed bottom-5 right-5 z-50 flex items-center justify-center w-14 h-14 rounded-full bg-[#015253] hover:bg-[#02696a] text-white shadow-[0_4px_12px_-3px_rgba(1,82,83,0.32)] hover:shadow-[0_8px_20px_-6px_rgba(1,82,83,0.4)] hover:-translate-y-0.5 hover:scale-105 active:scale-95 transition-all"
         >
           <AssistantAvatar className="w-[34px] h-[34px]" />
         </button>
@@ -118,7 +118,7 @@ export default function ChatWidget({ category }: Props) {
 
       {/* Panel */}
       {open && (
-        <div className="fixed bottom-5 right-5 z-50 w-[calc(100vw-2.5rem)] sm:w-[358px] h-[540px] max-h-[calc(100dvh-2.5rem)] bg-white rounded-[20px] shadow-2xl border border-[#015253]/10 flex flex-col overflow-hidden">
+        <div className="fixed bottom-5 right-5 z-50 w-[calc(100vw-2.5rem)] sm:w-[358px] h-[540px] max-h-[calc(100dvh-2.5rem)] bg-white/70 backdrop-blur-xl rounded-[20px] shadow-2xl border border-white/50 flex flex-col overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between px-3.5 py-3 text-white bg-[linear-gradient(145deg,#02726e,#015253_55%,#013f40)] shadow-[inset_0_-1px_0_rgba(255,255,255,0.1)]">
             <div className="flex items-center gap-2.5">
@@ -141,13 +141,13 @@ export default function ChatWidget({ category }: Props) {
           {/* Body */}
           <div
             ref={scrollRef}
-            className={`flex-1 overflow-y-auto p-3.5 space-y-3 bg-[#f5f8f7] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${
+            className={`flex-1 overflow-y-auto p-3.5 space-y-3 bg-transparent [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${
               messages.length === 0 ? 'flex flex-col justify-center' : ''
             }`}
           >
             {messages.length === 0 && (
               <div className="text-center">
-                <div className="w-14 h-14 mx-auto rounded-[19px] flex items-center justify-center mb-3.5 text-[#015253] bg-[radial-gradient(circle_at_50%_38%,#d7eae8,#eef6f5)] shadow-[0_10px_26px_-10px_rgba(1,82,83,0.4),0_0_0_7px_rgba(1,82,83,0.04)]">
+                <div className="w-14 h-14 mx-auto rounded-[19px] flex items-center justify-center mb-3.5 text-[#015253] bg-[radial-gradient(circle_at_50%_38%,#d7eae8,#eef6f5)] shadow-[0_5px_14px_-8px_rgba(1,82,83,0.28)]">
                   <AssistantAvatar className="w-7 h-7" />
                 </div>
                 <p className="text-sm text-slate-600 mb-1 font-medium">
@@ -262,7 +262,7 @@ export default function ChatWidget({ category }: Props) {
 
           {/* Suggestion / refine chips */}
           {(messages.length === 0 ? suggestions : activeRefine).length > 0 && (
-            <div className="px-3.5 py-3 bg-white border-t border-slate-100 flex flex-wrap gap-2">
+            <div className="px-3.5 py-3 bg-transparent border-t border-white/40 flex flex-wrap gap-2">
               {(messages.length === 0 ? suggestions : activeRefine).slice(0, 5).map((s) => (
                 <button
                   key={s}
@@ -281,7 +281,7 @@ export default function ChatWidget({ category }: Props) {
               e.preventDefault();
               send(input);
             }}
-            className="px-3.5 py-3 bg-white border-t border-slate-200 flex gap-2"
+            className="px-3.5 py-3 bg-transparent border-t border-white/40 flex gap-2"
           >
             <input
               value={input}

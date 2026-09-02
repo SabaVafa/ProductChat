@@ -258,6 +258,9 @@ class SuggestionsService:
             "hat ein Zeitungsfach?', 'Gibt es Paketboxen für große Pakete?'.\n"
             "- Schlecht (NICHT so): 'Mit Kamera integriert?', 'Für Gewerbe oder Privat?', "
             "'Für mehrere Lieferungen?', 'Welche Größe passt?'.\n"
+            "- Die GLOBALEN Startfragen BREIT und einladend halten — ein allgemeiner Einstieg "
+            "pro Kategorie, KEINE engen Spezialfälle. Gut: 'Habt ihr Türklingeln mit Gravur?'. "
+            "Zu speziell (NICHT so): 'Habt ihr Türklingeln mit Gravur für den Nachnamen?'.\n"
             "- Höchstens ~12 Wörter, aber lieber natürlich und vollständig als knapp und holprig. "
             "Keine Nummerierung."
         )
