@@ -121,7 +121,7 @@
     transition:transform .22s cubic-bezier(.34,1.56,.64,1), box-shadow .22s, background .22s; }\
   .launch:hover{ transform:translateY(-2px) scale(1.05); background:#02696a; box-shadow:0 18px 42px -12px rgba(1,82,83,.65), 0 4px 10px -2px rgba(0,0,0,.24); }\
   .launch:active{ transform:scale(.96); }\
-  .launch svg{ width:27px; height:27px; display:block; }\
+  .launch svg{ width:34px; height:34px; display:block; }\
   .panel{ position:fixed; bottom:20px; right:20px; z-index:2147483000; width:358px; max-width:calc(100vw - 28px);\
     height:min(552px, calc(100dvh - 36px)); background:#fff; border:1px solid rgba(1,82,83,.1); border-radius:20px;\
     box-shadow:0 32px 64px -24px rgba(1,44,45,.5), 0 8px 20px -12px rgba(0,0,0,.16); display:flex; flex-direction:column; overflow:hidden;\

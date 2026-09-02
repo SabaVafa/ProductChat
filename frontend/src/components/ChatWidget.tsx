@@ -112,7 +112,7 @@ export default function ChatWidget({ category }: Props) {
           title="Ask the assistant"
           className="fixed bottom-5 right-5 z-50 flex items-center justify-center w-14 h-14 rounded-full bg-[#015253] hover:bg-[#02696a] text-white shadow-lg hover:shadow-xl hover:-translate-y-0.5 hover:scale-105 active:scale-95 transition-all"
         >
-          <AssistantAvatar className="w-7 h-7" />
+          <AssistantAvatar className="w-[34px] h-[34px]" />
         </button>
       )}
 
