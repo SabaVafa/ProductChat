@@ -128,9 +128,9 @@
     height:min(552px, calc(100dvh - 36px)); background:#fff; border:1px solid rgba(1,82,83,.1); border-radius:20px;\
     box-shadow:0 32px 64px -24px rgba(1,44,45,.5), 0 8px 20px -12px rgba(0,0,0,.16); display:flex; flex-direction:column; overflow:hidden;\
     transform-origin:bottom right; }\
-  .panel.opening{ animation:pcOpen .32s cubic-bezier(.16,1,.3,1) both; }\
+  .panel.opening{ animation:pcOpen .26s cubic-bezier(.2,.75,.3,1) both; }\
   .panel.closing{ animation:pcClose .2s cubic-bezier(.4,0,1,1) both; }\
-  @keyframes pcOpen{ from{ opacity:0; transform:translateY(16px) scale(.82); } to{ opacity:1; transform:translateY(0) scale(1); } }\
+  @keyframes pcOpen{ from{ opacity:0; transform:translateY(10px) scale(.92); } to{ opacity:1; transform:translateY(0) scale(1); } }\
   @keyframes pcClose{ from{ opacity:1; transform:translateY(0) scale(1); } to{ opacity:0; transform:translateY(16px) scale(.82); } }\
   @media (prefers-reduced-motion: reduce){ .panel.opening, .panel.closing{ animation:none; } .launch{ transition:none; animation:none; } .typing i{ animation:none; } }\
   .hd{ display:flex; align-items:center; gap:11px; padding:13px 14px; color:#fff; background:radial-gradient(95% 130% at 22% -20%, rgba(255,255,255,.14), rgba(255,255,255,0) 55%), radial-gradient(120% 150% at 20% 0%, #05867f 0%, #015b58 42%, #013d3e 100%); box-shadow:inset 0 -1px 0 rgba(255,255,255,.1); }\

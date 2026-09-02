@@ -119,10 +119,10 @@ export default function ChatWidget({ category }: Props) {
       <style>{`
         .pc-input::-webkit-search-cancel-button{ -webkit-appearance:none; appearance:none; width:16px; height:16px; margin-left:8px; cursor:pointer; opacity:.85; transition:opacity .15s; background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23A1A1A1' stroke-width='2.2' stroke-linecap='round'><line x1='6' y1='6' x2='18' y2='18'/><line x1='6' y1='18' x2='18' y2='6'/></svg>") center / contain no-repeat; }
         .pc-input::-webkit-search-cancel-button:hover{ opacity:1; }
-        .pc-opening{ animation: pcOpen .32s cubic-bezier(.16,1,.3,1) both; }
+        .pc-opening{ animation: pcOpen .26s cubic-bezier(.2,.75,.3,1) both; }
         .pc-closing{ animation: pcClose .2s cubic-bezier(.4,0,1,1) both; }
         .pc-launch{ animation: pcLaunchIn .34s cubic-bezier(.34,1.56,.64,1) both; }
-        @keyframes pcOpen{ from{ opacity:0; transform:translateY(16px) scale(.82); } to{ opacity:1; transform:translateY(0) scale(1); } }
+        @keyframes pcOpen{ from{ opacity:0; transform:translateY(10px) scale(.92); } to{ opacity:1; transform:translateY(0) scale(1); } }
         @keyframes pcClose{ from{ opacity:1; transform:translateY(0) scale(1); } to{ opacity:0; transform:translateY(16px) scale(.82); } }
         @keyframes pcLaunchIn{ 0%{ opacity:0; transform:scale(.4); } 60%{ opacity:1; } 100%{ opacity:1; transform:scale(1); } }
         @media (prefers-reduced-motion: reduce){ .pc-opening,.pc-closing,.pc-launch{ animation:none; } }
