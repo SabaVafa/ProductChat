@@ -153,7 +153,7 @@ export default function ChatWidget({ category }: Props) {
           >
             {messages.length === 0 && (
               <div className="text-center">
-                <div className="w-14 h-14 mx-auto rounded-[19px] flex items-center justify-center mb-3.5 text-[#015253] bg-[#f2f6f6] shadow-[0_4px_12px_-6px_rgba(1,44,45,0.16)]">
+                <div className="w-14 h-14 mx-auto rounded-[19px] flex items-center justify-center mb-3.5 text-[#015253] bg-[#e3f0ef] shadow-[0_4px_12px_-6px_rgba(1,44,45,0.16)]">
                   <AssistantAvatar className="w-7 h-7" />
                 </div>
                 <p className="text-sm text-slate-600 mb-1 font-medium">
