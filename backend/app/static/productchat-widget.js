@@ -137,7 +137,7 @@
   .hd small{ display:block; font-size:11px; opacity:.72; margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }\
   .hd button{ background:rgba(255,255,255,.12); border:0; color:#fff; width:28px; height:28px; border-radius:9px; cursor:pointer; font-size:14px; line-height:1; flex:none; transition:background .15s; }\
   .hd button:hover{ background:rgba(255,255,255,.24); }\
-  .body{ flex:1; overflow-y:auto; padding:14px; background:#f5f8f7; display:flex; flex-direction:column; gap:9px; scrollbar-width:none; }\
+  .body{ flex:1; overflow-y:auto; padding:14px; background:#f5f6fa; display:flex; flex-direction:column; gap:9px; scrollbar-width:none; }\
   .body.pc-empty{ justify-content:center; }\
   .body::-webkit-scrollbar{ display:none; }\
   .row{ display:flex; } .row.u{ justify-content:flex-end; } .row.a{ justify-content:flex-start; }\

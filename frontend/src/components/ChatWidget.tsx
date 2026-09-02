@@ -147,7 +147,7 @@ export default function ChatWidget({ category }: Props) {
           {/* Body */}
           <div
             ref={scrollRef}
-            className={`flex-1 overflow-y-auto p-3.5 space-y-3 bg-[#f5f8f7] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${
+            className={`flex-1 overflow-y-auto p-3.5 space-y-3 bg-[#f5f6fa] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${
               messages.length === 0 ? 'flex flex-col justify-center' : ''
             }`}
           >
