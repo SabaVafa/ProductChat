@@ -176,7 +176,7 @@ export default function ChatWidget({ category }: Props) {
           >
             {messages.length === 0 && (
               <div className="text-center">
-                <img src={METZLER_LOGO} alt="Metzler" className="w-[48px] h-auto mx-auto mb-3 mt-0.5" />
+                <img src={METZLER_LOGO} alt="Metzler" className="w-[32px] h-[32px] mx-auto mb-3 mt-0.5" />
                 <p className="text-sm text-slate-600 mb-1 font-medium">
                   {category ? `Questions about ${category.toLowerCase()}` : 'Not sure where to start?'}
                 </p>
