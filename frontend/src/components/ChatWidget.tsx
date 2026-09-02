@@ -96,7 +96,7 @@ export default function ChatWidget({ category }: Props) {
       {!open && (
         <button
           onClick={() => setOpen(true)}
-          className="fixed bottom-6 right-6 z-50 flex items-center gap-2 pl-4 pr-5 py-3.5 rounded-full bg-gradient-to-br from-[#015253] to-[#013b3c] text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all"
+          className="fixed bottom-5 right-5 z-50 flex items-center gap-2 pl-3 pr-4 py-3 rounded-full bg-[#015253] hover:bg-[#02696a] text-white shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all"
         >
           <MessageSquare className="w-5 h-5" />
           <span className="font-medium text-sm">Ask the assistant</span>
@@ -105,9 +105,9 @@ export default function ChatWidget({ category }: Props) {
 
       {/* Panel */}
       {open && (
-        <div className="fixed bottom-6 right-6 z-50 w-[calc(100vw-3rem)] sm:w-[400px] h-[600px] max-h-[calc(100vh-3rem)] bg-white rounded-2xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden">
+        <div className="fixed bottom-5 right-5 z-50 w-[calc(100vw-2.5rem)] sm:w-[358px] h-[540px] max-h-[calc(100dvh-2.5rem)] bg-white rounded-[20px] shadow-2xl border border-[#015253]/10 flex flex-col overflow-hidden">
           {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-br from-[#015253] to-[#013b3c] text-white">
+          <div className="flex items-center justify-between px-3.5 py-3 bg-[#015253] text-white shadow-[inset_0_-1px_0_rgba(255,255,255,0.08)]">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
                 <Bot className="w-5 h-5" />
@@ -125,7 +125,7 @@ export default function ChatWidget({ category }: Props) {
           </div>
 
           {/* Body */}
-          <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50">
+          <div ref={scrollRef} className="flex-1 overflow-y-auto p-3.5 space-y-3 bg-[#f5f8f7]">
             {messages.length === 0 && (
               <div className="text-center pt-6">
                 <div className="w-12 h-12 mx-auto rounded-2xl bg-[#d3e6e5] flex items-center justify-center mb-3">
