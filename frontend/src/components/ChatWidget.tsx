@@ -96,7 +96,7 @@ export default function ChatWidget({ category }: Props) {
       {!open && (
         <button
           onClick={() => setOpen(true)}
-          className="fixed bottom-6 right-6 z-50 flex items-center gap-2 pl-4 pr-5 py-3.5 rounded-full bg-gradient-to-br from-indigo-600 to-violet-600 text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all"
+          className="fixed bottom-6 right-6 z-50 flex items-center gap-2 pl-4 pr-5 py-3.5 rounded-full bg-gradient-to-br from-[#015253] to-[#013b3c] text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all"
         >
           <MessageSquare className="w-5 h-5" />
           <span className="font-medium text-sm">Ask the assistant</span>
@@ -107,7 +107,7 @@ export default function ChatWidget({ category }: Props) {
       {open && (
         <div className="fixed bottom-6 right-6 z-50 w-[calc(100vw-3rem)] sm:w-[400px] h-[600px] max-h-[calc(100vh-3rem)] bg-white rounded-2xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden">
           {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-br from-indigo-600 to-violet-600 text-white">
+          <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-br from-[#015253] to-[#013b3c] text-white">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
                 <Bot className="w-5 h-5" />
@@ -128,8 +128,8 @@ export default function ChatWidget({ category }: Props) {
           <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50">
             {messages.length === 0 && (
               <div className="text-center pt-6">
-                <div className="w-12 h-12 mx-auto rounded-2xl bg-indigo-100 flex items-center justify-center mb-3">
-                  <Sparkles className="w-6 h-6 text-indigo-600" />
+                <div className="w-12 h-12 mx-auto rounded-2xl bg-[#d3e6e5] flex items-center justify-center mb-3">
+                  <Sparkles className="w-6 h-6 text-[#015253]" />
                 </div>
                 <p className="text-sm text-slate-600 mb-1 font-medium">
                   {category ? `Questions about ${category.toLowerCase()}` : 'Not sure where to start?'}
@@ -144,7 +144,7 @@ export default function ChatWidget({ category }: Props) {
                   <div
                     className={
                       m.role === 'user'
-                        ? 'bg-indigo-600 text-white rounded-2xl rounded-br-sm px-3.5 py-2.5 text-sm'
+                        ? 'bg-[#015253] text-white rounded-2xl rounded-br-sm px-3.5 py-2.5 text-sm'
                         : 'bg-white border border-slate-200 rounded-2xl rounded-bl-sm px-3.5 py-2.5 text-sm text-slate-700 shadow-sm'
                     }
                   >
@@ -160,7 +160,7 @@ export default function ChatWidget({ category }: Props) {
                           href={safeUrl(p.url) || '#'}
                           target={safeUrl(p.url) ? '_blank' : undefined}
                           rel="noopener noreferrer"
-                          className="flex gap-3 bg-white border border-slate-200 rounded-xl p-2.5 hover:border-indigo-300 hover:shadow-sm transition-all group"
+                          className="flex gap-3 bg-white border border-slate-200 rounded-xl p-2.5 hover:border-[#7fb3b3] hover:shadow-sm transition-all group"
                         >
                           {safeUrl(p.image) && (
                             <img
@@ -179,7 +179,7 @@ export default function ChatWidget({ category }: Props) {
                                 </span>
                               )}
                               {p.url && (
-                                <span className="flex items-center gap-1 text-[11px] text-indigo-600 group-hover:underline">
+                                <span className="flex items-center gap-1 text-[11px] text-[#015253] group-hover:underline">
                                   View <ExternalLink className="w-3 h-3" />
                                 </span>
                               )}
@@ -191,7 +191,7 @@ export default function ChatWidget({ category }: Props) {
                   )}
 
                   {m.followUp && (
-                    <p className="mt-2 text-xs text-indigo-700 bg-indigo-50 border border-indigo-100 rounded-lg px-3 py-2">
+                    <p className="mt-2 text-xs text-[#013b3c] bg-[#e9f3f3] border border-[#d3e6e5] rounded-lg px-3 py-2">
                       {m.followUp}
                     </p>
                   )}
@@ -243,7 +243,7 @@ export default function ChatWidget({ category }: Props) {
                 <button
                   key={s}
                   onClick={() => (messages.length === 0 ? send(s) : send(s, true))}
-                  className="px-2.5 py-1.5 text-xs bg-white border border-slate-200 rounded-full hover:border-indigo-400 hover:text-indigo-600 text-slate-600 transition-colors"
+                  className="px-2.5 py-1.5 text-xs bg-white border border-slate-200 rounded-full hover:border-[#4d8a8a] hover:text-[#015253] text-slate-600 transition-colors"
                 >
                   {s}
                 </button>
@@ -264,12 +264,12 @@ export default function ChatWidget({ category }: Props) {
               onChange={(e) => setInput(e.target.value)}
               placeholder="Type your question…"
               disabled={loading}
-              className="flex-1 px-3.5 py-2.5 text-sm bg-slate-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all"
+              className="flex-1 px-3.5 py-2.5 text-sm bg-slate-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#015253] focus:bg-white transition-all"
             />
             <button
               type="submit"
               disabled={loading || !input.trim()}
-              className="w-10 h-10 flex items-center justify-center bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 disabled:bg-slate-300 transition-colors"
+              className="w-10 h-10 flex items-center justify-center bg-[#015253] text-white rounded-xl hover:bg-[#013b3c] disabled:bg-slate-300 transition-colors"
             >
               <Send className="w-4 h-4" />
             </button>
