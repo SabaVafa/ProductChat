@@ -136,7 +136,7 @@ export default function ChatWidget({ category }: Props) {
             }}
           >
             <div className="flex items-center gap-2.5">
-              <div className="relative w-9 h-9 rounded-xl bg-white/[0.16] ring-1 ring-white/10 flex items-center justify-center">
+              <div className="relative w-9 h-9 rounded-[4px] bg-white/[0.16] ring-1 ring-white/10 flex items-center justify-center">
                 <AssistantAvatar className="w-[21px] h-[21px]" />
                 <span className="absolute -right-0.5 -bottom-0.5 w-2.5 h-2.5 rounded-full bg-[#2fd08a] ring-2 ring-[#024e4c]" />
               </div>
@@ -165,7 +165,7 @@ export default function ChatWidget({ category }: Props) {
                 <p className="text-sm text-slate-600 mb-1 font-medium">
                   {category ? `Questions about ${category.toLowerCase()}` : 'Not sure where to start?'}
                 </p>
-                <p className="text-xs text-slate-400">Pick a question below or type your own.</p>
+                <p className="text-xs text-slate-500">Pick a question below or type your own.</p>
               </div>
             )}
 
