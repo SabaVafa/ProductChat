@@ -167,7 +167,7 @@
   .chip{ font-size:12px; padding:6px 11px; background:#f2f7f6; border:1px solid transparent; border-radius:999px; cursor:pointer; color:#3d5250; font-weight:500; text-align:left; transition:all .14s; }\
   .chip:hover{ background:#e3f0ef; border-color:#bcdedb; color:#015253; }\
   .inp{ display:flex; gap:8px; padding:11px 12px; background:#fff; border-top:1px solid rgba(1,44,45,.07); }\
-  .inp input{ flex:1; height:44px; padding:0 14px; font-size:16px; background:#f5f6fa; border:1px solid #dadada; border-radius:8px; outline:none; color:#000; transition:border-color .15s, box-shadow .15s; }\
+  .inp input{ flex:1; height:44px; padding:0 14px; font-size:16px; background:#f5f6fa; border:1px solid #dadada; border-radius:8px; outline:none; color:#000; -webkit-appearance:none; appearance:none; transition:border-color .15s, box-shadow .15s; }\
   .inp input::placeholder{ color:#a1a1a1; }\
   .inp input:focus{ border-color:#015253; box-shadow:0 0 0 3px rgba(1,82,83,.10); }\
   .inp input::-webkit-search-cancel-button{ -webkit-appearance:none; appearance:none; width:16px; height:16px; margin-left:8px; cursor:pointer; opacity:.85; transition:opacity .15s; background:url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23A1A1A1' stroke-width='2.2' stroke-linecap='round'><line x1='6' y1='6' x2='18' y2='18'/><line x1='6' y1='18' x2='18' y2='6'/></svg>\") center / contain no-repeat; }\

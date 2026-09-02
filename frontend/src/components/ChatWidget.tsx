@@ -316,7 +316,7 @@ export default function ChatWidget({ category }: Props) {
               onChange={(e) => setInput(e.target.value)}
               placeholder="Type your question…"
               disabled={loading}
-              className="pc-input flex-1 h-11 px-3.5 text-base text-black bg-[#f5f6fa] border border-[#dadada] rounded-lg outline-none placeholder:text-[#a1a1a1] focus:border-[#015253] focus:ring-[3px] focus:ring-[rgba(1,82,83,0.1)] transition-[border-color,box-shadow]"
+              className="pc-input flex-1 h-11 px-3.5 text-base text-black bg-[#f5f6fa] border border-[#dadada] rounded-lg outline-none appearance-none [-webkit-appearance:none] placeholder:text-[#a1a1a1] focus:border-[#015253] focus:ring-[3px] focus:ring-[rgba(1,82,83,0.1)] transition-[border-color,box-shadow]"
             />
             <button
               type="submit"
