@@ -180,8 +180,17 @@ class GravurService:
                 cur.add(tag)
                 new_tags[pid] = ",".join(sorted(cur))
 
-        partial = self._fetch_errors > 0
         prev_tagged = {p.product_id: p for p in products if p.gravur_tags}
+        # A run is "partial" (clears NOTHING) on any transient fetch failure, OR
+        # when it matched nothing despite having had tags before — that means the
+        # category page/URL matching broke (e.g. a catalog sync was mid-flight),
+        # not that the category genuinely emptied. Without this guard such a run
+        # would wipe every existing tag (seen in practice: 27 -> 0).
+        partial = self._fetch_errors > 0 or (not new_tags and bool(prev_tagged))
+        if not new_tags and prev_tagged:
+            logger.warning("Gravur: matched 0 products but %d were previously "
+                           "tagged; treating as partial and clearing nothing",
+                           len(prev_tagged))
 
         # Apply in the DB.
         changed = 0
