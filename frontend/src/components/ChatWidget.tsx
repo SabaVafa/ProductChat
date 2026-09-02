@@ -141,10 +141,10 @@ export default function ChatWidget({ category }: Props) {
 
       {/* Panel */}
       {(open || closing) && (
-        <div className={`${closing ? 'pc-closing' : 'pc-opening'} origin-bottom-right fixed bottom-5 right-5 z-50 w-[calc(100vw-2.5rem)] sm:w-[358px] h-[540px] max-h-[calc(100dvh-2.5rem)] bg-white rounded-[20px] shadow-2xl border border-[#015253]/10 flex flex-col overflow-hidden`}>
+        <div className={`${closing ? 'pc-closing' : 'pc-opening'} origin-bottom-right fixed z-50 inset-0 w-full h-[100dvh] rounded-none border-0 sm:inset-auto sm:bottom-5 sm:right-5 sm:w-[358px] sm:h-[540px] sm:max-h-[calc(100dvh-2.5rem)] sm:rounded-[20px] sm:border sm:border-[#015253]/10 bg-white shadow-2xl flex flex-col overflow-hidden`}>
           {/* Header */}
           <div
-            className="flex items-center justify-between px-3.5 py-3 text-white shadow-[inset_0_-1px_0_rgba(255,255,255,0.1)]"
+            className="flex items-center justify-between px-3.5 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))] text-white shadow-[inset_0_-1px_0_rgba(255,255,255,0.1)]"
             style={{
               background:
                 'radial-gradient(95% 130% at 22% -20%, rgba(255,255,255,0.14), rgba(255,255,255,0) 55%), radial-gradient(120% 150% at 20% 0%, #05867f, #015b58 42%, #013d3e)',
@@ -308,7 +308,7 @@ export default function ChatWidget({ category }: Props) {
               e.preventDefault();
               send(input);
             }}
-            className="px-3.5 py-3 bg-white border-t border-slate-200 flex gap-2"
+            className="px-3.5 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] bg-white border-t border-slate-200 flex gap-2"
           >
             <input
               type="search"

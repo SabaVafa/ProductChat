@@ -178,7 +178,12 @@
   .empty{ text-align:center; color:#5b6c6a; font-size:13px; line-height:1.5; padding:8px 14px; }\
   .empty .hero-logo{ display:block; width:38px; height:38px; margin:2px auto 13px; }\
   @keyframes pchero{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-3px); } }\
-  @media (max-width:480px){ .panel{ width:calc(100vw - 20px); height:calc(100dvh - 20px); bottom:10px; right:10px; border-radius:16px; } .launch{ bottom:14px; right:14px; } }\
+  @media (max-width:600px){\
+    .panel{ top:0; left:0; right:0; bottom:0; width:auto; height:auto; max-width:none; max-height:none; border-radius:0; border:0; transform-origin:bottom center; }\
+    .hd{ padding-top:max(13px, env(safe-area-inset-top)); }\
+    .inp{ padding-bottom:max(11px, env(safe-area-inset-bottom)); }\
+    .launch{ bottom:max(16px, env(safe-area-inset-bottom)); right:16px; }\
+  }\
   ";
 
   // Support-agent avatar (head + shoulders with a headset), white on teal.
