@@ -115,13 +115,13 @@
   var CSS = "\
   :host{ all: initial; }\
   *{ box-sizing:border-box; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; }\
-  .launch{ position:fixed; bottom:20px; right:20px; z-index:2147483000; display:flex; align-items:center; gap:9px;\
-    padding:10px 16px 10px 11px; border:0; border-radius:999px; cursor:pointer; color:#fff; background:#015253;\
-    box-shadow:0 10px 30px -10px rgba(1,82,83,.55), 0 2px 6px -2px rgba(0,0,0,.2);\
-    font-size:13.5px; font-weight:600; letter-spacing:.01em; transition:transform .2s cubic-bezier(.34,1.56,.64,1), box-shadow .2s, background .2s; }\
-  .launch:hover{ transform:translateY(-2px); background:#02696a; box-shadow:0 16px 38px -12px rgba(1,82,83,.6), 0 3px 8px -2px rgba(0,0,0,.22); }\
-  .launch .ic{ width:26px; height:26px; border-radius:50%; background:rgba(255,255,255,.16); display:flex; align-items:center; justify-content:center; flex:none; }\
-  .launch svg{ width:15px; height:15px; display:block; }\
+  .launch{ position:fixed; bottom:20px; right:20px; z-index:2147483000; width:58px; height:58px; padding:0;\
+    display:flex; align-items:center; justify-content:center; border:0; border-radius:50%; cursor:pointer; color:#fff; background:#015253;\
+    box-shadow:0 12px 32px -10px rgba(1,82,83,.6), 0 3px 8px -2px rgba(0,0,0,.22);\
+    transition:transform .22s cubic-bezier(.34,1.56,.64,1), box-shadow .22s, background .22s; }\
+  .launch:hover{ transform:translateY(-2px) scale(1.05); background:#02696a; box-shadow:0 18px 42px -12px rgba(1,82,83,.65), 0 4px 10px -2px rgba(0,0,0,.24); }\
+  .launch:active{ transform:scale(.96); }\
+  .launch svg{ width:27px; height:27px; display:block; }\
   .panel{ position:fixed; bottom:20px; right:20px; z-index:2147483000; width:358px; max-width:calc(100vw - 28px);\
     height:min(552px, calc(100dvh - 36px)); background:#fff; border:1px solid rgba(1,82,83,.1); border-radius:20px;\
     box-shadow:0 32px 64px -24px rgba(1,44,45,.5), 0 8px 20px -12px rgba(0,0,0,.16); display:flex; flex-direction:column; overflow:hidden;\
@@ -264,9 +264,9 @@
     var hadFocus = prevInput && root.activeElement === prevInput;
 
     if (!state.open) {
-      wrap.innerHTML = '<button class="launch" id="pc-open" aria-label="' + T.open + '">' +
-        '<span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.7A8.4 8.4 0 0 1 4 11.5 8.5 8.5 0 0 1 12.5 3 8.4 8.4 0 0 1 21 11.5z"/></svg></span>' +
-        '<span>' + T.launcher + "</span></button>";
+      wrap.innerHTML = '<button class="launch" id="pc-open" aria-label="' + T.open + '" title="' + T.launcher + '">' +
+        '<svg viewBox="0 0 28 28" fill="none"><path d="M6 5h16a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3h-8l-5 4v-4H6a3 3 0 0 1-3-3V8a3 3 0 0 1 3-3z" fill="#fff"/>' +
+        '<path d="M14 8.1l1.05 2.75L17.8 11.9l-2.75 1.05L14 15.7l-1.05-2.75L10.2 11.9l2.75-1.05L14 8.1z" fill="#015253"/></svg></button>';
       root.getElementById("pc-open").onclick = function () {
         state.open = true; focusInputNext = true;
         if (!state.suggestions.length) loadSuggestions();

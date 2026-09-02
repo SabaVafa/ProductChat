@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { MessageSquare, X, Send, Loader2, Sparkles, ExternalLink, Bot, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { X, Send, Loader2, Sparkles, ExternalLink, Bot, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { chatAPI, suggestionsAPI } from '../services/api';
 import { ChatResponse, ProductCard as ProductType } from '../types';
 import { safeUrl, formatPrice } from '../utils/format';
@@ -96,10 +96,14 @@ export default function ChatWidget({ category }: Props) {
       {!open && (
         <button
           onClick={() => setOpen(true)}
-          className="fixed bottom-5 right-5 z-50 flex items-center gap-2 pl-3 pr-4 py-3 rounded-full bg-[#015253] hover:bg-[#02696a] text-white shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all"
+          aria-label="Ask the assistant"
+          title="Ask the assistant"
+          className="fixed bottom-5 right-5 z-50 flex items-center justify-center w-14 h-14 rounded-full bg-[#015253] hover:bg-[#02696a] text-white shadow-lg hover:shadow-xl hover:-translate-y-0.5 hover:scale-105 active:scale-95 transition-all"
         >
-          <MessageSquare className="w-5 h-5" />
-          <span className="font-medium text-sm">Ask the assistant</span>
+          <svg viewBox="0 0 28 28" className="w-7 h-7" fill="none">
+            <path d="M6 5h16a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3h-8l-5 4v-4H6a3 3 0 0 1-3-3V8a3 3 0 0 1 3-3z" fill="#fff" />
+            <path d="M14 8.1l1.05 2.75L17.8 11.9l-2.75 1.05L14 15.7l-1.05-2.75L10.2 11.9l2.75-1.05L14 8.1z" fill="#015253" />
+          </svg>
         </button>
       )}
 
