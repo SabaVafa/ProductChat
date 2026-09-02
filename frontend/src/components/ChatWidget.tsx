@@ -104,6 +104,10 @@ export default function ChatWidget({ category }: Props) {
 
   return (
     <>
+      <style>{`
+        .pc-input::-webkit-search-cancel-button{ -webkit-appearance:none; appearance:none; width:16px; height:16px; margin-left:8px; cursor:pointer; opacity:.85; transition:opacity .15s; background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23A1A1A1' stroke-width='2.2' stroke-linecap='round'><line x1='6' y1='6' x2='18' y2='18'/><line x1='6' y1='18' x2='18' y2='6'/></svg>") center / contain no-repeat; }
+        .pc-input::-webkit-search-cancel-button:hover{ opacity:1; }
+      `}</style>
       {/* Floating launcher */}
       {!open && (
         <button
@@ -295,7 +299,7 @@ export default function ChatWidget({ category }: Props) {
               onChange={(e) => setInput(e.target.value)}
               placeholder="Type your question…"
               disabled={loading}
-              className="flex-1 h-11 px-3.5 text-base text-black bg-[#f5f6fa] border border-[#dadada] rounded-lg outline-none placeholder:text-[#a1a1a1] focus:border-[#015253] focus:ring-[3px] focus:ring-[rgba(1,82,83,0.1)] transition-[border-color,box-shadow]"
+              className="pc-input flex-1 h-11 px-3.5 text-base text-black bg-[#f5f6fa] border border-[#dadada] rounded-lg outline-none placeholder:text-[#a1a1a1] focus:border-[#015253] focus:ring-[3px] focus:ring-[rgba(1,82,83,0.1)] transition-[border-color,box-shadow]"
             />
             <button
               type="submit"
@@ -305,6 +309,22 @@ export default function ChatWidget({ category }: Props) {
               <Send className="w-4 h-4" />
             </button>
           </form>
+
+          {/* Brand attribution */}
+          <a
+            href="https://edelstahl-tuerklingel.de"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-1.5 pt-1.5 pb-2.5 bg-white no-underline"
+          >
+            <svg viewBox="0 0 83 83" className="w-[15px] h-[15px] rounded-[3px]" fill="none" aria-hidden="true">
+              <path
+                d="M80.18 0H2.58C1.16 0 0 1.16 0 2.58V80.18C0 81.6 1.16 82.76 2.58 82.76H80.18C81.6 82.76 82.76 81.6 82.76 80.18V2.58C82.76 1.16 81.6 0 80.18 0ZM31.52 15.63L40.07 30.44L35.77 37.88L22.93 15.63H31.52ZM31.56 48.76L21.03 30.51V69.08H13.59V15.63H21.03L35.86 41.32L55.65 7.03H64.24L35.85 56.21L31.55 48.77L31.56 48.76ZM68.77 69.08H61.33V30.52L46.51 56.18H37.92L61.32 15.64H68.76V69.09L68.77 69.08Z"
+                fill="#D32B25"
+              />
+            </svg>
+            <span className="text-[10.5px] font-medium tracking-[0.02em] text-[#9aa5a3]">von Metzler</span>
+          </a>
         </div>
       )}
     </>

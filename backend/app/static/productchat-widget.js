@@ -171,6 +171,9 @@
   .inp button{ width:44px; height:44px; border:0; border-radius:8px; background:linear-gradient(150deg,#02726e,#015253); color:#fff; cursor:pointer; font-size:15px; flex:none; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 12px -4px rgba(1,82,83,.5); transition:filter .15s, transform .12s, box-shadow .15s; }\
   .inp button:hover{ filter:brightness(1.12); box-shadow:0 6px 16px -4px rgba(1,82,83,.55); } .inp button:active{ transform:scale(.94); }\
   .inp button:disabled{ background:#c3d3d1; box-shadow:none; cursor:default; } .muted{ color:#9aa5a3; font-size:12px; padding:2px; }\
+  .brand{ display:flex; align-items:center; justify-content:center; gap:6px; padding:6px 12px 9px; background:#fff; text-decoration:none; }\
+  .brand svg{ width:15px; height:15px; display:block; border-radius:3px; }\
+  .brand span{ font-size:10.5px; color:#9aa5a3; font-weight:500; letter-spacing:.02em; }\
   .empty{ text-align:center; color:#5b6c6a; font-size:13px; line-height:1.5; padding:8px 14px; }\
   .empty .hero{ display:flex; align-items:center; justify-content:center; width:58px; height:58px; border-radius:19px; color:#015253; background:#f2f6f6; box-shadow:0 6px 16px -6px rgba(1,44,45,.22), 0 1px 2px rgba(1,44,45,.08), 0 0 0 1px rgba(1,44,45,.04); margin:0 auto 14px; animation:pchero 3.6s ease-in-out infinite; }\
   .empty .hero svg{ width:31px; height:31px; }\
@@ -187,6 +190,10 @@
     '<path d="M19.9 14.7v.8a1.6 1.6 0 0 1-1.6 1.6h-2.3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>' +
     '<circle cx="14" cy="12.4" r="3.7" fill="currentColor"/>' +
     '<path d="M20.6 24c0-3.5-3-5.7-6.6-5.7S7.4 20.5 7.4 24z" fill="currentColor"/></svg>';
+
+  // Metzler brand mark (red monogram) for the footer attribution.
+  var LOGO_SVG =
+    '<svg viewBox="0 0 83 83" fill="none" aria-hidden="true"><path d="M80.18 0H2.58C1.16 0 0 1.16 0 2.58V80.18C0 81.6 1.16 82.76 2.58 82.76H80.18C81.6 82.76 82.76 81.6 82.76 80.18V2.58C82.76 1.16 81.6 0 80.18 0ZM31.52 15.63L40.07 30.44L35.77 37.88L22.93 15.63H31.52ZM31.56 48.76L21.03 30.51V69.08H13.59V15.63H21.03L35.86 41.32L55.65 7.03H64.24L35.85 56.21L31.55 48.77L31.56 48.76ZM68.77 69.08H61.33V30.52L46.51 56.18H37.92L61.32 15.64H68.76V69.09L68.77 69.08Z" fill="#D32B25"/></svg>';
 
   // ---- mount (GTM-safe: document.body may not exist yet) --------------------
   var root, wrap, focusInputNext = false;
@@ -326,7 +333,8 @@
       '<div class="body' + (state.messages.length ? "" : " pc-empty") + '" id="pc-body">' + empty + msgs + loading + "</div>" +
       (chips ? '<div class="chips">' + chips + "</div>" : "") +
       '<form class="inp" id="pc-form"><input id="pc-in" type="search" placeholder="' + T.placeholder + '" ' + (state.loading ? "disabled" : "") + ">" +
-      '<button type="submit" aria-label="' + T.send + '" ' + (state.loading ? "disabled" : "") + ">➤</button></form></div>";
+      '<button type="submit" aria-label="' + T.send + '" ' + (state.loading ? "disabled" : "") + ">➤</button></form>" +
+      '<a class="brand" href="https://edelstahl-tuerklingel.de" target="_blank" rel="noopener">' + LOGO_SVG + "<span>von Metzler</span></a></div>";
 
     root.getElementById("pc-close").onclick = function () { state.open = false; render(); };
     root.getElementById("pc-form").onsubmit = function (e) { e.preventDefault(); var inp = root.getElementById("pc-in"); send(inp.value); };
