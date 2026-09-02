@@ -153,7 +153,7 @@
   .fb{ display:flex; gap:3px; margin-top:5px; } .fb button{ border:0; background:none; cursor:pointer; padding:4px; border-radius:7px; color:#9aa5a3; font-size:12px; transition:background .12s; }\
   .fb button:hover{ background:rgba(1,44,45,.06); } .fb button.on-up{ color:#0b7a5b; background:#e6f5ef; } .fb button.on-dn{ color:#e11d48; background:#fff1f2; }\
   .chips{ display:flex; flex-wrap:wrap; gap:6px; padding:10px 12px; background:#fff; border-top:1px solid rgba(1,44,45,.07); }\
-  .chip{ font-size:12px; padding:6px 11px; background:#f2f7f6; border:1px solid transparent; border-radius:999px; cursor:pointer; color:#3d5250; font-weight:500; transition:all .14s; }\
+  .chip{ font-size:12px; padding:6px 11px; background:#f2f7f6; border:1px solid transparent; border-radius:999px; cursor:pointer; color:#3d5250; font-weight:500; text-align:left; transition:all .14s; }\
   .chip:hover{ background:#e3f0ef; border-color:#bcdedb; color:#015253; }\
   .inp{ display:flex; gap:8px; padding:11px 12px; background:#fff; border-top:1px solid rgba(1,44,45,.07); }\
   .inp input{ flex:1; padding:10px 13px; font-size:15px; background:#f2f6f5; border:1px solid transparent; border-radius:12px; outline:none; color:#14201f; transition:background .15s, border-color .15s, box-shadow .15s; }\

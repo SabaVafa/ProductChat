@@ -247,7 +247,7 @@ export default function ChatWidget({ category }: Props) {
                 <button
                   key={s}
                   onClick={() => (messages.length === 0 ? send(s) : send(s, true))}
-                  className="px-2.5 py-1.5 text-xs bg-white border border-slate-200 rounded-full hover:border-[#4d8a8a] hover:text-[#015253] text-slate-600 transition-colors"
+                  className="text-left px-2.5 py-1.5 text-xs bg-white border border-slate-200 rounded-full hover:border-[#4d8a8a] hover:text-[#015253] text-slate-600 transition-colors"
                 >
                   {s}
                 </button>
