@@ -133,9 +133,8 @@ def _order_recommendations(
 
 # Shown when the LLM is unavailable (e.g. Mistral rate-limited) but retrieval —
 # which only needs the embeddings endpoint — still works.
-DEGRADED_ANSWER = ("Unser KI-Assistent ist gerade stark ausgelastet – hier sind schon "
-                   "einmal passende Produkte aus unserem Sortiment. Für eine "
-                   "ausführliche Beratung frag bitte gleich noch einmal.")
+DEGRADED_ANSWER = ("Hier sind passende Produkte aus unserem Sortiment für dich – "
+                   "wähle unten einen Vorschlag, um weiter einzugrenzen.")
 
 
 def _degraded_cards(retrieved_products: List[Dict[str, Any]], limit: int = 4) -> List[Dict[str, Any]]:
