@@ -183,6 +183,12 @@ class RAGService:
         ("Zeitungsfach", "Zeitungsfach"), ("newspaper", "Zeitungsfach"),
         ("beleuchtet", "beleuchtet"), ("illuminated", "beleuchtet"),
     ]
+    # A feature only becomes a refine chip when it's a GENUINE, shared facet of
+    # the results — present in at least this many retrieved products. A lone
+    # mention (e.g. an "optional LED" doorbell ring on a single Briefkasten+
+    # Funkklingel combo) must not surface a misleading "Mit LED" chip on a plain
+    # mailbox search.
+    MIN_FEATURE_HITS = 2
 
     def _build_refine_suggestions(self, retrieved_products: List[Dict[str, Any]]) -> List[str]:
         """Derive cheap refine chips from the facets of the retrieved products."""
@@ -197,14 +203,22 @@ class RAGService:
 
         prices = [p.get("price") for p in retrieved_products if isinstance(p.get("price"), (int, float))]
 
-        # Which keyword facets actually appear in the retrieved set.
-        blob = " ".join(
-            f"{p.get('name','')} {p.get('description','')} {p.get('attributes','')}"
-            for p in retrieved_products
-        ).lower()
-        present: List[str] = []   # german chip labels, deduped
+        # Count, per retrieved product, which feature facets it has — using
+        # WORD-BOUNDARY matching (so "led" can't match inside another word) and
+        # requiring a facet to be shared by several products before it becomes a
+        # chip. This stops a one-off/optional mention from surfacing a misleading
+        # facet (e.g. "Mit LED" on a mailbox search).
+        hits: Dict[str, int] = {}
+        for p in retrieved_products:
+            text = f"{p.get('name','')} {p.get('description','')} {p.get('attributes','')}".lower()
+            matched: set = set()
+            for term, label in self.REFINE_KEYWORDS:
+                if label not in matched and re.search(rf"\b{re.escape(term.lower())}\b", text):
+                    hits[label] = hits.get(label, 0) + 1
+                    matched.add(label)
+        present: List[str] = []   # german chip labels, in keyword order, deduped
         for term, label in self.REFINE_KEYWORDS:
-            if term.lower() in blob and label not in present:
+            if label not in present and hits.get(label, 0) >= self.MIN_FEATURE_HITS:
                 present.append(label)
 
         suggestions: List[str] = []
