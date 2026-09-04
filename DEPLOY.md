@@ -88,6 +88,33 @@ git push
 
 ---
 
+## Alternative host: Hugging Face Spaces (Docker) — free, no card, 16 GB RAM
+
+Files: [`deploy/hf/Dockerfile`](deploy/hf/Dockerfile),
+[`deploy/hf/README.md`](deploy/hf/README.md). The Space builds itself from this
+GitHub repo + the `demo-seed` release asset, so its own repo needs only those two
+files. Prereq: the `demo-seed` release must exist (Step 2 above) — it does.
+
+1. Create a free account at [huggingface.co](https://huggingface.co) (no card).
+2. **New → Space**: name `productchat-demo`, **SDK = Docker** (blank), visibility
+   **Public**, hardware **CPU basic (free)**.
+3. Add two files to the Space repo (web UI: *Files → + Add file → Create*, or
+   `git push` to the Space):
+   - `Dockerfile` ← contents of `deploy/hf/Dockerfile`
+   - `README.md` ← contents of `deploy/hf/README.md` (the YAML header sets
+     `sdk: docker` and `app_port: 7860`)
+4. **Settings → Variables and secrets → New secret** — add all four as *secrets*
+   (runtime): `GROQ_API_KEY`, `MISTRAL_API_KEY`, `ADMIN_TOKEN`, `ENCRYPTION_KEY`.
+5. The Space builds (a few min). Your demo:
+   **`https://<owner>-productchat-demo.hf.space/widget-demo`**
+   (e.g. `https://sabavafa-productchat-demo.hf.space/widget-demo`).
+
+Notes for HF: free Spaces are **public** and **sleep after ~48 h idle** (wake on
+visit). To update after a catalog change, refresh the release asset (Step 1–2)
+and **Restart** the Space (a rebuild re-clones `main` and re-fetches the seed).
+
+---
+
 ## Notes
 
 - **Free-tier cold start:** Render spins the service down after ~15 min idle; the
