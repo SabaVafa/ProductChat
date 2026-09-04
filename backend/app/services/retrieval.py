@@ -1,6 +1,7 @@
 from app.services.qdrant_service import QdrantService
 from app.services.embeddings import EmbeddingsService
 from app.services.settings_service import SettingsService
+from app.config import settings
 from sqlalchemy.orm import Session
 from typing import List, Dict, Any, Optional
 import logging
@@ -58,10 +59,15 @@ class RetrievalService:
         self.qdrant = QdrantService()
         self.embeddings = EmbeddingsService()
 
-        # Embeddings must use the Mistral API key configured via the Admin
-        # UI (stored encrypted in the DB), not just the process env var,
-        # since that's how users actually set their key.
-        if db is not None:
+        # Embeddings API key resolution:
+        # The process env var MISTRAL_API_KEY WINS when set — that's how a
+        # deployment supplies it, and it must never be overridden by a DB value
+        # that may be stale or encrypted with a different ENCRYPTION_KEY (e.g. a
+        # baked/seeded DB), which would fail to decrypt and 401. When no env key
+        # is set (local dev), fall back to the key configured via the Admin UI
+        # (stored encrypted in the DB) — EmbeddingsService already defaults to
+        # settings.MISTRAL_API_KEY, so we only reach for the DB key when empty.
+        if db is not None and not (settings.MISTRAL_API_KEY or "").strip():
             api_key = SettingsService(db).get_category_settings("mistral").get("api_key")
             if api_key:
                 self.embeddings.set_api_key(api_key)
