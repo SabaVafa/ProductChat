@@ -19,11 +19,19 @@ import requests
 import logging
 import json
 import re
+import time
 
 logger = logging.getLogger(__name__)
 
 MISTRAL_API_BASE = "https://api.mistral.ai/v1"
 REQUEST_TIMEOUT = 60
+# Retry a rate-limited/5xx chat call a few times before giving up. On the free
+# Groq tier a burst of chats returns 429 with a sub-second-to-seconds reset;
+# without this, query understanding immediately falls back to a keyword-less
+# search and a follow-up ("Mit Gravur", "ohne Stand") drifts to the wrong
+# category. Waits are capped so a long Retry-After (daily cap) can't hang a request.
+CHAT_MAX_RETRIES = 4
+CHAT_MAX_BACKOFF = 6.0
 
 
 def ChatMessage(role: str, content: str) -> Dict[str, str]:
@@ -119,18 +127,37 @@ class MistralService:
             if effort:
                 payload["reasoning_effort"] = effort
 
-        resp = requests.post(
-            f"{self.api_base}/chat/completions",
-            headers={
-                "Authorization": f"Bearer {self.api_key}",
-                "Content-Type": "application/json",
-                "Accept": "application/json",
-            },
-            json=payload,
-            timeout=REQUEST_TIMEOUT,
-        )
-        resp.raise_for_status()
-        return resp.json()
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+        }
+        url = f"{self.api_base}/chat/completions"
+        # Retry on 429 / 5xx so a transient free-tier rate limit doesn't force
+        # the caller into its keyword-less fallback (which drifts). Waits honour
+        # Retry-After but are capped, so a long daily-cap Retry-After can't hang.
+        last_exc: Optional[Exception] = None
+        for attempt in range(CHAT_MAX_RETRIES):
+            resp = requests.post(url, headers=headers, json=payload, timeout=REQUEST_TIMEOUT)
+            if resp.status_code == 429 or resp.status_code >= 500:
+                if attempt == CHAT_MAX_RETRIES - 1:
+                    resp.raise_for_status()  # out of retries → propagate
+                retry_after = resp.headers.get("Retry-After")
+                try:
+                    wait = float(retry_after) if retry_after else 1.2 * (2 ** attempt)
+                except (TypeError, ValueError):
+                    wait = 1.2 * (2 ** attempt)
+                wait = min(wait, CHAT_MAX_BACKOFF)
+                logger.warning(
+                    "Chat HTTP %s (attempt %d/%d), retrying in %.1fs",
+                    resp.status_code, attempt + 1, CHAT_MAX_RETRIES, wait,
+                )
+                time.sleep(wait)
+                last_exc = requests.HTTPError(f"HTTP {resp.status_code}", response=resp)
+                continue
+            resp.raise_for_status()
+            return resp.json()
+        raise last_exc or RuntimeError("Chat request failed after retries")
 
     def chat_content(
         self,
