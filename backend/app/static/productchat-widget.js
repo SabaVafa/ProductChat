@@ -36,6 +36,7 @@
     errRate: "Einen Moment bitte – gerade zu viele Anfragen. Versuche es gleich noch einmal.",
     introFallback: "Hallo! Ich beantworte dir gern Fragen zu diesem Produkt – zum Beispiel zu Farben, Montage oder Alternativen.",
     close: "Chat schließen",
+    newChat: "Neuer Chat",
     send: "Frage senden",
     thumbUp: "Hilfreiche Antwort",
     thumbDown: "Nicht hilfreiche Antwort",
@@ -302,6 +303,16 @@
     setTimeout(finish, 260);   // fallback if animationend doesn't fire
   }
 
+  // Start a fresh conversation: clear the turns + any draft, back to the
+  // starter suggestions. Keeps the panel open (no close animation).
+  function resetChat() {
+    state.messages = [];
+    var inp = root && root.getElementById("pc-in");
+    if (inp) inp.value = "";           // clear the draft so render() won't restore it
+    focusInputNext = true;
+    if (!state.suggestions.length) loadSuggestions(); else render();
+  }
+
   function render() {
     // Preserve the user's draft + focus across full re-renders (async updates
     // like arriving suggestions must not eat what they're typing).
@@ -353,6 +364,7 @@
       '<span class="av">' + AVATAR_SVG + "</span>" +
       '<div class="tt"><b>' + T.title + "</b><small>" +
       (state.category ? T.browsing + esc(state.category) : T.subtitle) + "</small></div>" +
+      (state.messages.length ? '<button id="pc-reset" aria-label="' + T.newChat + '" title="' + T.newChat + '">↻</button>' : '') +
       '<button id="pc-close" aria-label="' + T.close + '">✕</button></div>' +
       '<div class="body' + (state.messages.length ? "" : " pc-empty") + '" id="pc-body">' + empty + msgs + loading + "</div>" +
       (chips ? '<div class="chips">' + chips + "</div>" : "") +
@@ -360,6 +372,8 @@
       '<button type="submit" aria-label="' + T.send + '" ' + (state.loading ? "disabled" : "") + ">➤</button></form></div>";
 
     root.getElementById("pc-close").onclick = function () { closePanel(); };
+    var pcReset = root.getElementById("pc-reset");
+    if (pcReset) pcReset.onclick = function () { resetChat(); };
     root.getElementById("pc-form").onsubmit = function (e) { e.preventDefault(); var inp = root.getElementById("pc-in"); send(inp.value); };
     Array.prototype.forEach.call(root.querySelectorAll(".chip"), function (b) {
       b.onclick = function () { send(b.getAttribute("data-c"), state.messages.length > 0); };

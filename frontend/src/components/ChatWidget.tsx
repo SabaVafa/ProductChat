@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { X, Send, ExternalLink, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { X, Send, ExternalLink, ThumbsUp, ThumbsDown, RotateCcw } from 'lucide-react';
 
 // Support-agent avatar (head + shoulders with a headset) — inherits currentColor.
 const AssistantAvatar = ({ className }: { className?: string }) => (
@@ -50,6 +50,12 @@ export default function ChatWidget({ category }: Props) {
   const [messages, setMessages] = useState<Msg[]>([]);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Start a fresh conversation: clear the turns + draft, back to starter chips.
+  const resetChat = () => {
+    setMessages([]);
+    setInput('');
+  };
 
   // Refetch suggestions whenever the category context changes.
   useEffect(() => {
@@ -162,9 +168,21 @@ export default function ChatWidget({ category }: Props) {
                 </p>
               </div>
             </div>
-            <button onClick={closePanel} className="p-1.5 rounded-lg hover:bg-white/20 transition-colors">
-              <X className="w-4 h-4" />
-            </button>
+            <div className="flex items-center gap-1">
+              {messages.length > 0 && (
+                <button
+                  onClick={resetChat}
+                  aria-label="New chat"
+                  title="New chat"
+                  className="p-1.5 rounded-lg hover:bg-white/20 transition-colors"
+                >
+                  <RotateCcw className="w-4 h-4" />
+                </button>
+              )}
+              <button onClick={closePanel} className="p-1.5 rounded-lg hover:bg-white/20 transition-colors">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
           </div>
 
           {/* Body */}
