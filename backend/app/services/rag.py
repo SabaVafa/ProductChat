@@ -190,24 +190,71 @@ class RAGService:
     # mailbox search.
     MIN_FEATURE_HITS = 2
 
-    def _build_refine_suggestions(self, retrieved_products: List[Dict[str, Any]]) -> List[str]:
-        """Derive cheap refine chips from the facets of the retrieved products."""
+    # Map a (sub)category to its product family, so a category chip is only
+    # offered when the results span DIFFERENT families — not when they are all
+    # sub-categories of one family (e.g. "Nur Briefkästen" is useless when every
+    # result is already a mailbox sub-category).
+    _FAMILY_MAP = [
+        ("briefkast", "Briefkästen"), ("postkast", "Briefkästen"),
+        ("sprechanlage", "Sprechanlagen"), ("gegensprech", "Sprechanlagen"),
+        ("paketbox", "Paketboxen"), ("paketkast", "Paketboxen"),
+        ("hausnummer", "Hausnummern"),
+        ("funkklingel", "Türklingeln"), ("türklingel", "Türklingeln"), ("klingel", "Türklingeln"),
+        ("leuchte", "Außenleuchten"), ("strahler", "Außenleuchten"), ("lampe", "Außenleuchten"),
+        ("kamera", "Sicherheitstechnik"), ("sicherheit", "Sicherheitstechnik"), ("alarm", "Sicherheitstechnik"),
+        ("mülltonne", "Mülltonnenboxen"),
+        ("namensschild", "Schilder"), ("hinweisschild", "Schilder"), ("schild", "Schilder"),
+    ]
+
+    @staticmethod
+    def _defold(s: str) -> str:
+        """Lowercase + fold umlauts so 'Briefkästen' matches the 'briefkast' key."""
+        s = (s or "").lower()
+        return s.replace("ä", "a").replace("ö", "o").replace("ü", "u").replace("ß", "ss")
+
+    @classmethod
+    def _family_of(cls, category: Optional[str]) -> Optional[str]:
+        if not category:
+            return None
+        c = cls._defold(category)
+        for kw, fam in cls._FAMILY_MAP:
+            if cls._defold(kw) in c:
+                return fam
+        return category  # unknown category → treat as its own family
+
+    def _build_refine_suggestions(
+        self, retrieved_products: List[Dict[str, Any]], applied_text: str = ""
+    ) -> List[str]:
+        """Context-aware refine chips.
+
+        A chip is only useful if it NARROWS the current results toward something
+        the customer hasn't already got. So we skip:
+          * a category chip when every result is the same product family
+            (sub-categories collapse to one family — "Nur Briefkästen" is moot);
+          * an attribute already named in the query/conversation OR already
+            present in the shown products (don't restate what they already have);
+          * an attribute shared by (nearly) ALL results — it doesn't narrow;
+          * a price chip unless it genuinely splits the set (some above AND below).
+
+        `applied_text` carries the user's message + search phrase + prior turns +
+        the shown product names, so already-applied/already-shown facets drop out.
+        """
         if not retrieved_products:
             return []
+        total = len(retrieved_products)
+        applied = (applied_text or "").lower()
 
-        categories = []
+        cat_chip: Optional[str] = None
+        fam_counts: Dict[str, int] = {}
         for p in retrieved_products:
-            c = p.get("category")
-            if c and c not in categories:
-                categories.append(c)
+            fam = self._family_of(p.get("category"))
+            if fam:
+                fam_counts[fam] = fam_counts.get(fam, 0) + 1
+        if len(fam_counts) > 1:
+            # Offer to narrow to the dominant family (drops the off-topic rest).
+            cat_chip = f"Nur {max(fam_counts.items(), key=lambda kv: kv[1])[0]}"
 
-        prices = [p.get("price") for p in retrieved_products if isinstance(p.get("price"), (int, float))]
-
-        # Count, per retrieved product, which feature facets it has — using
-        # WORD-BOUNDARY matching (so "led" can't match inside another word) and
-        # requiring a facet to be shared by several products before it becomes a
-        # chip. This stops a one-off/optional mention from surfacing a misleading
-        # facet (e.g. "Mit LED" on a mailbox search).
+        # Count products (word-boundary) per attribute facet.
         hits: Dict[str, int] = {}
         for p in retrieved_products:
             text = f"{p.get('name','')} {p.get('description','')} {p.get('attributes','')}".lower()
@@ -216,33 +263,46 @@ class RAGService:
                 if label not in matched and re.search(rf"\b{re.escape(term.lower())}\b", text):
                     hits[label] = hits.get(label, 0) + 1
                     matched.add(label)
-        present: List[str] = []   # german chip labels, in keyword order, deduped
+        # Facets already named in the query OR the shown products → don't re-offer.
+        applied_labels = {
+            label for term, label in self.REFINE_KEYWORDS
+            if re.search(rf"\b{re.escape(term.lower())}\b", applied)
+        }
+        # A facet in >~75% of results characterises the set, it doesn't narrow it.
+        near_universal = max(self.MIN_FEATURE_HITS, int(0.75 * total))
+        attr_chips: List[str] = []
         for term, label in self.REFINE_KEYWORDS:
-            if label not in present and hits.get(label, 0) >= self.MIN_FEATURE_HITS:
-                present.append(label)
+            chip = f"Mit {label}"
+            if label in applied_labels or chip in attr_chips:
+                continue
+            cnt = hits.get(label, 0)
+            if self.MIN_FEATURE_HITS <= cnt <= near_universal and cnt < total:
+                attr_chips.append(chip)
 
-        suggestions: List[str] = []
-        if len(categories) > 1:
-            suggestions.append(f"Nur {categories[0]}")
-        for label in present[:2]:
-            suggestions.append(f"Mit {label}")
-        if len(prices) >= 3:
+        price_chip: Optional[str] = None
+        prices = [p.get("price") for p in retrieved_products if isinstance(p.get("price"), (int, float))]
+        already_priced = ("unter " in applied or "under " in applied or "€" in applied)
+        if len(prices) >= 4 and not already_priced:
             srt = sorted(prices)
             mid = srt[len(srt) // 2]
-            hi = srt[-1]
-            # Round to a friendly threshold based on the price band.
             if mid >= 100:
                 threshold = int(round(mid / 50.0) * 50)
             elif mid >= 20:
                 threshold = int(round(mid / 10.0) * 10)
             else:
                 threshold = int(round(mid / 5.0) * 5)
-            # Only offer a price chip when it's a meaningful filter: a sane
-            # minimum and genuinely below the most expensive item (so it narrows
-            # the set). This avoids degenerate chips like "Under €3".
-            if threshold >= 10 and threshold < hi:
-                suggestions.append(f"Unter {threshold} €")
+            below = sum(1 for p in prices if p < threshold)
+            above = sum(1 for p in prices if p >= threshold)
+            # Genuine split only: at least two products on EACH side.
+            if threshold >= 10 and below >= 2 and above >= 2:
+                price_chip = f"Unter {threshold} €"
 
+        suggestions: List[str] = []
+        if cat_chip:
+            suggestions.append(cat_chip)
+        suggestions.extend(attr_chips[:2])
+        if price_chip:
+            suggestions.append(price_chip)
         return suggestions[:4]
 
     def chat(self, message: str, history: Optional[List[Dict[str, Any]]] = None, is_refinement: bool = False, include_debug: bool = True, product_id: Optional[str] = None, category: Optional[str] = None) -> Dict[str, Any]:
@@ -505,11 +565,21 @@ class RAGService:
                 product_ids=[p["id"] for p in formatted_products],
             )
 
+            # What the customer has already expressed or been shown — so refine
+            # chips don't restate it (query + parsed search phrase + prior turns
+            # + the shown product names, which in this shop carry colour/gravur/
+            # zeitungsfach etc.).
+            applied_text = " ".join([
+                effective_message,
+                parsed.get("search_text") or "",
+                " ".join(prior_user),
+                " ".join(p.get("name", "") for p in formatted_products),
+            ])
             result = {
                 "answer": answer,
                 "products": formatted_products,
                 "follow_up_question": follow_up,
-                "refine_suggestions": self._build_refine_suggestions(retrieved_products),
+                "refine_suggestions": self._build_refine_suggestions(retrieved_products, applied_text),
             }
             if include_debug:
                 result["debug"] = debug
