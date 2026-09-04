@@ -315,6 +315,17 @@ class RAGService:
             understand_text = effective_message
             understand_context = prior_user
 
+            # Refine chip ("Mit Gravur", "Mit Anthrazit", "Unter 100 €"): a pure
+            # modifier on the CURRENT results that must never change the product
+            # type. Passing the prior turns only as background context is not
+            # reliable enough — the understanding model occasionally drops the
+            # category anyway (a bare "Mit Gravur" then drifts to engraved
+            # nameplates/package boxes). So fold the prior user turns INTO the
+            # query text, keeping the original product noun ("Briefkasten") in
+            # the message the model parses, which pins the category deterministically.
+            if is_refinement and prior_user:
+                understand_text = (" ".join(prior_user[-3:]) + " " + effective_message).strip()
+
             # LLM query understanding -> structured query (primary categories,
             # clean search phrase, price bounds). This replaces the old keyword
             # heuristics; the categories/price are applied as Qdrant filters.
