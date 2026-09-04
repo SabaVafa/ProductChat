@@ -52,6 +52,7 @@ def understand_query(
     categories: List[str],
     text: str,
     context: Optional[List[str]] = None,
+    is_refinement: bool = False,
 ) -> Dict[str, Any]:
     """Return {categories, search_text, price_min, price_max}.
 
@@ -60,6 +61,14 @@ def understand_query(
     mailbox" the shopper types "without gravur" or "cheaper". Such a fragment
     has no product type of its own, so the product type is inherited from the
     conversation; a message that names a new product type switches to it.
+
+    `is_refinement` marks a refine-chip tap (a pure modifier like "Mit Gravur").
+    Such a chip must NEVER change the product domain. When the LLM call fails
+    (e.g. a 429 on a burst), the plain-text fallback would search on the bare
+    modifier and drift to an unrelated category (e.g. "Mit Gravur" → engraved
+    nameplates). So for a refinement we fold the prior turns into the fallback
+    search text, keeping the original product noun (e.g. "Briefkasten") in the
+    query so semantic search stays on-domain even without the LLM.
     """
     fallback = {"categories": [], "search_text": text, "price_min": None, "price_max": None,
                 "gravur": None}
@@ -132,6 +141,11 @@ def understand_query(
         data = json.loads(content)
     except Exception as e:
         logger.warning(f"Query understanding failed, falling back to plain search: {e}")
+        # For a refine chip, keep the product domain in the fallback query so a
+        # bare modifier ("Mit Gravur") can't drift to an unrelated category.
+        if is_refinement and prior:
+            enriched = (" ".join(prior) + " " + text).strip()
+            return {**fallback, "search_text": enriched}
         return fallback
 
     valid = set(categories)

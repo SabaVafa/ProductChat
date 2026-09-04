@@ -322,7 +322,7 @@ class RAGService:
             uq_service = MistralService(api_key=mistral_settings.get("api_key"))
             parsed = understand_query(
                 uq_service, _catalog_categories(self.db), understand_text,
-                context=understand_context,
+                context=understand_context, is_refinement=is_refinement,
             )
 
             # "ohne Gravur" is answered from the shop's curated category
