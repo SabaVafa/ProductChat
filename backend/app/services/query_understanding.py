@@ -16,6 +16,8 @@ import re
 logger = logging.getLogger(__name__)
 
 # Small, fast, cheap model for parsing — not the answer-generation model.
+# Provider-aware: the actual id comes from `mistral.small_model` (Mistral small
+# or the Groq small model); this constant is only the Mistral fallback.
 UNDERSTANDING_MODEL = "mistral-small-latest"
 
 
@@ -125,7 +127,7 @@ def understand_query(
             temperature=0,
             max_tokens=300,
             response_format={"type": "json_object"},
-            model=UNDERSTANDING_MODEL,
+            model=getattr(mistral, "small_model", UNDERSTANDING_MODEL),
         )
         data = json.loads(content)
     except Exception as e:

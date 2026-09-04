@@ -1,9 +1,16 @@
-"""Mistral chat completions via the REST API.
+"""Chat completions via an OpenAI-compatible REST API.
 
 Uses `requests` directly instead of the `mistralai` SDK so the app runs on
 Python versions the pinned SDK (and its old `orjson` dependency) has no wheels
 for. `ChatMessage` is kept as a thin dict shim so existing call sites don't
 change.
+
+Despite the historical name, `MistralService` is provider-aware: with
+`settings.LLM_PROVIDER == "groq"` it talks to Groq's OpenAI-compatible endpoint
+(identical request/response shape, including `response_format: json_object`)
+using `GROQ_API_KEY` and the Groq model ids. Embeddings are NOT handled here and
+always stay on Mistral (see `EmbeddingsService`). This lets the chat tier move to
+Groq's free API while retrieval keeps using Mistral embeddings.
 """
 
 from typing import List, Dict, Any, Optional
@@ -56,15 +63,34 @@ def _sanitize(text, limit: int = 600) -> str:
 
 class MistralService:
     def __init__(self, api_key: Optional[str] = None):
-        self.api_key = api_key or settings.MISTRAL_API_KEY
-        self.model = settings.MISTRAL_MODEL
+        provider = (settings.LLM_PROVIDER or "mistral").strip().lower()
+        self.provider = provider
+        if provider == "groq":
+            self.api_base = settings.GROQ_API_BASE.rstrip("/")
+            # Callers pass the DB "mistral" key (that's the EMBEDDINGS key). Under
+            # Groq the chat key is GROQ_API_KEY only — never the passed one.
+            self.api_key = settings.GROQ_API_KEY
+            self.model = settings.GROQ_MODEL            # answer generation
+            self.small_model = settings.GROQ_SMALL_MODEL  # query understanding
+        else:
+            self.api_base = MISTRAL_API_BASE
+            self.api_key = api_key or settings.MISTRAL_API_KEY
+            self.model = settings.MISTRAL_MODEL
+            self.small_model = "mistral-small-latest"
         self.temperature = settings.MISTRAL_TEMPERATURE
         self.max_tokens = settings.MISTRAL_MAX_TOKENS
 
     def set_config(self, api_key: str, model: str, temperature: float, max_tokens: int):
-        """Update configuration."""
-        self.api_key = api_key
-        self.model = model
+        """Update configuration.
+
+        Under a non-Mistral provider the `api_key`/`model` here come from the DB
+        "mistral" settings (the embeddings key + a Mistral model name that does
+        not exist on the provider), so they are IGNORED — the provider's own key
+        and model from config stand. Only temperature/max_tokens are applied.
+        """
+        if self.provider == "mistral":
+            self.api_key = api_key
+            self.model = model
         self.temperature = temperature
         self.max_tokens = max_tokens
 
@@ -85,9 +111,16 @@ class MistralService:
         }
         if response_format is not None:
             payload["response_format"] = response_format
+        # Groq's gpt-oss are reasoning models — cap reasoning so it can't eat the
+        # token budget and truncate JSON-mode output (400 json_validate_failed).
+        # Provider-scoped: Mistral's API doesn't accept this param.
+        if self.provider == "groq":
+            effort = (settings.GROQ_REASONING_EFFORT or "").strip()
+            if effort:
+                payload["reasoning_effort"] = effort
 
         resp = requests.post(
-            f"{MISTRAL_API_BASE}/chat/completions",
+            f"{self.api_base}/chat/completions",
             headers={
                 "Authorization": f"Bearer {self.api_key}",
                 "Content-Type": "application/json",

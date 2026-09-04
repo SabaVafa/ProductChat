@@ -272,7 +272,12 @@ class SuggestionsService:
 
         try:
             mistral = MistralService(api_key=api_key)
-            mistral.model = model
+            # Under a non-Mistral provider the DB "mistral" model name won't exist
+            # on the provider — use the service's resolved (provider) model.
+            if getattr(mistral, "provider", "mistral") == "mistral":
+                mistral.model = model
+            else:
+                model = mistral.model
             content = mistral.chat_content(
                 messages=[
                     ChatMessage(role="system", content=system_prompt),
