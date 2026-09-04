@@ -5,8 +5,12 @@ Qdrant + SQLite, with the catalog and prebuilt vectors **baked into the image**.
 No Postgres/Qdrant/Redis, no persistent disk, no re-embedding on boot. Chat runs
 on **Groq** (free); embeddings run on **Mistral**.
 
+The seed (catalog DB + vectors, ~5 MB gzipped) is **not** in the repo — it ships
+as a GitHub **Release asset** and the Dockerfile fetches it at build time.
+
 Files: [`deploy/Dockerfile`](deploy/Dockerfile), [`render.yaml`](render.yaml),
-[`deploy/prepare_seed.py`](deploy/prepare_seed.py), [`.dockerignore`](.dockerignore).
+[`deploy/prepare_seed.py`](deploy/prepare_seed.py),
+[`deploy/fetch_seed.py`](deploy/fetch_seed.py), [`.dockerignore`](.dockerignore).
 
 ---
 
@@ -29,35 +33,44 @@ python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().d
 
 ## Step 1 — Build the seed (once, and after any catalog change)
 
-Run with the backend **stopped** so the files are quiescent:
+Run with the backend **stopped** so the files are quiescent, then pack the tarball:
 
 ```bash
 cd backend
 ../.venv/Scripts/python.exe ../deploy/prepare_seed.py
+cd ..
+tar --exclude='./qdrant_local/.lock' -czf deploy/seed.tar.gz -C deploy/seed .
 ```
 
-This writes `deploy/seed/productchat.db` (~1.6 MB) and `deploy/seed/qdrant_local/`
-(~17 MB), clearing the stored Mistral key so the deploy re-seeds it from env.
+`prepare_seed.py` writes `deploy/seed/` (DB with the stored Mistral key cleared →
+re-seeded from env on deploy). The tarball `deploy/seed.tar.gz` is ~5 MB, with
+`productchat.db` and `qdrant_local/` at its root. Both are gitignored.
 
-## Step 2 — Get the seed into the repo the host builds from
+## Step 2 — Publish the seed as a GitHub Release asset
 
-`deploy/seed/` matches the repo's `*.db` / `qdrant_local/` ignore rules, so it is
-**not** committed by accident. Force-add it for the deploy:
+The Dockerfile fetches the seed from a fixed URL. Create a release tagged
+**`demo-seed`** and upload `deploy/seed.tar.gz` as an asset named **`seed.tar.gz`**:
 
 ```bash
-git add -f deploy/seed
-git add deploy/Dockerfile render.yaml .dockerignore DEPLOY.md
-git commit -m "Add demo deploy: single-container image + baked seed data"
+# using the GitHub CLI (or do it in the web UI: Releases → Draft a new release)
+gh release create demo-seed deploy/seed.tar.gz -t "Demo seed" -n "Baked catalog + vectors for the demo image"
+```
+
+That yields the exact URL the Dockerfile defaults to:
+`https://github.com/SabaVafa/ProductChat/releases/download/demo-seed/seed.tar.gz`
+
+To refresh the catalog later, rebuild the tarball (Step 1) and
+`gh release upload demo-seed deploy/seed.tar.gz --clobber`, then redeploy.
+
+## Step 3 — Push the code
+
+```bash
 git push
 ```
 
-> Trade-off: this adds ~18 MB of binary data to the (public) Git history,
-> permanently. The data is public shop-catalog content, so there's no privacy
-> issue — only repo size. If you'd rather keep the repo lean, host the seed as a
-> GitHub **Release asset** and have the Dockerfile `curl` it at build time
-> instead (ask and I'll switch the Dockerfile to that).
+(The deploy config is already committed; the seed is NOT in the repo.)
 
-## Step 3 — Deploy on Render (free)
+## Step 4 — Deploy on Render (free)
 
 1. Push must be on GitHub (repo already is).
 2. Render → **New +** → **Blueprint** → connect this repo. Render reads
@@ -66,7 +79,7 @@ git push
 4. **Create** → first build + deploy takes a few minutes.
 5. Your URL: `https://productchat-demo.onrender.com` (Render shows the exact one).
 
-## Step 4 — Verify
+## Step 5 — Verify
 
 - Open `https://<your-url>/widget-demo` and run a query
   (e.g. *"briefkasten mit zeitungsfach unter 250 euro"*).

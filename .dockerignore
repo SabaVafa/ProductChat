@@ -12,7 +12,9 @@ backend/qdrant_local
 # Frontend is not needed — the backend serves the /widget-demo page itself.
 frontend
 **/node_modules
-# Docs / local-only files
+# Docs not needed in the image.
 *.md
-!deploy/**
+# The seed is fetched at build time from a Release asset, not copied in.
+deploy/seed
+deploy/*.tar.gz
 data/_example_products.json

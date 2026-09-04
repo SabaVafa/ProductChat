@@ -15,6 +15,10 @@ build/
 # Local vector store (embedded Qdrant)
 qdrant_local/
 
+# Deploy seed artifacts (shipped as a GitHub Release asset, never committed)
+deploy/seed/
+deploy/*.tar.gz
+
 # Application logs
 backend/logs/
 

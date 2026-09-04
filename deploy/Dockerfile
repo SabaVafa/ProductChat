@@ -22,12 +22,16 @@ COPY backend/requirements-local.txt .
 RUN pip install --no-cache-dir -r requirements-local.txt
 
 # Backend code (the live productchat.db / qdrant_local are excluded via
-# .dockerignore — the demo uses the baked seed below instead).
+# .dockerignore — the demo pulls its data from the seed asset below instead).
 COPY backend/ /app/
 
-# Baked catalog + prebuilt vectors -> /data (writable at runtime; Qdrant local
-# mode and SQLite both open their paths read-write).
-COPY deploy/seed/ /data/
+# Catalog + prebuilt vectors -> /data, fetched at build time from a GitHub
+# Release asset (keeps the ~5 MB seed out of the Git repo). Override SEED_URL as
+# a build arg if you publish the asset under a different tag/filename. The
+# release MUST exist before the first build, or this step fails.
+ARG SEED_URL="https://github.com/SabaVafa/ProductChat/releases/download/demo-seed/seed.tar.gz"
+COPY deploy/fetch_seed.py /tmp/fetch_seed.py
+RUN python /tmp/fetch_seed.py "$SEED_URL" /data && rm /tmp/fetch_seed.py
 
 # Point the app at the baked data and turn off every background job. These are
 # defaults; the host can still override any of them.
