@@ -3,6 +3,7 @@ from app.services.retrieval import RetrievalService, _apply_bestseller_tiebreak
 from app.services.settings_service import SettingsService
 from app.services.query_understanding import understand_query
 from app.models.product import Product
+from app.config import settings as app_settings
 from sqlalchemy.orm import Session
 from typing import Dict, Any, List, Optional
 import logging
@@ -363,6 +364,10 @@ class RAGService:
             num_retrieved = retrieval_settings.get("num_retrieved", 10)
             similarity_threshold = retrieval_settings.get("similarity_threshold", 0.0)
             enable_filters = retrieval_settings.get("enable_metadata_filters", False)
+            # Hybrid on if the env override OR the DB setting says so (settings
+            # round-trip as strings, so coerce rather than trust truthiness).
+            enable_hybrid = bool(app_settings.ENABLE_HYBRID_SEARCH) or \
+                str(retrieval_settings.get("enable_hybrid_search", False)).strip().lower() in ("true", "1", "yes", "on")
 
             # Get output settings
             output_settings = settings_dict.get("output", {})
@@ -441,6 +446,7 @@ class RAGService:
                 categories=categories_filter,
                 price_min=parsed["price_min"],
                 price_max=parsed["price_max"],
+                hybrid=enable_hybrid,
             )
 
             # Negation guard for OTHER "ohne X" / "without X" features (vector

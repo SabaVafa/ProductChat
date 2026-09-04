@@ -52,6 +52,12 @@ class Settings(BaseSettings):
     # "low" keeps reasoning to ~30 tokens (JSON fits, faster, fewer tokens vs the
     # free-tier TPM cap). Empty string omits the param (for non-reasoning models).
     GROQ_REASONING_EFFORT: str = "low"
+
+    # Hybrid dense+BM25 retrieval. Off by default. Setting this env var true
+    # force-enables it everywhere (handy on a baked/ephemeral deploy DB where the
+    # `enable_hybrid_search` DB setting wouldn't persist); either the env OR the
+    # DB setting turns it on. See services/bm25_index.py.
+    ENABLE_HYBRID_SEARCH: bool = False
     
     # Security
     SECRET_KEY: str = "your-secret-key-here-change-in-production"

@@ -26,7 +26,12 @@ def test_retrieval(
     """
     try:
         retrieval_service = RetrievalService(db)
-        api_key = SettingsService(db).get_category_settings("mistral").get("api_key")
+        settings_service = SettingsService(db)
+        api_key = settings_service.get_category_settings("mistral").get("api_key")
+        from app.config import settings as app_settings
+        retrieval_settings = settings_service.get_category_settings("retrieval")
+        enable_hybrid = bool(app_settings.ENABLE_HYBRID_SEARCH) or \
+            str(retrieval_settings.get("enable_hybrid_search", False)).strip().lower() in ("true", "1", "yes", "on")
         parsed = understand_query(
             MistralService(api_key=api_key), _catalog_categories(db), request.query
         )
@@ -38,6 +43,7 @@ def test_retrieval(
             categories=parsed["categories"] or None,
             price_min=parsed["price_min"],
             price_max=parsed["price_max"],
+            hybrid=enable_hybrid,
         )
         return RetrievalResponse(products=products, total=len(products))
     except Exception as e:

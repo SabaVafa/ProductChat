@@ -17,6 +17,10 @@ logger = logging.getLogger(__name__)
 # and adjacent results differ by ~0.005–0.02) so only genuine near-ties reorder.
 _TIER_WIDTH = 0.02
 
+# Max BM25-only products injected per query when hybrid search is on. Small, so a
+# few exact-term matches surface without flooding the candidate set.
+HYBRID_INJECT_MAX = 4
+
 
 def _bestseller_band(rank: Optional[int]) -> int:
     """Coarse popularity band (lower = more popular; 4 = unranked)."""
@@ -56,6 +60,7 @@ def _apply_bestseller_tiebreak(products: List[Dict[str, Any]]) -> List[Dict[str,
 
 class RetrievalService:
     def __init__(self, db: Optional[Session] = None):
+        self.db = db                      # kept for hybrid BM25 (catalog lookups)
         self.qdrant = QdrantService()
         self.embeddings = EmbeddingsService()
 
@@ -101,11 +106,18 @@ class RetrievalService:
         categories: Optional[List[str]] = None,
         price_min: Optional[float] = None,
         price_max: Optional[float] = None,
+        hybrid: bool = False,
     ) -> List[Dict[str, Any]]:
         """Retrieve products by semantic similarity, with structured filters
         (category / price) applied by the vector DB. If the filtered search
         returns too few results (e.g. the parsed category was off), fall back to
         an unfiltered semantic search so the user still gets useful matches.
+
+        When `hybrid` is set (the `enable_hybrid_search` setting), a lexical BM25
+        pass over the same category scope INJECTS any strong exact-term matches
+        the dense search missed (e.g. "Unterputz" mailboxes), fixing recall on
+        precise tokens. It only ADDS candidates — dense order/scores are kept —
+        so it can't regress the current semantic behaviour.
         """
         try:
             query_vector = self.embeddings.embed_text(query)
@@ -133,6 +145,9 @@ class RetrievalService:
                 )
                 products = self._format(results)
 
+            if hybrid:
+                products = self._inject_bm25(query, products, categories, price_min, price_max)
+
             # Relevance-gated bestseller tie-break: reorders only comparably
             # relevant results, so category/price routing above is preserved.
             return _apply_bestseller_tiebreak(products)
@@ -140,7 +155,70 @@ class RetrievalService:
         except Exception as e:
             logger.error(f"Retrieval error: {e}")
             return []
-    
+
+    def _inject_bm25(
+        self,
+        query: str,
+        dense_products: List[Dict[str, Any]],
+        categories: Optional[List[str]],
+        price_min: Optional[float],
+        price_max: Optional[float],
+    ) -> List[Dict[str, Any]]:
+        """Add strong BM25 exact-term matches the dense search missed.
+
+        Recall booster: only ADDS candidates the dense list lacks (kept within the
+        same category/price scope), scored as top-tier relevant since they are a
+        strong literal match for the query. Never removes or reorders dense hits;
+        any failure degrades silently to the dense-only result.
+        """
+        if self.db is None or not (query or "").strip():
+            return dense_products
+        try:
+            from app.services.bm25_index import get_bm25_index
+            from app.models.product import Product
+
+            idx = get_bm25_index(self.db)
+            allowed = set(categories) if categories else None
+            hits = idx.search(query, top_n=12, allowed_categories=allowed)
+            have = {p.get("product_id") for p in dense_products}
+            inject_ids = [pid for pid, _ in hits if pid not in have][:HYBRID_INJECT_MAX]
+            if not inject_ids:
+                return dense_products
+
+            rows = self.db.query(Product).filter(Product.product_id.in_(inject_ids)).all()
+            by_id = {r.product_id: r for r in rows}
+            # Score injected products BELOW the least-relevant dense hit, so they
+            # sit in a lower relevance tier: purely additive (appended after the
+            # dense results), never reordering the dense top-K or the bestseller
+            # lead. The LLM still sees them and can pick them for an exact-term ask.
+            if dense_products:
+                inj_score = max(0.01, min((p.get("score") or 0.0) for p in dense_products) - 0.05)
+            else:
+                inj_score = 0.5
+            extra: List[Dict[str, Any]] = []
+            for pid in inject_ids:              # preserve BM25 rank order
+                r = by_id.get(pid)
+                if r is None:
+                    continue
+                if price_min is not None and (r.price is None or r.price < price_min):
+                    continue
+                if price_max is not None and (r.price is None or r.price > price_max):
+                    continue
+                extra.append({
+                    "product_id": r.product_id, "name": r.name, "description": r.description,
+                    "category": r.category, "brand": r.brand, "price": r.price,
+                    "image_url": r.image_url, "product_url": r.product_url,
+                    "attributes": r.attributes, "bestseller_rank": r.bestseller_rank,
+                    "score": inj_score,
+                })
+            if extra:
+                logger.info("Hybrid BM25 injected %d exact-term match(es): %s",
+                            len(extra), [e["product_id"] for e in extra])
+            return dense_products + extra
+        except Exception as e:
+            logger.warning("Hybrid BM25 injection skipped (%s)", e)
+            return dense_products
+
     def retrieve_with_metadata_filters(
         self,
         query: str,
