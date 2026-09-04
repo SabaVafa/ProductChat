@@ -131,6 +131,40 @@ def _order_recommendations(
     return [it["_card"] for it in _apply_bestseller_tiebreak(picked)]
 
 
+# Shown when the LLM is unavailable (e.g. Mistral rate-limited) but retrieval —
+# which only needs the embeddings endpoint — still works.
+DEGRADED_ANSWER = ("Unser KI-Assistent ist gerade stark ausgelastet – hier sind schon "
+                   "einmal passende Produkte aus unserem Sortiment. Für eine "
+                   "ausführliche Beratung frag bitte gleich noch einmal.")
+
+
+def _degraded_cards(retrieved_products: List[Dict[str, Any]], limit: int = 4) -> List[Dict[str, Any]]:
+    """Build product cards straight from the retrieved set (no LLM selection).
+
+    Used as an insurance fallback: if answer generation fails, the shopper still
+    sees relevant products (retrieval already ran) instead of an error. Cards use
+    the same shape as _order_recommendations, minus the per-product reason.
+    """
+    cards: List[Dict[str, Any]] = []
+    for p in retrieved_products[:limit]:
+        attrs = p.get("attributes")
+        rank = p.get("bestseller_rank")
+        cards.append({
+            "id": p.get("product_id"),
+            "name": p.get("name"),
+            "price": p.get("price"),
+            "image": p.get("image_url"),
+            "url": p.get("product_url"),
+            "reason": "",
+            "score": p.get("score", 0.0),
+            "popular": rank is not None and rank <= 15,
+            "has_variants": isinstance(attrs, dict) and any(
+                isinstance(v, list) and len(v) > 1 for v in attrs.values()
+            ),
+        })
+    return cards
+
+
 class RAGService:
     def __init__(self, db: Session):
         self.db = db
@@ -423,10 +457,23 @@ class RAGService:
                 error=llm_debug.get("error"),
             )
 
-            # Format response for API
-            formatted_products = _order_recommendations(
-                response.get("recommendations", []), retrieved_products
-            )
+            # Insurance fallback: generation failed (e.g. Mistral chat models
+            # rate-limited) BUT retrieval succeeded (embeddings still work). Show
+            # the retrieved products with a short notice instead of an error — a
+            # degraded-but-useful result. A genuine "no products" answer (no error,
+            # LLM chose nothing) is left untouched.
+            if llm_debug.get("error") and retrieved_products:
+                formatted_products = _degraded_cards(retrieved_products, limit=4)
+                answer = DEGRADED_ANSWER
+                follow_up = ""
+                add_step("5_degraded_fallback", reason=llm_debug.get("error"),
+                         product_count=len(formatted_products))
+            else:
+                formatted_products = _order_recommendations(
+                    response.get("recommendations", []), retrieved_products
+                )
+                answer = response.get("answer", "")
+                follow_up = response.get("follow_up_question", "")
 
             add_step(
                 "5_final_products",
@@ -435,9 +482,9 @@ class RAGService:
             )
 
             result = {
-                "answer": response.get("answer", ""),
+                "answer": answer,
                 "products": formatted_products,
-                "follow_up_question": response.get("follow_up_question", ""),
+                "follow_up_question": follow_up,
                 "refine_suggestions": self._build_refine_suggestions(retrieved_products),
             }
             if include_debug:

@@ -120,6 +120,31 @@ def test_negation_filter_drops_all_excluded_rather_than_showing_them():
     assert _apply_negation_filter(prods, "ohne Gravur") == []
 
 
+from app.services.rag import _degraded_cards
+
+
+def test_degraded_cards_show_retrieved_products_without_llm():
+    # Insurance path: when the LLM is unavailable, cards come straight from the
+    # retrieved set (same shape as _order_recommendations, no reason).
+    retrieved = [
+        {"product_id": "A", "name": "Box A", "price": 10.0, "image_url": "i",
+         "product_url": "u", "score": 0.9, "bestseller_rank": 3,
+         "attributes": {"Farbe": ["Rot", "Blau"]}},
+        {"product_id": "B", "name": "Box B", "price": None, "image_url": None,
+         "product_url": None, "score": 0.5, "bestseller_rank": None, "attributes": None},
+    ]
+    cards = _degraded_cards(retrieved, limit=4)
+    assert [c["id"] for c in cards] == ["A", "B"]
+    assert cards[0]["popular"] is True and cards[0]["has_variants"] is True   # rank<=15, multi-option
+    assert cards[1]["popular"] is False and cards[1]["has_variants"] is False
+    assert all(c["reason"] == "" for c in cards)
+
+
+def test_degraded_cards_respects_limit():
+    retrieved = [{"product_id": str(i), "name": str(i), "score": 0.5} for i in range(10)]
+    assert len(_degraded_cards(retrieved, limit=4)) == 4
+
+
 def test_hallucinated_ids_are_dropped():
     out = _order_recommendations(
         [{"product_id": "GHOST", "reason": "r", "score": 0.5}], [_prod("A", 0.8, 2)]
