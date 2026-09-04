@@ -101,6 +101,12 @@ def start_scheduler():
     global _scheduler
     if _scheduler is not None:
         return
+    # Master switch: a hosted demo serving a baked/read-only catalog turns this
+    # off so no sync/reconcile/gravur/bestseller job runs (they hit the network
+    # and would mutate the shipped data).
+    if not settings.SCHEDULER_ENABLED:
+        logger.info("Scheduler disabled (SCHEDULER_ENABLED=false); no background jobs")
+        return
 
     _scheduler = BackgroundScheduler(daemon=True, timezone=_scheduler_tz())
     interval = max(1, settings.SYNC_INTERVAL_HOURS)

@@ -1,0 +1,18 @@
+# Keep the Docker build context small and reproducible.
+# The demo image bakes its data from deploy/seed/, NOT the live working copies.
+.git
+.github
+**/__pycache__
+**/*.pyc
+**/.venv
+backend/.venv
+backend/logs
+backend/productchat.db
+backend/qdrant_local
+# Frontend is not needed — the backend serves the /widget-demo page itself.
+frontend
+**/node_modules
+# Docs / local-only files
+*.md
+!deploy/**
+data/_example_products.json

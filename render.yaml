@@ -1,0 +1,45 @@
+# Render Blueprint for the ProductChat public demo (single Docker container).
+# In Render: New + -> Blueprint -> connect this repo. Render reads this file,
+# creates the service, then prompts for the four secret env vars below
+# (sync:false = "set in dashboard, not stored in git").
+#
+# Free plan: the service spins down after ~15 min idle; the first request after
+# that cold-starts in ~1 min. Fine for a shareable demo.
+services:
+  - type: web
+    name: productchat-demo
+    runtime: docker
+    dockerfilePath: ./deploy/Dockerfile
+    dockerContext: .
+    plan: free
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      # --- secrets: set these in the Render dashboard (never committed) ---
+      - key: GROQ_API_KEY        # chat (answers + understanding + suggestions)
+        sync: false
+      - key: MISTRAL_API_KEY     # embeddings / retrieval
+        sync: false
+      - key: ADMIN_TOKEN         # admin endpoints + debug trace
+        sync: false
+      - key: ENCRYPTION_KEY      # Fernet key; any value works (baked DB has no stored key)
+        sync: false
+      # --- non-secret config (baked defaults; listed for clarity/override) ---
+      - key: LLM_PROVIDER
+        value: groq
+      - key: DATABASE_URL
+        value: sqlite:////data/productchat.db
+      - key: QDRANT_URL
+        value: ""
+      - key: QDRANT_PATH
+        value: /data/qdrant_local
+      - key: SCHEDULER_ENABLED
+        value: "false"
+      - key: SCRAPE_ON_STARTUP
+        value: "false"
+      - key: BESTSELLER_CAPTURE_ENABLED
+        value: "false"
+      - key: ENVIRONMENT
+        value: production
+      - key: CORS_ORIGINS
+        value: "https://edelstahl-tuerklingel.de,https://www.edelstahl-tuerklingel.de"

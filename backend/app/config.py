@@ -75,6 +75,7 @@ class Settings(BaseSettings):
     REDIS_URL: str = "redis://localhost:6379/0"
 
     # Scraper / auto-sync scheduler
+    SCHEDULER_ENABLED: bool = True      # master switch for ALL background jobs
     SYNC_INTERVAL_HOURS: int = 6        # how often the catalog is re-synced
     SCRAPE_ON_STARTUP: bool = False     # run one sync ~30s after boot
     SCRAPE_MAX_PRODUCTS: int = 0        # 0 = unlimited (cap products per sync)
